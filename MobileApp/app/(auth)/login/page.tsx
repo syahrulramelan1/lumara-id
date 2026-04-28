@@ -87,6 +87,14 @@ export default function LoginPage() {
           </button>
         </form>
 
+        {isLogin && (
+          <div className="mt-3 text-center">
+            <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+              {t.auth.forgot_link}
+            </Link>
+          </div>
+        )}
+
         <div className="mt-4 text-center text-sm text-muted-foreground">
           {isLogin ? t.auth.no_account : t.auth.have_account}{" "}
           <button
