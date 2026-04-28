@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, ShoppingBag, Heart, Menu, X, Globe, Sun, Moon, Home, Grid3X3, Tag, User, Package } from "lucide-react";
+import { Search, ShoppingBag, Heart, Menu, X, Globe, Sun, Moon, Home, Grid3X3, Tag, User, Package, LayoutDashboard } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
@@ -208,6 +208,17 @@ export function Navbar() {
           >
             {t.nav.login}
           </Link>
+
+          {/* Admin Panel cross-redirect */}
+          <a
+            href={process.env.NEXT_PUBLIC_ADMIN_URL || "https://lumara-id-admin.onrender.com"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-[12px] text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          >
+            <LayoutDashboard size={16} />
+            Admin Panel
+          </a>
         </div>
       </div>
     </>
