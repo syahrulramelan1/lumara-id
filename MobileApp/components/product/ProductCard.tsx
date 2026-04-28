@@ -6,13 +6,15 @@ import { motion } from "framer-motion";
 import { formatPrice } from "@/lib/utils";
 import { useWishlistStore } from "@/store/wishlistStore";
 import type { ProductWithCategory } from "@/types";
+import { EASE_OUT_EXPO } from "@/components/motion/variants";
 
 interface ProductCardProps {
   product: ProductWithCategory;
   priority?: boolean;
+  index?: number;
 }
 
-export function ProductCard({ product, priority = false }: ProductCardProps) {
+export function ProductCard({ product, priority = false, index = 0 }: ProductCardProps) {
   const { toggle, isWishlisted } = useWishlistStore();
   const images: string[] = Array.isArray(product.images)
     ? (product.images as string[])
@@ -23,11 +25,17 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : null;
 
+  // Cap stagger delay so items far down the list don't wait too long
+  const delay = Math.min(index * 0.05, 0.3);
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="group relative bg-card rounded-[14px] overflow-hidden border border-card-border shadow-card hover:shadow-card-hover transition-shadow duration-300"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.45, ease: EASE_OUT_EXPO, delay }}
+      whileTap={{ scale: 0.97 }}
+      className="group relative bg-card rounded-card overflow-hidden border border-card-border shadow-card hover:shadow-card-hover transition-shadow duration-300"
     >
       <Link href={`/products/${product.slug}`}>
         <div className="relative aspect-[3/4] overflow-hidden bg-muted">
@@ -52,16 +60,20 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
         </div>
       </Link>
 
-      <button
+      {/* Wishlist heart — spring bounce when toggled */}
+      <motion.button
         onClick={() => toggle(product.id)}
-        className="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-colors"
+        whileTap={{ scale: 0.75 }}
+        animate={wishlisted ? { scale: [1, 1.35, 1] } : { scale: 1 }}
+        transition={{ duration: 0.3 }}
+        className="absolute top-2 right-2 p-2 bg-white/85 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-colors"
         aria-label={wishlisted ? "Hapus dari wishlist" : "Tambah ke wishlist"}
       >
         <Heart
           size={16}
           className={wishlisted ? "fill-red-500 text-red-500" : "text-muted-foreground"}
         />
-      </button>
+      </motion.button>
 
       <div className="p-3">
         <p className="text-xs text-muted-foreground mb-0.5">{product.category.name}</p>

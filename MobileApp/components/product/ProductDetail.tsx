@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ShoppingBag, Heart, Star, ChevronLeft } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/utils";
@@ -69,18 +69,30 @@ export function ProductDetail({ product }: ProductDetailProps) {
         {/* Images */}
         <div className="space-y-3">
           <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-muted">
-            {images[activeImage] && (
-              <Image
-                src={images[activeImage]}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            )}
+            {/* Crossfade between images using AnimatePresence */}
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={activeImage}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="absolute inset-0"
+              >
+                {images[activeImage] && (
+                  <Image
+                    src={images[activeImage]}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                    priority
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                )}
+              </motion.div>
+            </AnimatePresence>
             {discount && (
-              <span className="absolute top-3 left-3 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+              <span className="absolute top-3 left-3 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full z-10">
                 -{discount}%
               </span>
             )}
@@ -180,21 +192,26 @@ export function ProductDetail({ product }: ProductDetailProps) {
           </div>
 
           <div className="flex gap-3">
-            <button
+            <motion.button
               onClick={handleAddToCart}
-              className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-primary text-white font-semibold rounded-[12px] hover:bg-primary/90 transition-colors active:scale-95"
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-primary text-white font-semibold rounded-[12px] hover:bg-primary/90 transition-colors"
             >
               <ShoppingBag size={18} />
               {t.product.add_to_cart}
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               onClick={() => toggle(product.id)}
+              whileTap={{ scale: 0.8 }}
+              animate={wishlisted ? { scale: [1, 1.3, 1] } : { scale: 1 }}
+              transition={{ duration: 0.3 }}
               className={`p-3.5 rounded-[12px] border-2 transition-colors ${
                 wishlisted ? "border-red-500 bg-red-50 text-red-500 dark:bg-red-950" : "border-border hover:border-primary"
               }`}
             >
               <Heart size={20} className={wishlisted ? "fill-red-500" : ""} />
-            </button>
+            </motion.button>
           </div>
 
           <div className="border-t border-border pt-4">
