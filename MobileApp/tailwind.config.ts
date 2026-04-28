@@ -57,6 +57,9 @@ const config: Config = {
           muted: "var(--text-muted)",
         },
 
+        // Dark footer
+        dark: "#111111",
+
         // States
         outline: "var(--outline)",
         success: "var(--success)",
@@ -118,6 +121,8 @@ const config: Config = {
 
       // ━━━━━━ BOX SHADOW ━━━━━━
       boxShadow: {
+        card: "0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04)",
+        "card-hover": "0 6px 20px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06)",
         violet: "0 8px 32px -4px rgba(99, 14, 212, 0.16)",
         "violet-sm": "0 4px 16px -2px rgba(99, 14, 212, 0.08)",
         "violet-lg": "0 16px 48px -8px rgba(99, 14, 212, 0.24)",

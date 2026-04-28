@@ -12,32 +12,32 @@
     /* ━━━━━━ BRAND COLORS ━━━━━━ */
     --primary: #630ED4;
     --primary-hover: #7C3AED;
-    --primary-container: #EDE0FF;
+    --primary-container: #F3EEFF;
     --primary-foreground: #FFFFFF;
 
     --secondary: #824790;
-    --secondary-container: #F3AEFF;
+    --secondary-container: #FCF0FF;
     --secondary-foreground: #FFFFFF;
 
-    /* ━━━━━━ SURFACES ━━━━━━ */
-    --background: #F9F9FF;
-    --surface-low: #F0F3FF;
-    --surface: #E7EEFE;
-    --surface-high: #E2E8F8;
+    /* ━━━━━━ SURFACES — PURE WHITE ━━━━━━ */
+    --background: #FFFFFF;
+    --surface-low: #F7F7F8;
+    --surface: #F0F0F2;
+    --surface-high: #E8E8EA;
 
     --card: #FFFFFF;
-    --card-border: #EDE9FE;
+    --card-border: #EBEBED;
 
     /* ━━━━━━ TEXT ━━━━━━ */
-    --text-primary: #151C27;
-    --text-secondary: #4A4455;
-    --text-muted: #7B7487;
+    --text-primary: #111111;
+    --text-secondary: #444444;
+    --text-muted: #888888;
 
     /* ━━━━━━ STATES ━━━━━━ */
-    --outline: #CCC3D8;
-    --success: #4CAF7D;
-    --error: #BA1A1A;
-    --rating: #F0B429;
+    --outline: #D4D4D8;
+    --success: #16A34A;
+    --error: #DC2626;
+    --rating: #F59E0B;
 
     /* ━━━━━━ SHADCN COMPATIBILITY ━━━━━━ */
     --foreground: var(--text-primary);
@@ -55,9 +55,9 @@
     --ring: var(--primary);
 
     /* ━━━━━━ RADIUS ━━━━━━ */
-    --radius: 0.875rem;       /* 14px - card */
-    --radius-btn: 0.75rem;    /* 12px - button */
-    --radius-pill: 9999px;    /* pill - chip */
+    --radius: 0.875rem;
+    --radius-btn: 0.75rem;
+    --radius-pill: 9999px;
   }
 
   .dark {
