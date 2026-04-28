@@ -18,7 +18,7 @@ export default function AccountPage() {
         </div>
         <p className="text-muted-foreground text-sm">{t.pages.account.login_prompt}</p>
         <Link
-          href="/auth/login"
+          href="/login"
           className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-[12px] hover:bg-primary/90 transition-colors"
         >
           <LogIn size={16} />

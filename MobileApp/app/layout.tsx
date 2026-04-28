@@ -56,7 +56,6 @@ export const metadata: Metadata = {
     title: "lumara.id — Modest Fashion Premium",
     description: "Tampil Anggun, Tetap Syar'i",
   },
-  manifest: "/manifest.json",
 };
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

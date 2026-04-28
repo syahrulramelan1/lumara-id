@@ -72,6 +72,13 @@ const translations = {
         login_now: "Masuk Sekarang",
         my_orders: "Pesanan Saya",
       },
+      orders: {
+        title: "Pesanan Saya",
+        empty: "Belum ada pesanan",
+        empty_sub: "Pesananmu akan muncul di sini setelah kamu berbelanja",
+        login_required: "Masuk untuk melihat riwayat pesananmu",
+        login_now: "Masuk Sekarang",
+      },
     },
     product: {
       add_to_cart: "Tambah ke Keranjang",
@@ -236,6 +243,13 @@ const translations = {
         login_prompt: "Sign in to view your profile and order history",
         login_now: "Sign In Now",
         my_orders: "My Orders",
+      },
+      orders: {
+        title: "My Orders",
+        empty: "No orders yet",
+        empty_sub: "Your orders will appear here after you make a purchase",
+        login_required: "Sign in to view your order history",
+        login_now: "Sign In Now",
       },
     },
     product: {
