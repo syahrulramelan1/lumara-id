@@ -13,51 +13,62 @@ const CategoryTable = ({ categories }: { categories: ApiCategory[] }) => {
   });
 
   return (
-    <table className="mt-6 w-full whitespace-nowrap text-left max-lg:block max-lg:overflow-x-scroll">
-      <thead className="border-b dark:border-white/10 border-gray-200 text-sm dark:text-whiteSecondary text-blackPrimary">
-        <tr>
-          <th className="py-2 pl-4 pr-8 font-semibold sm:pl-6 lg:pl-8">Kategori</th>
-          <th className="py-2 pl-0 pr-8 font-semibold">Slug</th>
-          <th className="py-2 pl-0 pr-8 font-semibold">Jumlah Produk</th>
-          <th className="py-2 pl-0 pr-4 text-right font-semibold sm:pr-6 lg:pr-8">Aksi</th>
-        </tr>
-      </thead>
-      <tbody className="divide-y dark:divide-white/5 divide-gray-100">
-        {categories.map((cat) => (
-          <tr key={cat.id}>
-            <td className="py-4 pl-4 pr-8 sm:pl-6 lg:pl-8">
-              <div className="flex items-center gap-x-4">
-                {cat.image ? (
-                  <img src={cat.image} alt="" className="h-10 w-10 rounded object-cover" />
-                ) : (
-                  <div className="h-10 w-10 rounded dark:bg-gray-700 bg-gray-200" />
-                )}
-                <span className="text-sm font-medium dark:text-whiteSecondary text-blackPrimary">{cat.name}</span>
-              </div>
-            </td>
-            <td className="py-4 pl-0 pr-8 text-sm font-mono dark:text-whiteSecondary text-blackPrimary">{cat.slug}</td>
-            <td className="py-4 pl-0 pr-8 text-sm dark:text-whiteSecondary text-blackPrimary">{cat._count?.products ?? 0}</td>
-            <td className="py-4 pl-0 pr-4 text-right sm:pr-6 lg:pr-8">
-              <div className="flex gap-x-1 justify-end">
-                <Link to={`/categories/${cat.id}`}
-                  className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border dark:border-gray-600 border-gray-300 w-8 h-8 flex justify-center items-center hover:border-gray-400 transition-colors">
-                  <HiOutlinePencil className="text-lg" />
-                </Link>
-                <a href={`${import.meta.env.VITE_STORE_URL || ""}/categories/${cat.slug}`} target="_blank" rel="noopener noreferrer"
-                  className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border dark:border-gray-600 border-gray-300 w-8 h-8 flex justify-center items-center hover:border-gray-400 transition-colors">
-                  <HiOutlineEye className="text-lg" />
-                </a>
-                <button onClick={() => { if (window.confirm(`Hapus kategori "${cat.name}"?`)) deleteMutation.mutate(cat.id); }}
-                  disabled={deleteMutation.isPending}
-                  className="dark:bg-blackPrimary bg-whiteSecondary dark:text-rose-400 text-rose-500 border dark:border-gray-600 border-gray-300 w-8 h-8 flex justify-center items-center hover:border-rose-400 transition-colors disabled:opacity-50">
-                  <HiOutlineTrash className="text-lg" />
-                </button>
-              </div>
-            </td>
+    <div className="overflow-x-auto">
+      <table className="tbl">
+        <thead>
+          <tr>
+            <th>Kategori</th>
+            <th>Slug</th>
+            <th>Jumlah Produk</th>
+            <th className="text-right pr-4">Aksi</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {categories.map((cat) => (
+            <tr key={cat.id}>
+              <td>
+                <div className="flex items-center gap-3">
+                  {cat.image ? (
+                    <img src={cat.image} alt="" className="h-10 w-10 rounded-lg object-cover bg-[var(--bg-3)] flex-shrink-0" />
+                  ) : (
+                    <div className="h-10 w-10 rounded-lg bg-[var(--bg-3)] flex-shrink-0" />
+                  )}
+                  <span className="text-sm font-medium text-[var(--text)]">{cat.name}</span>
+                </div>
+              </td>
+              <td className="font-mono text-xs text-[var(--text-muted)]">{cat.slug}</td>
+              <td>
+                <span className="badge badge-purple">{cat._count?.products ?? 0} produk</span>
+              </td>
+              <td>
+                <div className="flex items-center justify-end gap-1.5 pr-4">
+                  <Link to={`/categories/${cat.id}`} className="btn-icon" title="Edit">
+                    <HiOutlinePencil />
+                  </Link>
+                  <a
+                    href={`${import.meta.env.VITE_STORE_URL || ""}/categories/${cat.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-icon"
+                    title="Lihat"
+                  >
+                    <HiOutlineEye />
+                  </a>
+                  <button
+                    onClick={() => { if (window.confirm(`Hapus kategori "${cat.name}"?`)) deleteMutation.mutate(cat.id); }}
+                    disabled={deleteMutation.isPending}
+                    className="btn-icon btn-icon-danger disabled:opacity-40"
+                    title="Hapus"
+                  >
+                    <HiOutlineTrash />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 export default CategoryTable;
