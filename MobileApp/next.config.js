@@ -2,6 +2,14 @@
 const nextConfig = {
   reactStrictMode: true,
   output: process.env.NODE_ENV === "production" ? "standalone" : undefined,
+  async rewrites() {
+    return [
+      {
+        source: "/manifest.json",
+        destination: "/manifest.webmanifest",
+      },
+    ];
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
