@@ -1,0 +1,181 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* LUMARA.ID DESIGN SYSTEM TOKENS                  */
+/* Modest Luxury — Premium Fashion Indonesia       */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+@layer base {
+  :root {
+    /* ━━━━━━ BRAND COLORS ━━━━━━ */
+    --primary: #630ED4;
+    --primary-hover: #7C3AED;
+    --primary-container: #EDE0FF;
+    --primary-foreground: #FFFFFF;
+
+    --secondary: #824790;
+    --secondary-container: #F3AEFF;
+    --secondary-foreground: #FFFFFF;
+
+    /* ━━━━━━ SURFACES ━━━━━━ */
+    --background: #F9F9FF;
+    --surface-low: #F0F3FF;
+    --surface: #E7EEFE;
+    --surface-high: #E2E8F8;
+
+    --card: #FFFFFF;
+    --card-border: #EDE9FE;
+
+    /* ━━━━━━ TEXT ━━━━━━ */
+    --text-primary: #151C27;
+    --text-secondary: #4A4455;
+    --text-muted: #7B7487;
+
+    /* ━━━━━━ STATES ━━━━━━ */
+    --outline: #CCC3D8;
+    --success: #4CAF7D;
+    --error: #BA1A1A;
+    --rating: #F0B429;
+
+    /* ━━━━━━ SHADCN COMPATIBILITY ━━━━━━ */
+    --foreground: var(--text-primary);
+    --card-foreground: var(--text-primary);
+    --popover: var(--card);
+    --popover-foreground: var(--text-primary);
+    --muted: var(--surface-low);
+    --muted-foreground: var(--text-muted);
+    --accent: var(--primary-container);
+    --accent-foreground: var(--primary);
+    --destructive: var(--error);
+    --destructive-foreground: #FFFFFF;
+    --border: var(--card-border);
+    --input: var(--outline);
+    --ring: var(--primary);
+
+    /* ━━━━━━ RADIUS ━━━━━━ */
+    --radius: 0.875rem;       /* 14px - card */
+    --radius-btn: 0.75rem;    /* 12px - button */
+    --radius-pill: 9999px;    /* pill - chip */
+  }
+
+  .dark {
+    /* ━━━━━━ BRAND COLORS (DARK) ━━━━━━ */
+    --primary: #7C3AED;
+    --primary-hover: #9D6FF5;
+    --primary-container: #3B2F6B;
+    --primary-foreground: #FFFFFF;
+
+    --secondary: #B17CC0;
+    --secondary-container: #4A2B57;
+    --secondary-foreground: #FFFFFF;
+
+    /* ━━━━━━ SURFACES (DARK) ━━━━━━ */
+    --background: #0F0A1E;
+    --surface-low: #1A1330;
+    --surface: #221A3A;
+    --surface-high: #2D2148;
+
+    --card: #221A3A;
+    --card-border: #3B2F6B;
+
+    /* ━━━━━━ TEXT (DARK) ━━━━━━ */
+    --text-primary: #EBF1FF;
+    --text-secondary: #C5B8E0;
+    --text-muted: #9D95B0;
+
+    /* ━━━━━━ STATES (DARK) ━━━━━━ */
+    --outline: #4A3A6B;
+    --success: #66D49B;
+    --error: #FF6B6B;
+    --rating: #F0B429;
+
+    /* ━━━━━━ SHADCN COMPATIBILITY (DARK) ━━━━━━ */
+    --foreground: var(--text-primary);
+    --card-foreground: var(--text-primary);
+    --popover: var(--card);
+    --popover-foreground: var(--text-primary);
+    --muted: var(--surface-low);
+    --muted-foreground: var(--text-muted);
+    --accent: var(--primary-container);
+    --accent-foreground: var(--primary);
+    --destructive: var(--error);
+    --destructive-foreground: #FFFFFF;
+    --border: var(--card-border);
+    --input: var(--outline);
+    --ring: var(--primary);
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* BASE STYLES                                     */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--text-primary);
+    font-family: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  /* Selection color */
+  ::selection {
+    background-color: var(--primary-container);
+    color: var(--primary);
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* UTILITIES                                       */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+@layer utilities {
+  /* Hide scrollbar */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Safe area for mobile (iOS notch) */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* Glassmorphism effect */
+  .glass {
+    background-color: color-mix(in srgb, var(--card) 80%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Ambient violet shadow */
+  .shadow-violet {
+    box-shadow: 0 8px 32px -4px color-mix(in srgb, var(--primary) 16%, transparent);
+  }
+
+  /* Text balance */
+  .text-balance {
+    text-wrap: balance;
+  }
+}

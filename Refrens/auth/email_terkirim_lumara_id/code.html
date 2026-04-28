@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Email Terkirim - Lumara ID</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#d2bbff",
+                        "surface-container-low": "#f0f3ff",
+                        "on-secondary-container": "#753b83",
+                        "surface": "#f9f9ff",
+                        "surface-dim": "#d3daea",
+                        "tertiary-container": "#674a00",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed": "#fcd7ff",
+                        "surface-bright": "#f9f9ff",
+                        "on-secondary-fixed-variant": "#682f76",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#eaddff",
+                        "surface-variant": "#dce3f2",
+                        "on-surface": "#151c27",
+                        "on-background": "#151c27",
+                        "tertiary": "#4a3400",
+                        "on-surface-variant": "#4a4455",
+                        "surface-container-highest": "#dce3f2",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#ebf1ff",
+                        "secondary": "#824790",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#e2e8f8",
+                        "tertiary-fixed": "#ffdea4",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#261900",
+                        "on-primary-fixed": "#25005a",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#f3b72c",
+                        "outline": "#7b7487",
+                        "primary": "#4800a0",
+                        "on-primary-container": "#cdb4ff",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2a313c",
+                        "secondary-fixed-dim": "#f3aeff",
+                        "outline-variant": "#ccc3d8",
+                        "tertiary-fixed-dim": "#fabd32",
+                        "on-secondary-fixed": "#340042",
+                        "inverse-primary": "#d2bbff",
+                        "surface-container": "#e7eefe",
+                        "background": "#f9f9ff",
+                        "primary-container": "#630ed4",
+                        "secondary-container": "#f3aeff",
+                        "on-tertiary-fixed-variant": "#5d4200",
+                        "surface-tint": "#732ee4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "gutter": "24px",
+                        "xl": "64px",
+                        "lg": "40px",
+                        "sm": "16px",
+                        "margin": "32px",
+                        "xs": "8px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "label-lg": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1.2", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-lg": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 h-16 bg-[#F9F9FF] dark:bg-slate-950 font-['Plus_Jakarta_SANS'] font-medium tracking-tight border-b border-[#EDE9FE] dark:border-slate-800 shadow-[0_4px_12px_rgba(99,14,212,0.08)] dark:shadow-none">
+<button class="flex items-center justify-center p-2 text-[#630ED4] dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors rounded-full active:opacity-70 active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="text-xl font-bold text-[#630ED4] dark:text-violet-300 tracking-widest uppercase">lumara-id</h1>
+<button class="flex items-center justify-center px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors rounded-full active:opacity-70 active:scale-95 duration-200">
+<span class="font-label-lg text-label-lg">Help</span>
+</button>
+</header>
+<!-- Main Content -->
+<main class="flex-grow flex flex-col items-center justify-center px-margin pt-24 pb-12 w-full max-w-md mx-auto">
+<div class="flex flex-col items-center text-center w-full space-y-md">
+<!-- Success Icon -->
+<div class="w-24 h-24 rounded-full bg-[#DCF5E7] flex items-center justify-center mb-sm shadow-[0_4px_12px_rgba(99,14,212,0.12)]">
+<span class="material-symbols-outlined text-[48px] text-[#4CAF7D]" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<!-- Typography Content -->
+<div class="space-y-sm w-full">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Email Terkirim!</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[280px] mx-auto">
+                    Link reset password telah dikirim ke <strong class="text-on-surface font-semibold">amara.putri@gmail.com</strong>. Cek inbox atau folder spam kamu.
+                </p>
+</div>
+<!-- Actions Container -->
+<div class="w-full mt-lg space-y-md">
+<!-- Primary Action -->
+<button class="w-full h-14 bg-primary-container text-on-primary rounded-xl font-label-lg text-label-lg flex items-center justify-center hover:bg-[#7C3AED] transition-colors shadow-[0_4px_12px_rgba(99,14,212,0.12)]">
+                    Kembali ke Halaman Masuk
+                </button>
+<!-- Resend State -->
+<div class="flex flex-col items-center space-y-xs pt-sm">
+<p class="font-body-md text-body-md text-on-surface-variant flex gap-1">
+                        Tidak menerima email? 
+                        <a class="text-primary-container font-semibold hover:underline" href="#">Kirim Ulang</a>
+</p>
+<p class="font-label-sm text-label-sm text-outline">
+                        Kirim ulang tersedia dalam 00:45
+                    </p>
+</div>
+</div>
+</div>
+</main>
+</body></html>

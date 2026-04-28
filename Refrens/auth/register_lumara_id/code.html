@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lumara-id - Register</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#d2bbff",
+                        "surface-container-low": "#f0f3ff",
+                        "on-secondary-container": "#753b83",
+                        "surface": "#f9f9ff",
+                        "surface-dim": "#d3daea",
+                        "tertiary-container": "#674a00",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed": "#fcd7ff",
+                        "surface-bright": "#f9f9ff",
+                        "on-secondary-fixed-variant": "#682f76",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#eaddff",
+                        "surface-variant": "#dce3f2",
+                        "on-surface": "#151c27",
+                        "on-background": "#151c27",
+                        "tertiary": "#4a3400",
+                        "on-surface-variant": "#4a4455",
+                        "surface-container-highest": "#dce3f2",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#ebf1ff",
+                        "secondary": "#824790",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#e2e8f8",
+                        "tertiary-fixed": "#ffdea4",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#261900",
+                        "on-primary-fixed": "#25005a",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#f3b72c",
+                        "outline": "#7b7487",
+                        "primary": "#4800a0",
+                        "on-primary-container": "#cdb4ff",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2a313c",
+                        "secondary-fixed-dim": "#f3aeff",
+                        "outline-variant": "#ccc3d8",
+                        "tertiary-fixed-dim": "#fabd32",
+                        "on-secondary-fixed": "#340042",
+                        "inverse-primary": "#d2bbff",
+                        "surface-container": "#e7eefe",
+                        "background": "#f9f9ff",
+                        "primary-container": "#630ed4",
+                        "secondary-container": "#f3aeff",
+                        "on-tertiary-fixed-variant": "#5d4200",
+                        "surface-tint": "#732ee4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "gutter": "24px",
+                        "xl": "64px",
+                        "lg": "40px",
+                        "sm": "16px",
+                        "margin": "32px",
+                        "xs": "8px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "label-lg": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1.2", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-lg": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased flex flex-col min-h-screen">
+<!-- Top AppBar (Suppressed normal nav for transactional flow, but keeping brand header) -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 h-16 bg-[#F9F9FF] border-b border-[#EDE9FE] shadow-[0_4px_12px_rgba(99,14,212,0.08)]">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-violet-50 transition-colors text-[#630ED4]">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-xl font-bold text-[#630ED4] tracking-widest uppercase">lumara-id</h1>
+<button class="text-[#630ED4] font-label-lg px-2 py-1 rounded-md hover:bg-violet-50 transition-colors">Help</button>
+</header>
+<main class="flex-grow pt-16 flex flex-col px-4 pb-8 md:max-w-md md:mx-auto md:w-full">
+<!-- Brand Area -->
+<div class="mt-8 mb-8 text-center flex flex-col items-center">
+<div class="w-16 h-16 bg-primary-container rounded-full flex items-center justify-center mb-4 shadow-[0_4px_12px_rgba(99,14,212,0.12)]">
+<span class="material-symbols-outlined text-on-primary text-3xl">shopping_bag</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Bergabung Bersama Kami</h2>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1 justify-center">
+<span class="material-symbols-outlined text-primary-container text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                10.000+ pelanggan puas
+            </p>
+</div>
+<!-- Form Area -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(99,14,212,0.08)] border border-[#EDE9FE] p-6 mb-6">
+<div class="mb-6">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Buat Akun Baru</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Daftar dan nikmati belanja premium.</p>
+</div>
+<button class="w-full flex items-center justify-center gap-2 bg-surface-container-low border border-outline-variant rounded-lg py-3 px-4 mb-6 hover:bg-surface-variant transition-colors shadow-[0_2px_8px_rgba(99,14,212,0.04)]">
+<img alt="Google Logo" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2fvozk1JMS_uVXVNxZvCtItQiaZz2QFMXYKq5JHppyYc0zjNs22QVi2w_1rft0HCE89INa0hrJF3U-VyWd3KnoGZKeQ1dgSVN_-2yuefT9CVMc-YKfOFVTvcSxmRmhl4B7zlqrDKseb8kpWZiWBdhJwai0nopXhX0W1J-uCbOTPBJo1ZyGKsgdoOr3OooJwMH0t83DUTLhjspHPj_g5RbEYVGG5hMf9YYLoMcMh0NEMSJnLbSxd96DR-1aFE9B1HFI9wMs2w9IR8"/>
+<span class="font-label-lg text-label-lg text-on-surface">Daftar dengan Google</span>
+</button>
+<div class="flex items-center gap-4 mb-6">
+<hr class="flex-grow border-outline-variant"/>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">atau dengan email</span>
+<hr class="flex-grow border-outline-variant"/>
+</div>
+<form class="flex flex-col gap-4">
+<!-- Nama Lengkap -->
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Nama Lengkap</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg py-3 px-4 pl-10 pr-10 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" type="text" value="Amara Putri"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">person</span>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#4CAF50]">check_circle</span>
+</div>
+</div>
+<!-- Email -->
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Email</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg py-3 px-4 pl-10 pr-10 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" type="email" value="amara.putri@gmail.com"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">mail</span>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#4CAF50]">check_circle</span>
+</div>
+</div>
+<!-- Nomor HP -->
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Nomor HP</label>
+<div class="flex">
+<span class="bg-surface-variant border border-outline-variant border-r-0 rounded-l-lg py-3 px-4 font-body-md text-body-md text-on-surface-variant flex items-center justify-center">+62</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-r-lg py-3 px-4 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" type="tel" value="812-3456-7890"/>
+</div>
+</div>
+<!-- Password -->
+<div class="flex flex-col gap-1 mt-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Password</label>
+<div class="relative mb-2">
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg py-3 px-4 pl-10 pr-10 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" placeholder="Minimal 8 karakter" type="password" value="Password123!"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">lock</span>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface" type="button">
+<span class="material-symbols-outlined">visibility_off</span>
+</button>
+</div>
+<!-- Password Strength -->
+<div class="flex items-center gap-2">
+<div class="flex gap-1 flex-grow h-1.5">
+<div class="w-1/3 bg-error rounded-full"></div>
+<div class="w-1/3 bg-[#FFC107] rounded-full"></div>
+<div class="w-1/3 bg-primary-container rounded-full"></div>
+</div>
+<span class="font-label-sm text-label-sm text-primary-container">Kuat</span>
+</div>
+</div>
+<!-- Konfirmasi Password (Mismatch Error) -->
+<div class="flex flex-col gap-1 mt-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Konfirmasi Password</label>
+<div class="relative">
+<input class="w-full bg-[#FFF8F8] border-2 border-error rounded-lg py-3 px-4 pl-10 pr-10 font-body-md text-body-md text-on-surface focus:outline-none" type="password" value="Password12"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-error">lock</span>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-error">error</span>
+</div>
+<span class="font-label-sm text-label-sm text-error flex items-center gap-1 mt-1">
+                        Password tidak cocok.
+                    </span>
+</div>
+<!-- Terms Checkbox -->
+<div class="flex items-start gap-3 mt-4">
+<div class="flex items-center h-5">
+<input class="w-5 h-5 rounded border-outline-variant text-primary-container focus:ring-primary-container bg-surface-container-low cursor-pointer" type="checkbox"/>
+</div>
+<label class="font-label-sm text-label-sm text-on-surface-variant leading-snug cursor-pointer">
+                        Saya menyetujui <a class="text-primary-container font-semibold hover:underline" href="#">Syarat &amp; Ketentuan</a> serta <a class="text-primary-container font-semibold hover:underline" href="#">Kebijakan Privasi</a> yang berlaku.
+                    </label>
+</div>
+<!-- Register Button -->
+<button class="w-full mt-6 bg-outline-variant text-on-surface-variant font-label-lg text-label-lg py-4 rounded-lg cursor-not-allowed" disabled="" type="button">
+                    Daftar Sekarang
+                </button>
+</form>
+</div>
+<!-- Redirect -->
+<div class="text-center mt-2">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Sudah punya akun? <a class="text-primary-container font-semibold hover:underline" href="#">Masuk di sini</a>
+</p>
+</div>
+</main>
+</body></html>

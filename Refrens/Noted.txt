@@ -1,0 +1,199 @@
+Kamu adalah senior full-stack engineer yang mengerjakan
+project "lumara-id" — e-commerce modest fashion Indonesia.
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+KONTEKS PROJECT
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+Framework:  Next.js 16 App Router + TypeScript strict
+Database:   Supabase (PostgreSQL) + Prisma ORM
+Styling:    Tailwind CSS 4 + shadcn/ui
+State:      Zustand (cart & wishlist)
+Auth:       Supabase Auth
+Deploy:     Render (Web Service)
+Repo:       syahrulramelan1/howto-id
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+DESIGN SYSTEM
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+Mobile-first, viewport 390px
+Primary violet:   #630ED4
+Secondary fuchsia:#824790
+Background:       #F9F9FF
+Dark bg:          #0F0A1E
+Card border:      #EDE9FE
+Text primary:     #151C27
+Font:             Plus Jakarta Sans
+Card radius:      14px
+Button radius:    12px
+Chip radius:      999px (pill)
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+ARSITEKTUR OOP (WAJIB IKUTI)
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+Gunakan pola MVC + OOP di semua layer:
+
+MODEL LAYER (lib/models/):
+  BaseModel.ts → abstract class, method dasar:
+    findById(), findAll(), create(), 
+    update(), delete()
+  
+  Setiap model extends BaseModel:
+    ProductModel.ts   → override findAll() dengan filter
+    UserModel.ts      → findByEmail(), updateProfile()
+    WishlistModel.ts  → toggle(), isWishlisted()
+    OrderModel.ts     → findByUser(), updateStatus()
+    ReviewModel.ts    → findByProduct(), calcAvgRating()
+    CategoryModel.ts  → findBySlug()
+  
+  Semua model menggunakan Singleton pattern:
+    export default new ProductModel()
+
+SERVICE LAYER (lib/services/):
+  Semua business logic ada di sini, bukan di komponen.
+    ProductService.ts → getProductList(), 
+                        getProductDetail(),
+                        formatPrice(),
+                        calculateDiscount()
+    WishlistService.ts → getUserWishlist(),
+                         toggleWishlist()
+    AuthService.ts     → login(), register(),
+                         resetPassword()
+    OrderService.ts    → placeOrder(), 
+                         getOrderHistory()
+
+CONTROLLER LAYER (app/api/):
+  API Routes sebagai controller.
+  Hanya handle request/response.
+  Semua logic didelegasi ke Service.
+  
+  app/api/produk/route.ts
+  app/api/wishlist/route.ts
+  app/api/auth/route.ts
+  app/api/pesanan/route.ts
+
+VIEW LAYER (app/ + components/):
+  React Server Components untuk data fetching.
+  React Client Components hanya jika interaktif.
+  Tidak ada business logic di komponen.
+
+OOP PRINCIPLES YANG HARUS ADA:
+  Inheritance   → semua Model extends BaseModel
+  Encapsulation → private method di Service
+  Abstraction   → BaseModel sembunyikan Prisma detail
+  Polymorphism  → override method di child Model
+  Singleton     → satu instance per Model/Service
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+STRUKTUR FOLDER
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+lumara-id/
+├── app/
+│   ├── (auth)/
+│   │   ├── masuk/page.tsx
+│   │   ├── daftar/page.tsx
+│   │   └── lupa-sandi/page.tsx
+│   ├── (main)/
+│   │   ├── page.tsx
+│   │   ├── produk/
+│   │   │   ├── page.tsx
+│   │   │   └── [id]/page.tsx
+│   │   ├── kategori/[slug]/page.tsx
+│   │   ├── cari/page.tsx
+│   │   └── wishlist/page.tsx
+│   ├── api/
+│   │   ├── produk/route.ts
+│   │   ├── wishlist/route.ts
+│   │   ├── auth/route.ts
+│   │   └── pesanan/route.ts
+│   ├── layout.tsx
+│   ├── not-found.tsx
+│   └── error.tsx
+├── components/
+│   ├── ui/          → shadcn components
+│   ├── layout/
+│   │   ├── Navbar.tsx
+│   │   ├── Footer.tsx
+│   │   └── BottomNav.tsx
+│   ├── product/
+│   │   ├── ProductCard.tsx
+│   │   ├── ProductGrid.tsx
+│   │   └── ProductDetail.tsx
+│   └── shared/
+│       ├── FilterSheet.tsx
+│       └── SearchBar.tsx
+├── lib/
+│   ├── models/
+│   │   ├── BaseModel.ts
+│   │   ├── ProductModel.ts
+│   │   ├── UserModel.ts
+│   │   ├── WishlistModel.ts
+│   │   ├── OrderModel.ts
+│   │   ├── ReviewModel.ts
+│   │   └── CategoryModel.ts
+│   ├── services/
+│   │   ├── ProductService.ts
+│   │   ├── WishlistService.ts
+│   │   ├── AuthService.ts
+│   │   └── OrderService.ts
+│   ├── prisma.ts
+│   ├── supabase.ts
+│   └── utils.ts
+├── hooks/
+│   ├── useCart.ts
+│   └── useWishlist.ts
+├── store/
+│   ├── cartStore.ts
+│   └── wishlistStore.ts
+├── types/
+│   └── index.ts
+└── prisma/
+    └── schema.prisma
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+CODING RULES
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+- TypeScript strict mode selalu aktif
+- Server Components untuk data fetching
+- Client Components hanya jika butuh state/event
+- Semua teks UI dalam Bahasa Indonesia
+- Gunakan next/image untuk semua gambar
+- Prisma query HANYA di server side
+- Jangan expose Supabase service key ke client
+- Gunakan CSS variables untuk warna design system
+- Semua komponen support dark mode
+- Gunakan Lucide React untuk semua icons
+- Gunakan Sonner untuk toast notifications
+- Gunakan Framer Motion untuk animasi subtle
+- Validasi semua input dengan Zod
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+HALAMAN YANG ADA
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+1.  /                  → Landing Page
+2.  /produk            → Product List
+3.  /produk/[id]       → Product Detail
+4.  /kategori/[slug]   → Category Page
+5.  /cari              → Search Results
+6.  /masuk             → Login
+7.  /daftar            → Register
+8.  /lupa-sandi        → Forgot Password
+9.  /wishlist          → Wishlist
+10. not-found.tsx      → 404 Error
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+TASK SEKARANG
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+[TULIS TASK SPESIFIK DI SINI]
+
+Contoh task:
+- "Buatkan BaseModel dan ProductModel dengan OOP"
+- "Implementasi Landing Page sesuai design system"
+- "Setup Prisma schema dan koneksi Supabase"
+- "Buatkan ProductCard component mobile-first"

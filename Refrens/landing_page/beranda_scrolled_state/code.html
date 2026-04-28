@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>lumara-id - Modest Luxury</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-error-container": "#93000a",
+                      "tertiary-container": "#674a00",
+                      "on-primary": "#ffffff",
+                      "on-tertiary-container": "#f3b72c",
+                      "primary-fixed": "#eaddff",
+                      "tertiary": "#4a3400",
+                      "surface-tint": "#732ee4",
+                      "on-primary-fixed-variant": "#5a00c6",
+                      "on-background": "#151c27",
+                      "inverse-primary": "#d2bbff",
+                      "primary-container": "#630ed4",
+                      "on-secondary": "#ffffff",
+                      "surface-dim": "#d3daea",
+                      "on-primary-fixed": "#25005a",
+                      "background": "#f9f9ff",
+                      "inverse-surface": "#2a313c",
+                      "on-primary-container": "#cdb4ff",
+                      "surface-bright": "#f9f9ff",
+                      "secondary-fixed": "#fcd7ff",
+                      "on-error": "#ffffff",
+                      "surface-container-highest": "#dce3f2",
+                      "on-surface": "#151c27",
+                      "secondary-fixed-dim": "#f3aeff",
+                      "error": "#ba1a1a",
+                      "surface-container-high": "#e2e8f8",
+                      "on-secondary-container": "#753b83",
+                      "surface-container-low": "#f0f3ff",
+                      "surface-container": "#e7eefe",
+                      "secondary-container": "#f3aeff",
+                      "on-secondary-fixed-variant": "#682f76",
+                      "error-container": "#ffdad6",
+                      "on-surface-variant": "#4a4455",
+                      "on-tertiary-fixed-variant": "#5d4200",
+                      "on-secondary-fixed": "#340042",
+                      "tertiary-fixed": "#ffdea4",
+                      "surface": "#f9f9ff",
+                      "outline-variant": "#ccc3d8",
+                      "outline": "#7b7487",
+                      "on-tertiary-fixed": "#261900",
+                      "primary": "#4800a0",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-variant": "#dce3f2",
+                      "secondary": "#824790",
+                      "tertiary-fixed-dim": "#fabd32",
+                      "inverse-on-surface": "#ebf1ff",
+                      "primary-fixed-dim": "#d2bbff",
+                      "on-tertiary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "base": "4px",
+                      "lg": "40px",
+                      "xl": "64px",
+                      "xs": "8px",
+                      "margin": "32px",
+                      "sm": "16px",
+                      "md": "24px"
+              },
+              "fontFamily": {
+                      "label-lg": ["Plus Jakarta Sans"],
+                      "display-lg": ["Plus Jakarta Sans"],
+                      "label-sm": ["Plus Jakarta Sans"],
+                      "headline-lg": ["Plus Jakarta Sans"],
+                      "body-md": ["Plus Jakarta Sans"],
+                      "headline-md": ["Plus Jakarta Sans"],
+                      "body-lg": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "label-lg": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        /* Utility to hide scrollbar for horizontal scrolling sections */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md antialiased pb-24 md:pb-0">
+<!-- TopAppBar Shared Component -->
+<header class="bg-[#F9F9FF] dark:bg-slate-950 text-[#630ED4] dark:text-[#7C3AED] font-['Plus_Jakarta_Sans'] font-medium docked full-width top-0 sticky z-50 border-b border-[#EDE9FE] dark:border-slate-800 shadow-[0px_4px_20px_rgba(99,14,212,0.12)] flex justify-between items-center w-full px-6 py-4">
+<button aria-label="Menu" class="hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<div class="text-xl font-bold tracking-tight text-[#630ED4] dark:text-[#7C3AED] uppercase">lumara-id</div>
+<button aria-label="Search" class="hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+</header>
+<main>
+<!-- Featured Products -->
+<section class="py-xl px-sm md:px-margin max-w-7xl mx-auto">
+<h2 class="font-headline-md text-headline-md text-on-primary-fixed-variant mb-md text-center">Featured Collection</h2>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-sm md:gap-gutter">
+<!-- Product Card 1 -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden group hover:shadow-[0px_4px_20px_rgba(99,14,212,0.12)] transition-shadow duration-300">
+<div class="aspect-[3/4] overflow-hidden bg-surface-container-high relative">
+<img alt="Woman wearing a minimalist beige modest dress posing in soft natural lighting" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Woman wearing a minimalist beige modest dress posing in soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUjY5BPSsoYoSf8CdQXrIckUWQhOVt4hYDks5Qwj0cI4NBmXCaytLiVvhKZAsZH4VNnh35JHbmwh4Ongm2ACy5MuzM6K-muPiwPYNgIyl3cZE-P2xMnvkvK1jqs9sFxeLXWxtUSXOlEVcKMoXcQ2PGte6nsjU4vuKy05lrwfg2QJKRKhy-3IegNilgv6Iw6ZZnVRdD9t0t9kETm56Krl58I_qE-la-xLSGyANalRDHLd3wDF_LuR9rV55wlqJx0S20MbZ5JBjAtDs"/>
+<button class="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur rounded-full text-outline hover:text-surface-tint transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite">favorite</span>
+</button>
+</div>
+<div class="p-sm flex flex-col gap-base">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Serenity Pleated Dress</h3>
+<p class="font-body-md text-body-md text-surface-tint font-medium">Rp 850.000</p>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden group hover:shadow-[0px_4px_20px_rgba(99,14,212,0.12)] transition-shadow duration-300">
+<div class="aspect-[3/4] overflow-hidden bg-surface-container-high relative">
+<img alt="Elegant silk hijab in dusty rose color styled beautifully against a clean background" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Elegant silk hijab in dusty rose color styled beautifully against a clean background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvbknykw23nqN6Y0WVu6_yzH30SV-Rl67c0yoeQXNeauDSfy5Axa50n09RNWrP4axSqFPXbnVYOyuqMdUGAatBcvALFT3CaVqBY5HsE_TdR7hKGQk-t7rVcScA1OFYMCobWZ8DDpuZPKnbSD84C9xvB0bnbLt4ji8AZ1h_6Nu4tFKmv7D7-f9X6xphvmAaZTme6GUqWb77GwSsQmI7QTALy5kQZ3T9Sr6CQ9oDKsxZ2gC2jACf0IuwWPtz8q-DokVzwdys0QHr5HY"/>
+<button class="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur rounded-full text-outline hover:text-surface-tint transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite">favorite</span>
+</button>
+</div>
+<div class="p-sm flex flex-col gap-base">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Lumiere Silk Hijab</h3>
+<p class="font-body-md text-body-md text-surface-tint font-medium">Rp 299.000</p>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden group hover:shadow-[0px_4px_20px_rgba(99,14,212,0.12)] transition-shadow duration-300">
+<div class="aspect-[3/4] overflow-hidden bg-surface-container-high relative">
+<img alt="Detail shot of a tailored modest blazer in soft lilac color with elegant buttons" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Detail shot of a tailored modest blazer in soft lilac color with elegant buttons" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASbSlFhg27FsTMzzNR8AHIwecxKRKc3sfAReLkisZ_GuVjcoANS1uSs_MP3__x7bVxgHM-N4E7NcTSPvPLFR8FisVzSaNS0FFxSPTawmOb6PWunZ-2e8wR89sdBr3KF6nNFqaH9nMh-kHK36JQD9Z-AOa-XoF6nWJLRgvsiTgHQFPv8qdrTlconY76xIQo2uxui43Kf6Z3IAMmie7VPC33lJoXIsn-iu5tMPMxs14mxkr-r1n6I3h_fX8UTVXSd2YN2KJLHOvAWkI"/>
+<button class="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur rounded-full text-outline hover:text-surface-tint transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite">favorite</span>
+</button>
+</div>
+<div class="p-sm flex flex-col gap-base">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Violette Tailored Blazer</h3>
+<p class="font-body-md text-body-md text-surface-tint font-medium">Rp 1.150.000</p>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden group hover:shadow-[0px_4px_20px_rgba(99,14,212,0.12)] transition-shadow duration-300">
+<div class="aspect-[3/4] overflow-hidden bg-surface-container-high relative">
+<img alt="Flowing wide leg trousers in pure white worn by a model in an airy studio setting" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Flowing wide leg trousers in pure white worn by a model in an airy studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCugO1lJdgNXvFBjPNwAf6I5zJzMoAAaDhF_8mD5KkI42orriuZtSUp0VOSWL-aouCi-dp8wr4SlO4BH9vrHV9E1do2M8BbmOAxAHUhpnV-01p36nCwLyD4mYIwTthPCaOlMxT4pt5ywkXJ26cNzLC4hiFrLIC-wnPTiEruIWBQMJ1skMHdyJ99RCs5JAy6NjmLF0c_LnCnA8MLTy4Yx_J9GM9TsFsILZjaN4UisWUqchuSGH-gI5Q6DL0Bg1LawWtxjWx6gs_nYOA"/>
+<button class="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur rounded-full text-outline hover:text-surface-tint transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite">favorite</span>
+</button>
+</div>
+<div class="p-sm flex flex-col gap-base">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Aria Wide-Leg Trousers</h3>
+<p class="font-body-md text-body-md text-surface-tint font-medium">Rp 650.000</p>
+</div>
+</div>
+</div>
+</section>
+<!-- New Arrivals (Horizontal Strip) -->
+<section class="py-lg bg-surface-container-low">
+<div class="flex justify-between items-end px-sm md:px-margin mb-md max-w-7xl mx-auto">
+<h2 class="font-headline-md text-headline-md text-on-primary-fixed-variant">New Arrivals</h2>
+<a class="font-label-lg text-label-lg text-surface-tint flex items-center gap-1 hover:underline" href="#">
+                    Lihat Semua <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+<div class="flex overflow-x-auto snap-x snap-mandatory gap-sm px-sm md:px-margin pb-sm no-scrollbar">
+<!-- Arrival Card 1 -->
+<div class="flex-none w-[70%] md:w-[30%] snap-start bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+<img alt="Close up of delicate lace detailing on a modest top with soft lighting" class="w-full h-48 object-cover" data-alt="Close up of delicate lace detailing on a modest top with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB79b2HepAr9gbWgYcJMWJUjw3LCk-WjGS2swYzEcyzMTthopQF-snZfWCCipe76UPx8XN0KRNVpYugLzK8GY8mXKXp5QBFukZgRuajgekzjkDbRXuY-gAG0XreGtIgjaRNpvKbC-PEUVYKxiSExKo1jOSuLHN7Tz9nubPOq6dW1MHlO1qKXz-vMuti4e_wNxKT5RrTON0J_A481__3hd5CGImfzObpyM4b71XYVxAlZnbwnLwxURHEkd8JP3kmlbc8XWNiWZfMx3k"/>
+<div class="p-sm">
+<div class="inline-block px-2 py-1 bg-secondary-container text-on-secondary-container text-[10px] uppercase font-bold rounded-full mb-2">Baru</div>
+<h3 class="font-label-lg text-label-lg text-on-surface">Lace Embrace Tunic</h3>
+<p class="font-body-md text-body-md text-surface-tint mt-1">Rp 520.000</p>
+</div>
+</div>
+<!-- Arrival Card 2 -->
+<div class="flex-none w-[70%] md:w-[30%] snap-start bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+<img alt="Model wearing a minimalist sage green modest dress walking in a modern architectural space" class="w-full h-48 object-cover" data-alt="Model wearing a minimalist sage green modest dress walking in a modern architectural space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5eTkwdCkURcREWnbtUnqiufmv0-ZB6vL-jZqFYE7G7MMuANQqbT5FN741grRKyTeLjRlLd7o_9-LOBnQzii88JEyFKPy0FKraY2ENPMcbrXhwiLznDhNKuwVZt8m7lm3w_jiRQry9x90lBPDK-hrftmXobmbxbNE3G-04UuoVWq2tH5pszaWDlRZGXK0thuiUb_HaOgTcbrPc5WQqvFU_ArmAydC3T8LG9udlKtz5cqIHXu7AS7hQc0-Qxww5ZNWiLN21ehUcmgM"/>
+<div class="p-sm">
+<div class="inline-block px-2 py-1 bg-secondary-container text-on-secondary-container text-[10px] uppercase font-bold rounded-full mb-2">Baru</div>
+<h3 class="font-label-lg text-label-lg text-on-surface">Sage Minimalist Abaya</h3>
+<p class="font-body-md text-body-md text-surface-tint mt-1">Rp 1.200.000</p>
+</div>
+</div>
+<!-- Arrival Card 3 -->
+<div class="flex-none w-[70%] md:w-[30%] snap-start bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+<img alt="Luxurious textured fabric in muted lavender hue with elegant draping" class="w-full h-48 object-cover" data-alt="Luxurious textured fabric in muted lavender hue with elegant draping" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZCFoN7DkMSlYKwVUqbv9_YyyOBNv82Ec1m3Uhb-BqoA9_TpZRjvx6R-Am8RE9wlbGBZmZtEZmNjXqY7uwVsNAzs_w-QcJsYsjvWBjX4HwwA4Sx42P5xGdervXzy9_1SmdCUUy84LkEz0N24eUMiqGkJCbT-ntXdVRxHJ5uU_j8aKwZYSedeaiYhdMY6AuS5eA9IkhC7dZAG1rgLzkBJEEARXDA8S1BsZI-m2tgKcMFbWWmpQleSyHff0rdcOMv2gwJiPqHGhaJ-w"/>
+<div class="p-sm">
+<div class="inline-block px-2 py-1 bg-secondary-container text-on-secondary-container text-[10px] uppercase font-bold rounded-full mb-2">Baru</div>
+<h3 class="font-label-lg text-label-lg text-on-surface">Lavender Drape Skirt</h3>
+<p class="font-body-md text-body-md text-surface-tint mt-1">Rp 480.000</p>
+</div>
+</div>
+</div>
+</section>
+<!-- How It Works -->
+<section class="py-xl px-sm md:px-margin max-w-3xl mx-auto">
+<h2 class="font-headline-md text-headline-md text-on-primary-fixed-variant text-center mb-lg">Pengalaman Berbelanja</h2>
+<div class="flex flex-col gap-lg relative">
+<!-- Vertical Line Connector -->
+<div class="absolute left-[23px] top-8 bottom-8 w-[2px] bg-outline-variant z-0 hidden md:block"></div>
+<!-- Step 1 -->
+<div class="flex gap-md items-start relative z-10">
+<div class="w-12 h-12 shrink-0 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-headline-md shadow-[0px_4px_20px_rgba(99,14,212,0.12)]">1</div>
+<div>
+<h3 class="font-label-lg text-label-lg text-on-surface mb-xs">Eksplorasi Koleksi</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Temukan kurasi modest fashion terbaik yang dirancang untuk kenyamanan dan keanggunan sehari-hari Anda.</p>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="flex gap-md items-start relative z-10">
+<div class="w-12 h-12 shrink-0 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-headline-md shadow-[0px_4px_20px_rgba(99,14,212,0.12)]">2</div>
+<div>
+<h3 class="font-label-lg text-label-lg text-on-surface mb-xs">Pilih dengan Percaya Diri</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Gunakan panduan ukuran detail kami dan nikmati foto produk resolusi tinggi untuk memastikan pilihan yang tepat.</p>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="flex gap-md items-start relative z-10">
+<div class="w-12 h-12 shrink-0 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-headline-md shadow-[0px_4px_20px_rgba(99,14,212,0.12)]">3</div>
+<div>
+<h3 class="font-label-lg text-label-lg text-on-surface mb-xs">Pengiriman Eksklusif</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Pesanan Anda dikemas dengan indah dalam kemasan ramah lingkungan dan dikirim dengan aman ke depan pintu Anda.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Testimonials -->
+<section class="py-xl bg-surface-container-highest overflow-hidden">
+<h2 class="font-headline-md text-headline-md text-center text-on-primary-fixed-variant mb-md px-sm">Kisah Mereka</h2>
+<div class="flex overflow-x-auto snap-x snap-mandatory gap-md px-sm md:px-margin pb-sm no-scrollbar">
+<!-- Card 1 -->
+<div class="flex-none w-[85%] md:w-[400px] snap-center bg-surface-container-lowest p-md rounded-2xl shadow-[0px_4px_20px_rgba(99,14,212,0.05)] border border-outline-variant/50">
+<div class="flex gap-1 text-on-tertiary-container mb-sm">
+<span class="material-symbols-outlined" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant italic mb-md">"Kualitas kainnya luar biasa. Jatuhnya sangat anggun dan warnanya persis seperti di foto. Sangat puas dengan lumara-id."</p>
+<div class="flex items-center gap-xs">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold">A</div>
+<span class="font-label-lg text-label-lg text-on-surface">Annisa R.</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="flex-none w-[85%] md:w-[400px] snap-center bg-surface-container-lowest p-md rounded-2xl shadow-[0px_4px_20px_rgba(99,14,212,0.05)] border border-outline-variant/50">
+<div class="flex gap-1 text-on-tertiary-container mb-sm">
+<span class="material-symbols-outlined" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant italic mb-md">"Desain minimalis yang saya cari-cari akhirnya ketemu disini. Potongannya sangat flattering namun tetap sopan."</p>
+<div class="flex items-center gap-xs">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary font-bold">S</div>
+<span class="font-label-lg text-label-lg text-on-surface">Sarah F.</span>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Banner -->
+<section class="py-xl px-sm md:px-margin max-w-5xl mx-auto">
+<div class="bg-primary-container text-on-primary-container p-xl rounded-2xl text-center relative overflow-hidden shadow-[0px_10px_30px_rgba(99,14,212,0.2)]">
+<!-- Decorative background elements -->
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+<div class="absolute -bottom-24 -left-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+<div class="relative z-10">
+<h2 class="font-display-lg text-headline-lg md:text-display-lg text-on-primary mb-md">Tingkatkan Gaya Modest Anda</h2>
+<p class="font-body-lg text-body-lg text-inverse-primary mb-lg max-w-2xl mx-auto">Bergabunglah dengan buletin kami dan dapatkan potongan 10% untuk pesanan pertama Anda. Temukan inspirasi gaya elegan setiap minggunya.</p>
+<div class="flex flex-col sm:flex-row gap-sm justify-center max-w-md mx-auto">
+<input class="bg-white/10 border border-white/20 text-on-primary placeholder:text-inverse-primary/70 rounded-full px-lg py-sm focus:outline-none focus:border-white w-full font-body-md backdrop-blur-sm" placeholder="Alamat Email Anda" type="email"/>
+<button class="bg-on-primary text-primary-container px-lg py-sm rounded-full font-label-lg text-label-lg hover:bg-surface-bright transition-colors whitespace-nowrap shadow-[0px_4px_20px_rgba(255,255,255,0.15)]">Daftar Sekarang</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Shared Component -->
+<footer class="bg-[#F9F9FF] dark:bg-slate-950 text-[#630ED4] dark:text-[#7C3AED] text-sm font-light font-['Plus_Jakarta_Sans'] leading-relaxed w-full mt-auto border-t border-[#EDE9FE] dark:border-slate-800 w-full px-8 py-12 md:px-32 flex flex-col md:flex-row justify-between items-start gap-8">
+<div>
+<span class="text-lg font-bold text-[#630ED4] mb-4 block">lumara-id</span>
+<p class="text-slate-500 dark:text-slate-400">© 2024 lumara-id. Modest Luxury Defined.</p>
+</div>
+<div class="flex flex-col md:flex-row gap-6 md:gap-12">
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#630ED4] underline underline-offset-4 transition-colors" href="#">Tentang Kami</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#630ED4] underline underline-offset-4 transition-colors" href="#">Kebijakan Privasi</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#630ED4] underline underline-offset-4 transition-colors" href="#">Syarat &amp; Ketentuan</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#630ED4] underline underline-offset-4 transition-colors" href="#">Hubungi Kami</a>
+</div>
+</footer>
+<!-- BottomNavBar Shared Component -->
+<nav class="md:hidden bg-white/80 dark:bg-slate-900/80 backdrop-blur-md text-[#630ED4] dark:text-[#7C3AED] text-[10px] font-semibold font-['Plus_Jakarta_Sans'] uppercase tracking-widest fixed bottom-0 w-full z-50 border-t border-[#EDE9FE] dark:border-slate-800 shadow-[0_-4px_20px_rgba(99,14,212,0.08)] tap-highlight-transparent transition-all duration-300 fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3">
+<!-- Active Item: Beranda -->
+<a class="flex flex-col items-center justify-center text-[#630ED4] dark:text-[#7C3AED] relative after:content-[''] after:absolute after:-bottom-1 after:w-1 after:h-1 after:bg-[#630ED4] after:rounded-full hover:text-[#630ED4] dark:hover:text-[#7C3AED]" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]" data-icon="home">home</span>
+            Beranda
+        </a>
+<!-- Inactive Items -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#630ED4] dark:hover:text-[#7C3AED]" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]" data-icon="grid_view">grid_view</span>
+            Katalog
+        </a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#630ED4] dark:hover:text-[#7C3AED]" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]" data-icon="favorite">favorite</span>
+            Wishlist
+        </a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#630ED4] dark:hover:text-[#7C3AED]" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]" data-icon="shopping_bag">shopping_bag</span>
+            Keranjang
+        </a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#630ED4] dark:hover:text-[#7C3AED]" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]" data-icon="person">person</span>
+            Akun
+        </a>
+</nav>
+</body></html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Urutkan - Bottom Sheet</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#340042",
+                        "on-tertiary-fixed": "#261900",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#eaddff",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "outline": "#7b7487",
+                        "surface-container-high": "#e2e8f8",
+                        "on-secondary-container": "#753b83",
+                        "secondary": "#824790",
+                        "on-tertiary-container": "#f3b72c",
+                        "primary-container": "#630ed4",
+                        "surface": "#f9f9ff",
+                        "tertiary-container": "#674a00",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "background": "#f9f9ff",
+                        "inverse-primary": "#d2bbff",
+                        "surface-variant": "#dce3f2",
+                        "surface-container-highest": "#dce3f2",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#ccc3d8",
+                        "on-surface-variant": "#4a4455",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#cdb4ff",
+                        "on-background": "#151c27",
+                        "surface-container": "#e7eefe",
+                        "primary": "#4800a0",
+                        "secondary-fixed-dim": "#f3aeff",
+                        "secondary-container": "#f3aeff",
+                        "surface-bright": "#f9f9ff",
+                        "secondary-fixed": "#fcd7ff",
+                        "surface-container-low": "#f0f3ff",
+                        "inverse-surface": "#2a313c",
+                        "surface-dim": "#d3daea",
+                        "surface-tint": "#732ee4",
+                        "inverse-on-surface": "#ebf1ff",
+                        "on-secondary-fixed-variant": "#682f76",
+                        "tertiary": "#4a3400",
+                        "on-tertiary-fixed-variant": "#5d4200",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#fabd32",
+                        "on-primary-fixed": "#25005a",
+                        "tertiary-fixed": "#ffdea4",
+                        "primary-fixed-dim": "#d2bbff",
+                        "on-surface": "#151c27"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin": "32px",
+                        "gutter": "24px",
+                        "md": "24px",
+                        "xl": "64px",
+                        "lg": "40px",
+                        "sm": "16px",
+                        "base": "4px",
+                        "xs": "8px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Plus Jakarta Sans"],
+                        "label-lg": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-lg": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "1.2", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#E5E5E5] flex justify-center items-center min-h-screen">
+<!-- Mobile Device Simulator Container -->
+<div class="relative w-[390px] h-[844px] bg-background overflow-hidden shadow-2xl">
+<!-- Mock Content behind bottom sheet -->
+<div class="p-gutter pt-12 opacity-40 grayscale">
+<div class="w-full h-40 bg-surface-container-highest rounded-xl mb-sm"></div>
+<div class="w-3/4 h-6 bg-surface-container-highest rounded mb-sm"></div>
+<div class="w-1/2 h-4 bg-surface-container-highest rounded mb-xl"></div>
+<div class="grid grid-cols-2 gap-sm">
+<div class="h-48 bg-surface-container-highest rounded-xl"></div>
+<div class="h-48 bg-surface-container-highest rounded-xl"></div>
+</div>
+</div>
+<!-- Backdrop Overlay -->
+<div class="absolute inset-0 bg-inverse-surface/40 backdrop-blur-[2px] z-40 transition-opacity"></div>
+<!-- Bottom Sheet Surface -->
+<div class="absolute bottom-0 left-0 w-full bg-surface-container-lowest rounded-t-[32px] z-50 flex flex-col shadow-[0_-8px_30px_rgba(99,14,212,0.08)] transform translate-y-0 transition-transform duration-300">
+<!-- Drag Handle Indicator -->
+<div class="w-full flex justify-center pt-4 pb-2">
+<div class="w-12 h-1.5 bg-outline-variant rounded-full opacity-60"></div>
+</div>
+<!-- Header Section -->
+<div class="flex items-center justify-between px-gutter py-sm border-b border-surface-variant">
+<h2 class="font-headline-md text-headline-md text-on-surface">Urutkan</h2>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant text-[28px]">close</span>
+</button>
+</div>
+<!-- Options List -->
+<div class="flex flex-col py-sm">
+<!-- Option 1: Selected -->
+<button class="flex items-center justify-between w-full px-gutter py-sm bg-surface-container-low/50 hover:bg-surface-container-low transition-colors text-left group">
+<span class="font-body-md text-body-md text-on-surface font-medium">Relevansi</span>
+<!-- Selected Violet Radio -->
+<div class="w-6 h-6 rounded-full border-[2px] border-primary-container flex items-center justify-center bg-surface-container-lowest">
+<div class="w-3 h-3 rounded-full bg-primary-container"></div>
+</div>
+</button>
+<!-- Option 2 -->
+<button class="flex items-center justify-between w-full px-gutter py-sm hover:bg-surface-container-low transition-colors text-left group">
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface transition-colors">Terbaru</span>
+<!-- Unselected Radio -->
+<div class="w-6 h-6 rounded-full border-[2px] border-outline-variant flex items-center justify-center bg-surface-container-lowest transition-colors group-hover:border-outline"></div>
+</button>
+<!-- Option 3 -->
+<button class="flex items-center justify-between w-full px-gutter py-sm hover:bg-surface-container-low transition-colors text-left group">
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface transition-colors">Harga: Rendah ke Tinggi</span>
+<!-- Unselected Radio -->
+<div class="w-6 h-6 rounded-full border-[2px] border-outline-variant flex items-center justify-center bg-surface-container-lowest transition-colors group-hover:border-outline"></div>
+</button>
+<!-- Option 4 -->
+<button class="flex items-center justify-between w-full px-gutter py-sm hover:bg-surface-container-low transition-colors text-left group">
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface transition-colors">Harga: Tinggi ke Rendah</span>
+<!-- Unselected Radio -->
+<div class="w-6 h-6 rounded-full border-[2px] border-outline-variant flex items-center justify-center bg-surface-container-lowest transition-colors group-hover:border-outline"></div>
+</button>
+<!-- Option 5 -->
+<button class="flex items-center justify-between w-full px-gutter py-sm hover:bg-surface-container-low transition-colors text-left group">
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface transition-colors">Paling Banyak Dilihat</span>
+<!-- Unselected Radio -->
+<div class="w-6 h-6 rounded-full border-[2px] border-outline-variant flex items-center justify-center bg-surface-container-lowest transition-colors group-hover:border-outline"></div>
+</button>
+</div>
+<!-- Action Button Area -->
+<div class="p-gutter pt-sm pb-margin bg-surface-container-lowest border-t border-surface-variant">
+<button class="w-full bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg py-4 rounded-full flex justify-center items-center transition-colors shadow-[0_4px_14px_rgba(99,14,212,0.2)]">
+                    Terapkan
+                </button>
+</div>
+</div>
+</div>
+</body></html>

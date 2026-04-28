@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tidak Ada Koneksi Internet - lumara.id</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#dce3f2",
+                    "outline-variant": "#ccc3d8",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-container": "#753b83",
+                    "secondary-container": "#f3aeff",
+                    "primary-container": "#630ed4",
+                    "background": "#f9f9ff",
+                    "on-primary-container": "#cdb4ff",
+                    "on-primary-fixed": "#25005a",
+                    "tertiary": "#4a3400",
+                    "surface-container-low": "#f0f3ff",
+                    "surface-variant": "#dce3f2",
+                    "surface-container-high": "#e2e8f8",
+                    "on-background": "#151c27",
+                    "surface-tint": "#732ee4",
+                    "outline": "#7b7487",
+                    "on-surface": "#151c27",
+                    "primary-fixed-dim": "#d2bbff",
+                    "surface-dim": "#d3daea",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#5d4200",
+                    "inverse-on-surface": "#ebf1ff",
+                    "surface-bright": "#f9f9ff",
+                    "secondary": "#824790",
+                    "primary-fixed": "#eaddff",
+                    "on-tertiary-container": "#f3b72c",
+                    "inverse-primary": "#d2bbff",
+                    "secondary-fixed-dim": "#f3aeff",
+                    "on-primary-fixed-variant": "#5a00c6",
+                    "on-tertiary-fixed": "#261900",
+                    "on-secondary-fixed": "#340042",
+                    "tertiary-fixed": "#ffdea4",
+                    "tertiary-fixed-dim": "#fabd32",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed": "#fcd7ff",
+                    "surface-container": "#e7eefe",
+                    "on-secondary-fixed-variant": "#682f76",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#674a00",
+                    "inverse-surface": "#2a313c",
+                    "error": "#ba1a1a",
+                    "surface-container-lowest": "#ffffff",
+                    "on-surface-variant": "#4a4455",
+                    "surface": "#f9f9ff",
+                    "primary": "#4800a0",
+                    "on-secondary": "#ffffff",
+                    "on-error": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "64px",
+                    "lg": "40px",
+                    "gutter": "24px",
+                    "md": "24px",
+                    "xs": "8px",
+                    "sm": "16px",
+                    "base": "4px",
+                    "margin": "32px"
+            },
+            "fontFamily": {
+                    "display-lg": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "label-sm": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "label-lg": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "headline-lg": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "body-lg": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "headline-md": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "body-md": [
+                            "Plus Jakarta Sans"
+                    ]
+            },
+            "fontSize": {
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "label-lg": [
+                            "14px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.4",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        /* Custom styles to bridge Tailwind config and arbitrary design rules */
+        .ambient-shadow {
+            box-shadow: 0 2px 15px rgba(99,14,212,0.08);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background min-h-screen flex flex-col antialiased">
+<!-- Suppressed Navigation Shells: As a dead-end error state, main navigation is hidden to prioritize the canvas. -->
+<!-- Minimal Brand Anchor -->
+<header class="w-full flex justify-center py-margin">
+<span class="font-display-lg text-headline-md text-primary-container tracking-tight">lumara.id</span>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 flex flex-col items-center justify-center px-gutter pb-xl w-full max-w-lg mx-auto">
+<!-- Connection Visual -->
+<div class="relative flex items-center justify-center mb-lg">
+<!-- Concentric rings to simulate pulsing connection attempt -->
+<div class="absolute w-40 h-40 rounded-full bg-surface-container-low opacity-50"></div>
+<div class="absolute w-32 h-32 rounded-full bg-surface-container opacity-70"></div>
+<div class="absolute w-24 h-24 rounded-full bg-surface-container-high"></div>
+<div class="relative z-10 w-16 h-16 rounded-full bg-surface-container-lowest flex items-center justify-center ambient-shadow">
+<span class="material-symbols-outlined text-[32px] text-primary-container" style="font-variation-settings: 'FILL' 0;">
+                    wifi_off
+                </span>
+</div>
+</div>
+<!-- Typography Context -->
+<div class="text-center mb-lg flex flex-col gap-xs">
+<h1 class="font-headline-lg text-headline-md text-on-background">Tidak Ada Koneksi Internet</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[300px] mx-auto">
+                Periksa koneksi WiFi atau data selulermu, lalu coba lagi.
+            </p>
+</div>
+<!-- Tips Bento Card -->
+<div class="w-full bg-surface-container-lowest rounded-xl border border-surface-variant p-md mb-lg ambient-shadow">
+<ul class="flex flex-col gap-sm">
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary-fixed-dim text-[20px] mt-0.5">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Pastikan WiFi atau data aktif</span>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary-fixed-dim text-[20px] mt-0.5">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Coba matikan dan nyalakan mode pesawat</span>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary-fixed-dim text-[20px] mt-0.5">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Restart aplikasi</span>
+</li>
+</ul>
+</div>
+<!-- Primary Action -->
+<button class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg py-sm rounded-xl hover:bg-surface-tint active:scale-95 transition-all duration-200">
+            Coba Lagi
+        </button>
+</main>
+</body></html>
