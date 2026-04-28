@@ -1,9 +1,7 @@
-"use client";
 import { useState } from "react";
 import { FaReact } from "react-icons/fa6";
 import { InputWithLabel, SimpleInput } from "../components";
-import { Link, useNavigate } from "react-router-dom";
-import { FaArrowRight } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
 
@@ -32,14 +30,14 @@ const LoginComponent = () => {
         <FaReact className="text-5xl dark:text-whiteSecondary text-blackPrimary hover:rotate-180 hover:duration-1000 cursor-pointer" />
         <div className="text-center">
           <h2 className="text-2xl dark:text-whiteSecondary text-blackPrimary font-bold">lumara.id Admin</h2>
-          <p className="text-sm dark:text-gray-400 text-gray-500 mt-1">Masuk dengan akun Supabase kamu</p>
+          <p className="text-sm dark:text-gray-400 text-gray-500 mt-1">Khusus administrator — akun dibuat oleh super admin</p>
         </div>
 
         <form onSubmit={handleLogin} className="w-full flex flex-col gap-5">
           <InputWithLabel label="Email">
             <SimpleInput
               type="email"
-              placeholder="admin@email.com"
+              placeholder="admin@lumara.id"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -64,14 +62,8 @@ const LoginComponent = () => {
           </button>
         </form>
 
-        <p className="dark:text-gray-400 text-gray-700 text-base flex gap-1 items-center">
-          Belum punya akun?{" "}
-          <Link
-            to="/register"
-            className="dark:text-whiteSecondary text-blackPrimary hover:underline flex gap-1 items-center"
-          >
-            Daftar <FaArrowRight className="mt-[2px]" />
-          </Link>
+        <p className="text-xs dark:text-gray-500 text-gray-400 text-center">
+          Tidak punya akses? Hubungi super admin.
         </p>
       </div>
     </div>

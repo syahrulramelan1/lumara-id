@@ -28,8 +28,17 @@ export default function LoginPage() {
         toast.success(t.auth.success_login);
         router.push("/");
       } else {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
+
+        // Sync user ke database dengan role USER
+        if (data.session?.access_token) {
+          await fetch("/api/auth/sync-user", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${data.session.access_token}` },
+          });
+        }
+
         toast.success(t.auth.success_register);
       }
     } catch (err) {

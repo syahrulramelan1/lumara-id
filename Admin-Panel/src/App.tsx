@@ -3,7 +3,7 @@ import {
   Categories, CreateCategory, CreateOrder, CreateProduct, CreateReview,
   CreateUser, EditCategory, EditOrder, EditProduct, EditReview, EditUser,
   HelpDesk, HomeLayout, Landing, Login, Notifications, Orders, Products,
-  Profile, Register, Reviews, Users,
+  Profile, Reviews, Users,
 } from "./pages";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -11,7 +11,6 @@ const protect = (el: React.ReactNode) => <ProtectedRoute>{el}</ProtectedRoute>;
 
 const router = createBrowserRouter([
   { path: "/login",    element: <Login /> },
-  { path: "/register", element: <Register /> },
   {
     path: "/",
     element: protect(<HomeLayout />),
