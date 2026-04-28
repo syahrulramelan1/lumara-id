@@ -1,60 +1,47 @@
-import { HiOutlineEye } from "react-icons/hi";
-import { SimpleNotification, Sidebar, WhiteButton } from "../components";
+import { HiOutlineBell, HiOutlineCheck } from "react-icons/hi";
+import { SimpleNotification, Sidebar } from "../components";
+
+const notifications = [
+  { username: "johndoe",   hoursAgo: "2 jam lalu",  date: "Kamis 16.20", action: "mengikuti kamu" },
+  { username: "markkwik",  hoursAgo: "3 jam lalu",  date: "Kamis 15.15", action: "menyukai ulasanmu" },
+  { username: "markdoe",   hoursAgo: "4 jam lalu",  date: "Kamis 13.30", action: "mengikuti kamu" },
+  { username: "gg86",      hoursAgo: "5 jam lalu",  date: "Kamis 12.10", action: "mengundangmu ke grup" },
+];
 
 const Notifications = () => {
   return (
-    <div className="h-auto border-t border-blackSecondary border-1 flex dark:bg-blackPrimary bg-whiteSecondary">
+    <div className="min-h-screen flex dark:bg-[#0D0B14] bg-[var(--bg-2)]">
       <Sidebar />
-      <div className="dark:bg-blackPrimary bg-whiteSecondary w-full">
-        <div className="dark:bg-blackPrimary bg-whiteSecondary py-10">
-          <div className="px-4 sm:px-6 lg:px-8 pb-8 border-b border-gray-800 flex justify-between items-center max-sm:flex-col max-sm:gap-5">
-            <div className="flex flex-col gap-3">
-              <h2 className="text-3xl font-bold leading-7 dark:text-whiteSecondary text-blackPrimary">
-                Notifications
-              </h2>
+      <div className="flex-1 flex flex-col">
+        <div className="page-header">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[var(--brand-light)] flex items-center justify-center">
+              <HiOutlineBell className="text-brand-600 dark:text-brand-400 text-lg" />
             </div>
-            <WhiteButton
-                link="/notifications"
-                textSize="lg"
-                width="48"
-                py="2"
-                text="Set all as read"
-              >
-                <HiOutlineEye className="dark:text-blackPrimary text-whiteSecondary text-xl" />
-              </WhiteButton>
+            <div>
+              <h2 className="page-title">Notifikasi</h2>
+              <p className="page-subtitle">{notifications.length} notifikasi baru</p>
+            </div>
           </div>
-          <div className="px-4 sm:px-6 lg:px-8 pb-8 pt-8">
-            {/* Notifications */}
-            <div className="flex flex-col gap-1">
-              {/* Single Notification */}
-              <SimpleNotification
-                username="johndoe"
-                imgSrc="/src/assets/random user 1.jpg"
-                date="Thursday 4:20pm"
-                hoursAgo="2 hours ago"
-                action="followed you"
-              />
-              <SimpleNotification
-                username="markkwik"
-                imgSrc="/src/assets/random user 2.jpg"
-                date="Thursday 3:15pm"
-                hoursAgo="3 hours ago"
-                action="liked your post"
-              />
-              <SimpleNotification
-                username="markdoe"
-                imgSrc="/src/assets/random user 3.jpg"
-                date="Thursday 1:30pm"
-                hoursAgo="4 hours ago"
-                action="followed you"
-              />
-              <SimpleNotification
-                username="gg86"
-                imgSrc="/src/assets/random user 4.jpg"
-                date="Thursday 12:10am"
-                hoursAgo="5 hours ago"
-                action="invited you in a private group"
-              />
+          <button className="btn-ghost flex items-center gap-2 text-sm">
+            <HiOutlineCheck className="text-base" />
+            Tandai Semua Dibaca
+          </button>
+        </div>
+
+        <div className="p-6 max-w-2xl">
+          <div className="card overflow-hidden">
+            <div className="flex flex-col divide-y divide-[var(--border)]">
+              {notifications.map((n) => (
+                <div key={n.username} className="p-4">
+                  <SimpleNotification
+                    username={n.username}
+                    date={n.date}
+                    hoursAgo={n.hoursAgo}
+                    action={n.action}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -62,5 +49,4 @@ const Notifications = () => {
     </div>
   );
 };
-
 export default Notifications;

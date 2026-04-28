@@ -1,123 +1,103 @@
-import { HiOutlineSave, HiOutlineUpload } from "react-icons/hi";
-import { InputWithLabel, Sidebar, SimpleInput, WhiteButton } from "../components";
+import { HiOutlineSave, HiOutlineCamera } from "react-icons/hi";
+import { InputWithLabel, Sidebar, SimpleInput } from "../components";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 const Profile = () => {
-  const [inputObject, setInputObject] = useState({
-    username: "",
-    email: "",
+  const { user } = useAuth();
+  const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Admin";
+  const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
+  const avatarSrc = avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${displayName}`;
+
+  const [form, setForm] = useState({
+    username: displayName,
+    email: user?.email || "",
     password: "",
     confirmPassword: "",
   });
+
   return (
-    <div className="h-auto border-t border-blackSecondary border-1 flex dark:bg-blackPrimary bg-whiteSecondary">
+    <div className="min-h-screen flex dark:bg-[#0D0B14] bg-[var(--bg-2)]">
       <Sidebar />
-      <div className="dark:bg-blackPrimary bg-whiteSecondary w-full">
-        <div className="dark:bg-blackPrimary bg-whiteSecondary py-10">
-          <div className="px-4 sm:px-6 lg:px-8 pb-8 border-b border-gray-800 flex justify-between items-center max-sm:flex-col max-sm:gap-5">
-            <div className="flex flex-col gap-3">
-              <h2 className="text-3xl font-bold leading-7 dark:text-whiteSecondary text-blackPrimary">
-                Your Profile
-              </h2>
-            </div>
-            {/* Profile update button or any other action */}
-            <WhiteButton
-                link="/profile"
-                textSize="lg"
-                width="48"
-                py="2"
-                text="Update profile"
-              >
-                <HiOutlineSave className="dark:text-blackPrimary text-whiteSecondary text-xl" />
-              </WhiteButton>
+      <div className="flex-1 flex flex-col">
+        <div className="page-header">
+          <div>
+            <h2 className="page-title">Profil Saya</h2>
+            <p className="page-subtitle">Kelola informasi akun admin</p>
           </div>
-          <div className="px-4 sm:px-6 lg:px-8 pb-8 pt-8">
-            {/* Profile details section */}
+          <button className="btn-primary flex items-center gap-2 text-sm">
+            <HiOutlineSave className="text-base" />
+            Simpan Perubahan
+          </button>
+        </div>
+
+        <div className="p-6 flex flex-col xl:flex-row gap-6 max-w-5xl">
+          {/* Avatar card */}
+          <div className="card p-6 flex flex-col items-center gap-4 w-full xl:w-64 shrink-0 h-fit">
+            <div className="relative">
+              <img
+                src={avatarSrc}
+                alt="profile"
+                className="w-24 h-24 rounded-full object-cover ring-4 ring-[var(--border)]"
+              />
+              <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-gradient-to-br from-brand-700 to-brand-400 flex items-center justify-center text-white shadow-md hover:opacity-90 transition-opacity">
+                <HiOutlineCamera className="text-sm" />
+              </button>
+            </div>
+            <div className="text-center">
+              <p className="font-semibold text-[var(--text)]">{displayName}</p>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">{user?.email}</p>
+            </div>
+            <span className="badge badge-purple">Administrator</span>
+          </div>
+
+          {/* Form card */}
+          <div className="card p-6 flex-1">
+            <h3 className="font-semibold text-[var(--text)] mb-5">Informasi Akun</h3>
             <div className="flex flex-col gap-4">
-              {/* Example: Displaying user information */}
-              <div className="flex justify-between items-center max-sm:flex-col max-sm:gap-10">
-              <div className="flex items-center gap-4">
-                <img
-                  src="/src/assets/profile.jpg"
-                  alt="Profile"
-                  className="rounded-full w-20 h-20"
+              <InputWithLabel label="Nama Pengguna">
+                <SimpleInput
+                  type="text"
+                  placeholder="Nama kamu"
+                  value={form.username}
+                  onChange={(e) => setForm({ ...form, username: e.target.value })}
                 />
-                <div>
-                  <p className="dark:text-whiteSecondary text-blackPrimary text-xl">
-                    Sherwood Gruninger
-                  </p>
-                  <p className="dark:text-whiteSecondary text-blackPrimary">
-                    Web Developer
-                  </p>
+              </InputWithLabel>
+              <InputWithLabel label="Email">
+                <SimpleInput
+                  type="email"
+                  placeholder="email@lumara.id"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                />
+              </InputWithLabel>
+
+              <div className="border-t border-[var(--border)] pt-4 mt-2">
+                <h4 className="text-sm font-medium text-[var(--text-muted)] mb-4">Ganti Password</h4>
+                <div className="flex flex-col gap-4">
+                  <InputWithLabel label="Password Baru">
+                    <SimpleInput
+                      type="password"
+                      placeholder="Minimal 6 karakter"
+                      value={form.password}
+                      onChange={(e) => setForm({ ...form, password: e.target.value })}
+                    />
+                  </InputWithLabel>
+                  <InputWithLabel label="Konfirmasi Password">
+                    <SimpleInput
+                      type="password"
+                      placeholder="Ulangi password baru"
+                      value={form.confirmPassword}
+                      onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+                    />
+                  </InputWithLabel>
                 </div>
               </div>
-              
-              <button className="dark:bg-blackPrimary bg-whiteSecondary border border-gray-600 w-72 py-2 text-lg dark:hover:border-gray-500 hover:border-gray-400 duration-200 flex items-center justify-center gap-x-2">
-              <HiOutlineUpload className="dark:text-whiteSecondary text-blackPrimary text-xl" />
-              <span className="dark:text-whiteSecondary text-blackPrimary font-medium">
-              Change profile picture
-              </span>
-            </button>
-              </div>
-              {/* Additional sections like password change, email update, etc. */}
-              <div className="flex flex-col gap-3 mt-5">
-                <InputWithLabel label="Your username">
-                  <SimpleInput
-                    type="text"
-                    placeholder="Your username"
-                    value={inputObject.username}
-                    onChange={(e) =>
-                      setInputObject({
-                        ...inputObject,
-                        username: e.target.value,
-                      })
-                    }
-                  />
-                </InputWithLabel>
-                <InputWithLabel label="Your email">
-                  <SimpleInput
-                    type="text"
-                    placeholder="Your email"
-                    value={inputObject.email}
-                    onChange={(e) =>
-                      setInputObject({ ...inputObject, email: e.target.value })
-                    }
-                  />
-                </InputWithLabel>
-                <InputWithLabel label="New password">
-                  <SimpleInput
-                    type="password"
-                    placeholder="Enter your new password..."
-                    value={inputObject.password}
-                    onChange={(e) =>
-                      setInputObject({
-                        ...inputObject,
-                        password: e.target.value,
-                      })
-                    }
-                  />
-                </InputWithLabel>
-                <InputWithLabel label="Confirm new password">
-                  <SimpleInput
-                    type="password"
-                    placeholder="Confirm your new password..."
-                    value={inputObject.confirmPassword}
-                    onChange={(e) =>
-                      setInputObject({
-                        ...inputObject,
-                        confirmPassword: e.target.value,
-                      })
-                    }
-                  />
-                </InputWithLabel>
-              </div>
             </div>
           </div>
-          {/* Notifications section, already implemented in the provided code */}
         </div>
       </div>
     </div>
   );
 };
-
 export default Profile;

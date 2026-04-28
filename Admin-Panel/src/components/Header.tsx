@@ -1,8 +1,7 @@
-import { HiOutlineMoon, HiOutlineSun, HiOutlineBell, HiOutlineMenu, HiOutlineExternalLink } from "react-icons/hi";
+import { HiOutlineMoon, HiOutlineSun, HiOutlineMenu, HiOutlineExternalLink, HiOutlineLogout } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { setSidebar } from "../features/dashboard/dashboardSlice";
 import { Link } from "react-router-dom";
-import SearchInput from "./SearchInput";
 import { toggleDarkMode } from "../features/darkMode/darkModeSlice";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
@@ -21,77 +20,78 @@ const Header = () => {
 
   const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Admin";
   const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
+  const initials = displayName.charAt(0).toUpperCase();
 
   return (
-    <header className="dark:bg-blackPrimary bg-whiteSecondary relative border-b dark:border-blackSecondary border-gray-200">
-      <div className="flex justify-between items-center px-6 py-4 max-xl:flex-col max-xl:gap-y-4 max-[400px]:px-3">
-        <HiOutlineMenu
-          className="text-2xl dark:text-whiteSecondary text-blackPrimary absolute bottom-6 left-4 xl:hidden max-sm:static max-sm:order-1 cursor-pointer"
-          onClick={() => dispatch(setSidebar())}
-        />
+    <header className="sticky top-0 z-20 bg-[var(--surface)] border-b border-[var(--border)] backdrop-blur-md">
+      <div className="flex items-center justify-between px-4 sm:px-6 h-16 gap-4">
 
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <span className="text-xl font-bold dark:text-whiteSecondary text-blackPrimary">lumara.id</span>
-          <span className="text-xs px-2 py-0.5 dark:bg-whiteSecondary bg-blackPrimary dark:text-blackPrimary text-whiteSecondary rounded font-semibold">
-            ADMIN
-          </span>
-        </Link>
+        {/* Left: hamburger + logo */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => dispatch(setSidebar())}
+            className="xl:hidden p-2 rounded-lg text-[var(--text-muted)] hover:bg-[var(--bg-3)] transition-colors"
+          >
+            <HiOutlineMenu className="text-xl" />
+          </button>
+          <Link to="/" className="xl:hidden flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-700 to-brand-400 flex items-center justify-center">
+              <span className="text-white text-xs font-bold">L</span>
+            </div>
+            <span className="font-bold text-sm text-[var(--text)]">lumara.id</span>
+          </Link>
+        </div>
 
-        <SearchInput />
+        {/* Right: actions */}
+        <div className="flex items-center gap-2 ml-auto">
 
-        <div className="flex gap-3 items-center max-xl:justify-center">
-          {/* Link to store */}
+          {/* Visit store */}
           <a
             href={STORE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            title="Buka Website Toko"
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm dark:bg-blackSecondary bg-gray-100 dark:text-whiteSecondary text-blackPrimary border dark:border-blackSecondary border-gray-300 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:border-brand-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
           >
-            <HiOutlineExternalLink className="text-base" />
-            <span className="max-sm:hidden">Lihat Toko</span>
+            <HiOutlineExternalLink className="text-sm" />
+            <span>Lihat Toko</span>
           </a>
 
           {/* Dark mode toggle */}
-          {darkMode ? (
-            <HiOutlineSun
-              onClick={() => dispatch(toggleDarkMode())}
-              className="text-xl dark:text-whiteSecondary text-blackPrimary cursor-pointer"
-            />
-          ) : (
-            <HiOutlineMoon
-              onClick={() => dispatch(toggleDarkMode())}
-              className="text-xl dark:text-whiteSecondary text-blackPrimary cursor-pointer"
-            />
-          )}
+          <button
+            onClick={() => dispatch(toggleDarkMode())}
+            className="p-2 rounded-lg text-[var(--text-muted)] hover:bg-[var(--bg-3)] hover:text-[var(--brand)] transition-colors"
+            title={darkMode ? "Mode Terang" : "Mode Gelap"}
+          >
+            {darkMode
+              ? <HiOutlineSun className="text-xl" />
+              : <HiOutlineMoon className="text-xl" />}
+          </button>
 
-          <Link to="/notifications">
-            <HiOutlineBell className="text-xl dark:text-whiteSecondary text-blackPrimary" />
-          </Link>
+          {/* Divider */}
+          <div className="w-px h-6 bg-[var(--border)] mx-1" />
 
-          {/* User menu */}
-          <div className="flex gap-2 items-center group relative">
-            <Link to="/profile" className="flex gap-2 items-center cursor-pointer">
+          {/* User */}
+          <div className="flex items-center gap-2">
+            <Link to="/profile" className="flex items-center gap-2 group">
               {avatarUrl ? (
-                <img src={avatarUrl} alt="profile" className="rounded-full w-9 h-9 object-cover" />
+                <img src={avatarUrl} alt="avatar" className="w-8 h-8 rounded-full object-cover ring-2 ring-[var(--border)] group-hover:ring-brand-500 transition-all" />
               ) : (
-                <div className="w-9 h-9 rounded-full dark:bg-whiteSecondary bg-blackPrimary flex items-center justify-center">
-                  <span className="dark:text-blackPrimary text-whiteSecondary text-sm font-bold uppercase">
-                    {displayName.charAt(0)}
-                  </span>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-600 to-brand-400 flex items-center justify-center ring-2 ring-[var(--border)] group-hover:ring-brand-500 transition-all">
+                  <span className="text-white text-xs font-bold">{initials}</span>
                 </div>
               )}
-              <div className="flex flex-col max-xl:hidden">
-                <p className="dark:text-whiteSecondary text-blackPrimary text-sm font-medium">{displayName}</p>
-                <p className="dark:text-gray-400 text-gray-500 text-xs">Admin</p>
+              <div className="hidden md:flex flex-col leading-none">
+                <span className="text-sm font-semibold text-[var(--text)]">{displayName}</span>
+                <span className="text-[10px] text-[var(--text-muted)] font-medium uppercase tracking-wider">Admin</span>
               </div>
             </Link>
+
             <button
               onClick={handleSignOut}
-              className="ml-1 text-xs dark:text-gray-400 text-gray-500 hover:underline"
+              title="Keluar"
+              className="p-2 rounded-lg text-[var(--text-muted)] hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950 dark:hover:text-red-400 transition-colors"
             >
-              Keluar
+              <HiOutlineLogout className="text-lg" />
             </button>
           </div>
         </div>

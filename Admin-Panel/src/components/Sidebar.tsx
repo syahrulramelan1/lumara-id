@@ -6,71 +6,78 @@ import { NavLink } from "react-router-dom";
 
 const STORE_URL = (import.meta.env.VITE_STORE_URL as string) || "https://lumara-id-mobile.onrender.com";
 
-const navActive = "flex items-center gap-4 py-3.5 px-6 dark:bg-whiteSecondary bg-white dark:text-blackPrimary text-blackPrimary font-semibold";
-const navInactive = "flex items-center gap-4 py-3.5 px-6 dark:bg-blackPrimary bg-whiteSecondary dark:hover:bg-blackSecondary hover:bg-white dark:text-whiteSecondary text-blackPrimary transition-colors";
+const navItem = (isActive: boolean) =>
+  `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 mx-2 ${
+    isActive
+      ? "bg-gradient-to-r from-brand-700 to-brand-500 text-white shadow-md"
+      : "text-[var(--text-muted)] hover:bg-[var(--brand-light)] hover:text-[var(--brand)]"
+  }`;
+
+const navItems = [
+  { to: "/",           end: true,  icon: HiOutlineHome,            label: "Dashboard" },
+  { to: "/products",   end: false, icon: HiOutlineDevicePhoneMobile,label: "Produk" },
+  { to: "/categories", end: false, icon: HiOutlineTag,             label: "Kategori" },
+  { to: "/orders",     end: false, icon: HiOutlineTruck,           label: "Pesanan" },
+  { to: "/users",      end: false, icon: HiOutlineUserGroup,       label: "Pengguna" },
+  { to: "/reviews",    end: false, icon: HiOutlineStar,            label: "Ulasan" },
+  { to: "/profile",    end: false, icon: HiOutlineUser,            label: "Profil" },
+];
 
 const Sidebar = () => {
   const { isSidebarOpen } = useAppSelector((state) => state.dashboard);
   const dispatch = useAppDispatch();
-  const sidebarClass = isSidebarOpen ? "sidebar-open" : "sidebar-closed";
 
   return (
     <div className="relative">
-      <div className={`w-64 min-h-screen dark:bg-blackPrimary bg-whiteSecondary pt-4 xl:sticky xl:top-0 xl:z-10 max-xl:fixed max-xl:top-0 max-xl:z-10 xl:translate-x-0 flex flex-col ${sidebarClass}`}>
-        <HiOutlineX
-          className="dark:text-whiteSecondary text-blackPrimary text-2xl ml-auto mb-2 mr-3 cursor-pointer xl:hidden"
+      <div className={`w-64 min-h-screen dark:bg-[#0D0B14] bg-white border-r border-[var(--border)] pt-4 xl:sticky xl:top-0 xl:z-10 max-xl:fixed max-xl:top-0 max-xl:z-10 xl:translate-x-0 flex flex-col ${isSidebarOpen ? "sidebar-open" : "sidebar-closed"}`}>
+
+        {/* Close button (mobile) */}
+        <button
+          className="xl:hidden ml-auto mr-3 mb-2 p-1.5 rounded-lg text-[var(--text-muted)] hover:bg-[var(--brand-light)] hover:text-[var(--brand)] transition-colors"
           onClick={() => dispatch(setSidebar())}
-        />
+        >
+          <HiOutlineX className="text-xl" />
+        </button>
 
-        <nav className="flex flex-col flex-1">
-          <NavLink to="/" end className={({ isActive }) => isActive ? navActive : navInactive}>
-            <HiOutlineHome className="text-xl shrink-0" />
-            <span>Dashboard</span>
-          </NavLink>
+        {/* Brand */}
+        <div className="px-6 mb-6">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-700 to-brand-400 flex items-center justify-center">
+              <span className="text-white text-xs font-bold">L</span>
+            </div>
+            <div>
+              <p className="font-bold text-sm text-[var(--text)]">lumara.id</p>
+              <p className="text-[10px] text-[var(--text-muted)] font-medium uppercase tracking-wider">Admin Panel</p>
+            </div>
+          </div>
+        </div>
 
-          <NavLink to="/products" className={({ isActive }) => isActive ? navActive : navInactive}>
-            <HiOutlineDevicePhoneMobile className="text-xl shrink-0" />
-            <span>Produk</span>
-          </NavLink>
+        {/* Nav label */}
+        <p className="px-6 mb-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)]">Menu</p>
 
-          <NavLink to="/categories" className={({ isActive }) => isActive ? navActive : navInactive}>
-            <HiOutlineTag className="text-xl shrink-0" />
-            <span>Kategori</span>
-          </NavLink>
-
-          <NavLink to="/orders" className={({ isActive }) => isActive ? navActive : navInactive}>
-            <HiOutlineTruck className="text-xl shrink-0" />
-            <span>Pesanan</span>
-          </NavLink>
-
-          <NavLink to="/users" className={({ isActive }) => isActive ? navActive : navInactive}>
-            <HiOutlineUserGroup className="text-xl shrink-0" />
-            <span>Pengguna</span>
-          </NavLink>
-
-          <NavLink to="/reviews" className={({ isActive }) => isActive ? navActive : navInactive}>
-            <HiOutlineStar className="text-xl shrink-0" />
-            <span>Ulasan</span>
-          </NavLink>
-
-          <NavLink to="/profile" className={({ isActive }) => isActive ? navActive : navInactive}>
-            <HiOutlineUser className="text-xl shrink-0" />
-            <span>Profil</span>
-          </NavLink>
+        {/* Main navigation */}
+        <nav className="flex flex-col flex-1 gap-0.5 pb-4">
+          {navItems.map(({ to, end, icon: Icon, label }) => (
+            <NavLink key={to} to={to} end={end} className={({ isActive }) => navItem(isActive)}>
+              <Icon className="text-lg shrink-0" />
+              <span>{label}</span>
+            </NavLink>
+          ))}
         </nav>
 
-        <div className="border-t dark:border-blackSecondary border-gray-200">
-          <NavLink to="/help-desk" className={({ isActive }) => isActive ? navActive : navInactive}>
-            <HiOutlineInformationCircle className="text-xl shrink-0" />
+        {/* Bottom */}
+        <div className="border-t border-[var(--border)] pt-2 pb-4 flex flex-col gap-0.5">
+          <NavLink to="/help-desk" className={({ isActive }) => navItem(isActive)}>
+            <HiOutlineInformationCircle className="text-lg shrink-0" />
             <span>Bantuan</span>
           </NavLink>
           <a
             href={STORE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className={navInactive}
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium mx-2 text-[var(--text-muted)] hover:bg-[var(--brand-light)] hover:text-[var(--brand)] transition-all"
           >
-            <HiOutlineExternalLink className="text-xl shrink-0" />
+            <HiOutlineExternalLink className="text-lg shrink-0" />
             <span>Buka Toko</span>
           </a>
         </div>
