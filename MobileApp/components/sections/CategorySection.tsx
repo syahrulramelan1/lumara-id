@@ -1,21 +1,27 @@
+"use client";
 import Link from "next/link";
 import Image from "next/image";
 import type { CategoryWithCount } from "@/types";
+import { useUIStore } from "@/store/uiStore";
+import { getT } from "@/lib/i18n";
 
 interface CategorySectionProps {
   categories: CategoryWithCount[];
 }
 
 export function CategorySection({ categories }: CategorySectionProps) {
+  const language = useUIStore((s) => s.language);
+  const t = getT(language);
+
   return (
     <section className="max-w-7xl mx-auto px-4 py-12">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Kategori</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">Temukan koleksi sesuai style kamu</p>
+          <h2 className="text-2xl font-bold text-foreground">{t.sections.categories_title}</h2>
+          <p className="text-sm text-muted-foreground mt-0.5">{t.sections.categories_subtitle}</p>
         </div>
         <Link href="/categories" className="text-sm font-medium text-primary hover:underline">
-          Lihat semua
+          {t.sections.view_all}
         </Link>
       </div>
 
@@ -41,7 +47,9 @@ export function CategorySection({ categories }: CategorySectionProps) {
             </div>
             <div className="text-center">
               <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{cat.name}</p>
-              <p className="text-xs text-muted-foreground">{cat._count.products} produk</p>
+              <p className="text-xs text-muted-foreground">
+                {cat._count.products} {t.sections.products_count}
+              </p>
             </div>
           </Link>
         ))}

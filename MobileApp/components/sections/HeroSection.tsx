@@ -3,8 +3,13 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { SearchBar } from "@/components/shared/SearchBar";
+import { useUIStore } from "@/store/uiStore";
+import { getT } from "@/lib/i18n";
 
 export function HeroSection() {
+  const language = useUIStore((s) => s.language);
+  const t = getT(language);
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-[#F9F9FF] via-[#EDE9FE] to-[#F0E6FF] dark:from-[#0F0A1E] dark:via-[#1a0f2e] dark:to-[#0F0A1E] min-h-[480px] flex items-center">
       <div className="absolute inset-0 pointer-events-none">
@@ -21,18 +26,18 @@ export function HeroSection() {
         >
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-semibold mb-6">
             <Sparkles size={14} />
-            Koleksi Ramadhan 2025 Tersedia
+            {t.hero.badge}
           </div>
 
           <h1 className="text-4xl md:text-6xl font-extrabold leading-tight text-foreground mb-4">
-            Tampil Anggun,{" "}
+            {t.hero.title_1}{" "}
             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              Tetap Syar&apos;i
+              {t.hero.title_2}
             </span>
           </h1>
 
           <p className="text-lg text-muted-foreground mb-8 max-w-lg">
-            Koleksi modest fashion premium pilihan untuk muslimah Indonesia. Kualitas terbaik, harga bersahabat.
+            {t.hero.subtitle}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 mb-8">
@@ -40,23 +45,23 @@ export function HeroSection() {
               href="/products"
               className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-white font-semibold rounded-[12px] hover:bg-primary/90 transition-all hover:gap-3"
             >
-              Belanja Sekarang
+              {t.hero.shop_now}
               <ArrowRight size={18} />
             </Link>
             <Link
               href="/categories"
               className="inline-flex items-center justify-center gap-2 px-6 py-3.5 border-2 border-primary text-primary font-semibold rounded-[12px] hover:bg-primary/5 transition-colors"
             >
-              Lihat Koleksi
+              {t.hero.view_collection}
             </Link>
           </div>
 
-          <SearchBar className="max-w-md" placeholder="Cari gamis, hijab, abaya..." />
+          <SearchBar className="max-w-md" placeholder={t.hero.search_placeholder} />
 
           <div className="flex items-center gap-6 mt-6 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1.5">✅ Gratis ongkir s.d. Rp 500rb</span>
-            <span className="flex items-center gap-1.5">✅ Bahan premium</span>
-            <span className="flex items-center gap-1.5">✅ 7 hari retur</span>
+            <span className="flex items-center gap-1.5">✅ {t.hero.badge_shipping}</span>
+            <span className="flex items-center gap-1.5">✅ {t.hero.badge_premium}</span>
+            <span className="flex items-center gap-1.5">✅ {t.hero.badge_return}</span>
           </div>
         </motion.div>
       </div>

@@ -3,18 +3,22 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Grid3X3, Search, Heart, User } from "lucide-react";
 import { useWishlistStore } from "@/store/wishlistStore";
-
-const navItems = [
-  { href: "/", icon: Home, label: "Beranda" },
-  { href: "/categories", icon: Grid3X3, label: "Kategori" },
-  { href: "/search", icon: Search, label: "Cari" },
-  { href: "/wishlist", icon: Heart, label: "Wishlist" },
-  { href: "/account", icon: User, label: "Akun" },
-];
+import { useUIStore } from "@/store/uiStore";
+import { getT } from "@/lib/i18n";
 
 export function BottomNav() {
   const pathname = usePathname();
   const wishCount = useWishlistStore((s) => s.count());
+  const language = useUIStore((s) => s.language);
+  const t = getT(language);
+
+  const navItems = [
+    { href: "/", icon: Home, label: t.bottom_nav.home },
+    { href: "/categories", icon: Grid3X3, label: t.bottom_nav.categories },
+    { href: "/search", icon: Search, label: t.bottom_nav.search },
+    { href: "/wishlist", icon: Heart, label: t.bottom_nav.wishlist },
+    { href: "/account", icon: User, label: t.bottom_nav.account },
+  ];
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border safe-area-pb">

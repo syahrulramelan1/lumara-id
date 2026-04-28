@@ -60,6 +60,24 @@
     --radius-pill: 9999px;
   }
 
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  /* PURPLE THEME (original brand surfaces)          */
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  [data-theme="purple"] {
+    --background: #F9F9FF;
+    --surface-low: #F0F3FF;
+    --surface: #E7EEFE;
+    --surface-high: #E2E8F8;
+    --card: #FFFFFF;
+    --card-border: #EDE9FE;
+    --primary-container: #EDE0FF;
+    --secondary-container: #F3AEFF;
+    --text-primary: #151C27;
+    --text-secondary: #4A4455;
+    --text-muted: #7B7487;
+    --outline: #CCC3D8;
+  }
+
   .dark {
     /* ━━━━━━ BRAND COLORS (DARK) ━━━━━━ */
     --primary: #7C3AED;

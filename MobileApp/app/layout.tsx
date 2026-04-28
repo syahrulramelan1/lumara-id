@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { UIProvider } from "@/components/providers/UIProvider";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -89,7 +90,9 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          {children}
+          <UIProvider>
+            {children}
+          </UIProvider>
 
           <Toaster
             position="top-center"
