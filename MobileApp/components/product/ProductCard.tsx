@@ -19,7 +19,7 @@ export function ProductCard({ product, priority = false, index = 0 }: ProductCar
   const images: string[] = Array.isArray(product.images)
     ? (product.images as string[])
     : (() => { try { return JSON.parse(product.images as string); } catch { return []; } })();
-  const coverImage = images[0] ?? "/placeholder.png";
+  const coverImage = images[0] ?? null;
   const wishlisted = isWishlisted(product.id);
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -39,14 +39,20 @@ export function ProductCard({ product, priority = false, index = 0 }: ProductCar
     >
       <Link href={`/products/${product.slug}`}>
         <div className="relative aspect-[3/4] overflow-hidden bg-muted">
-          <Image
-            src={coverImage}
-            alt={product.name}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-            priority={priority}
-          />
+          {coverImage ? (
+            <Image
+              src={coverImage}
+              alt={product.name}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              priority={priority}
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center">
+              <span className="text-4xl opacity-30">🧕</span>
+            </div>
+          )}
           {discount && (
             <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
               -{discount}%

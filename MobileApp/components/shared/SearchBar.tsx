@@ -27,15 +27,25 @@ export function SearchBar({ placeholder, className = "", autoFocus = false }: Se
 
   return (
     <form onSubmit={handleSubmit} className={`relative ${className}`}>
-      <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+      <Search
+        size={16}
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none z-10"
+      />
       <input
         ref={inputRef}
-        type="search"
+        type="text"
+        inputMode="search"
+        enterKeyHint="search"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={placeholder ?? t.hero.search_placeholder}
         autoFocus={autoFocus}
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="off"
+        spellCheck={false}
         className="w-full pl-9 pr-9 py-2.5 text-sm bg-muted border border-border rounded-[12px] outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+        style={{ WebkitAppearance: "none", appearance: "none" }}
       />
       {query && (
         <button
