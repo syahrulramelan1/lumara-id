@@ -19,9 +19,11 @@ export function ProductDetail({ product }: ProductDetailProps) {
   const { addItem } = useCartStore();
   const { toggle, isWishlisted } = useWishlistStore();
 
-  const images: string[] = (() => { try { return JSON.parse(product.images); } catch { return []; } })();
-  const sizes: string[] = (() => { try { return JSON.parse(product.sizes); } catch { return []; } })();
-  const colors: string[] = (() => { try { return JSON.parse(product.colors); } catch { return []; } })();
+  const parseJsonArr = (val: unknown): string[] =>
+    Array.isArray(val) ? (val as string[]) : (() => { try { return JSON.parse(val as string); } catch { return []; } })();
+  const images: string[] = parseJsonArr(product.images);
+  const sizes: string[] = parseJsonArr(product.sizes);
+  const colors: string[] = parseJsonArr(product.colors);
 
   const [activeImage, setActiveImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(sizes[0] ?? "");

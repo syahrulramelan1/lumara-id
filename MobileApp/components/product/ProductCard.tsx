@@ -14,7 +14,9 @@ interface ProductCardProps {
 
 export function ProductCard({ product, priority = false }: ProductCardProps) {
   const { toggle, isWishlisted } = useWishlistStore();
-  const images: string[] = (() => { try { return JSON.parse(product.images); } catch { return []; } })();
+  const images: string[] = Array.isArray(product.images)
+    ? (product.images as string[])
+    : (() => { try { return JSON.parse(product.images as string); } catch { return []; } })();
   const coverImage = images[0] ?? "/placeholder.png";
   const wishlisted = isWishlisted(product.id);
   const discount = product.originalPrice
