@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, ShoppingBag, Heart, Menu, Sun, Moon, Globe } from "lucide-react";
+import { Search, ShoppingBag, Heart, Menu, Globe } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
@@ -49,14 +49,29 @@ export function Navbar() {
             <span className="text-xs font-semibold uppercase">{language}</span>
           </button>
 
-          {/* Dark / Light Toggle */}
-          <button
-            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-            title={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            className="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-          >
-            {resolvedTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
+          {/* White / Dark segmented toggle */}
+          <div className="flex items-center rounded-lg border border-border bg-muted p-0.5 gap-0.5">
+            <button
+              onClick={() => setTheme("light")}
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                resolvedTheme !== "dark"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              White
+            </button>
+            <button
+              onClick={() => setTheme("dark")}
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                resolvedTheme === "dark"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Dark
+            </button>
+          </div>
 
           <Link href="/search" className="p-2 hover:bg-muted rounded-full transition-colors" aria-label={t.nav.products}>
             <Search size={20} />
