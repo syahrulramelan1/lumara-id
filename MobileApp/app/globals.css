@@ -9,29 +9,29 @@
 
 @layer base {
   :root {
-    /* ━━━━━━ BRAND COLORS ━━━━━━ */
-    --primary: #630ED4;
-    --primary-hover: #7C3AED;
-    --primary-container: #F3EEFF;
+    /* ━━━━━━ BRAND — PURPLE ACCENT ━━━━━━ */
+    --primary: #7C3AED;
+    --primary-hover: #6D28D9;
+    --primary-container: #EDE9FE;
     --primary-foreground: #FFFFFF;
 
-    --secondary: #824790;
-    --secondary-container: #FCF0FF;
+    --secondary: #9333EA;
+    --secondary-container: #F3E8FF;
     --secondary-foreground: #FFFFFF;
 
-    /* ━━━━━━ SURFACES — PURE WHITE ━━━━━━ */
+    /* ━━━━━━ SURFACES — WHITE ━━━━━━ */
     --background: #FFFFFF;
-    --surface-low: #F7F7F8;
-    --surface: #F0F0F2;
-    --surface-high: #E8E8EA;
+    --surface-low: #FAFAFA;
+    --surface: #F4F4F5;
+    --surface-high: #E4E4E7;
 
     --card: #FFFFFF;
-    --card-border: #EBEBED;
+    --card-border: #E4E4E7;
 
     /* ━━━━━━ TEXT ━━━━━━ */
-    --text-primary: #111111;
-    --text-secondary: #444444;
-    --text-muted: #888888;
+    --text-primary: #09090B;
+    --text-secondary: #3F3F46;
+    --text-muted: #71717A;
 
     /* ━━━━━━ STATES ━━━━━━ */
     --outline: #D4D4D8;
@@ -39,7 +39,7 @@
     --error: #DC2626;
     --rating: #F59E0B;
 
-    /* ━━━━━━ SHADCN COMPATIBILITY ━━━━━━ */
+    /* ━━━━━━ SHADCN COMPAT ━━━━━━ */
     --foreground: var(--text-primary);
     --card-foreground: var(--text-primary);
     --popover: var(--card);
@@ -54,62 +54,46 @@
     --input: var(--outline);
     --ring: var(--primary);
 
-    /* ━━━━━━ RADIUS ━━━━━━ */
     --radius: 0.875rem;
     --radius-btn: 0.75rem;
     --radius-pill: 9999px;
   }
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  /* PURPLE THEME (original brand surfaces)          */
+  /* DARK — VSCode-style, purple nuance             */
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  [data-theme="purple"] {
-    --background: #F9F9FF;
-    --surface-low: #F0F3FF;
-    --surface: #E7EEFE;
-    --surface-high: #E2E8F8;
-    --card: #FFFFFF;
-    --card-border: #EDE9FE;
-    --primary-container: #EDE0FF;
-    --secondary-container: #F3AEFF;
-    --text-primary: #151C27;
-    --text-secondary: #4A4455;
-    --text-muted: #7B7487;
-    --outline: #CCC3D8;
-  }
-
   .dark {
-    /* ━━━━━━ BRAND COLORS (DARK) ━━━━━━ */
-    --primary: #7C3AED;
-    --primary-hover: #9D6FF5;
-    --primary-container: #3B2F6B;
+    /* ━━━━━━ BRAND (DARK) ━━━━━━ */
+    --primary: #A78BFA;
+    --primary-hover: #C4B5FD;
+    --primary-container: #2E1065;
     --primary-foreground: #FFFFFF;
 
-    --secondary: #B17CC0;
-    --secondary-container: #4A2B57;
+    --secondary: #C084FC;
+    --secondary-container: #3B0764;
     --secondary-foreground: #FFFFFF;
 
-    /* ━━━━━━ SURFACES (DARK) ━━━━━━ */
-    --background: #0F0A1E;
-    --surface-low: #1A1330;
-    --surface: #221A3A;
-    --surface-high: #2D2148;
+    /* ━━━━━━ SURFACES — VSCode dark ━━━━━━ */
+    --background: #1E1E1E;
+    --surface-low: #252526;
+    --surface: #2D2D30;
+    --surface-high: #3C3C3C;
 
-    --card: #221A3A;
-    --card-border: #3B2F6B;
+    --card: #252526;
+    --card-border: #3C3C3C;
 
-    /* ━━━━━━ TEXT (DARK) ━━━━━━ */
-    --text-primary: #EBF1FF;
-    --text-secondary: #C5B8E0;
-    --text-muted: #9D95B0;
+    /* ━━━━━━ TEXT ━━━━━━ */
+    --text-primary: #D4D4D4;
+    --text-secondary: #AEAEAE;
+    --text-muted: #6E6E6E;
 
-    /* ━━━━━━ STATES (DARK) ━━━━━━ */
-    --outline: #4A3A6B;
-    --success: #66D49B;
-    --error: #FF6B6B;
-    --rating: #F0B429;
+    /* ━━━━━━ STATES ━━━━━━ */
+    --outline: #3C3C3C;
+    --success: #4EC9B0;
+    --error: #F48771;
+    --rating: #CE9178;
 
-    /* ━━━━━━ SHADCN COMPATIBILITY (DARK) ━━━━━━ */
+    /* ━━━━━━ SHADCN COMPAT (DARK) ━━━━━━ */
     --foreground: var(--text-primary);
     --card-foreground: var(--text-primary);
     --popover: var(--card);

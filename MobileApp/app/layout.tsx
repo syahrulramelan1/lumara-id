@@ -86,8 +86,8 @@ export default function RootLayout({
       <body className={`${jakarta.variable} font-sans antialiased min-h-screen bg-background text-text-primary`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
+          defaultTheme="system"
+          enableSystem={true}
           disableTransitionOnChange
         >
           <UIProvider>

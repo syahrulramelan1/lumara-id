@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, ShoppingBag, Heart, Menu, Palette, Globe } from "lucide-react";
+import { Search, ShoppingBag, Heart, Menu, Sun, Moon, Globe } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { useUIStore } from "@/store/uiStore";
@@ -11,7 +12,8 @@ export function Navbar() {
   const pathname = usePathname();
   const cartCount = useCartStore((s) => s.count());
   const wishCount = useWishlistStore((s) => s.count());
-  const { colorTheme, language, toggleColorTheme, toggleLanguage } = useUIStore();
+  const { language, toggleLanguage } = useUIStore();
+  const { resolvedTheme, setTheme } = useTheme();
   const t = getT(language);
 
   return (
@@ -47,16 +49,13 @@ export function Navbar() {
             <span className="text-xs font-semibold uppercase">{language}</span>
           </button>
 
-          {/* Color Theme Toggle */}
+          {/* Dark / Light Toggle */}
           <button
-            onClick={toggleColorTheme}
-            title={colorTheme === "white" ? t.nav.theme_purple : t.nav.theme_white}
-            className="p-2 rounded-full hover:bg-muted transition-colors"
+            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+            title={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            className="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
           >
-            <Palette
-              size={18}
-              className={colorTheme === "purple" ? "text-primary" : "text-muted-foreground hover:text-foreground"}
-            />
+            {resolvedTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
           <Link href="/search" className="p-2 hover:bg-muted rounded-full transition-colors" aria-label={t.nav.products}>
