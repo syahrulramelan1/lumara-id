@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { Product } from "@prisma/client";
+import type { Product, Prisma } from "@prisma/client";
 import type { ProductWithCategory, ProductWithReviews, FilterParams, PaginationResult } from "@/types";
 
 export class ProductModel {
@@ -115,11 +115,11 @@ export class ProductModel {
     };
   }
 
-  async create(data: Omit<Product, "id" | "createdAt" | "updatedAt">): Promise<Product> {
+  async create(data: Prisma.ProductUncheckedCreateInput): Promise<Product> {
     return prisma.product.create({ data });
   }
 
-  async update(id: string, data: Partial<Omit<Product, "id" | "createdAt" | "updatedAt">>): Promise<Product> {
+  async update(id: string, data: Prisma.ProductUncheckedUpdateInput): Promise<Product> {
     return prisma.product.update({ where: { id }, data });
   }
 
