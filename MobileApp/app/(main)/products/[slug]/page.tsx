@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { productService } from "@/lib/services/ProductService";
 import { ProductDetail } from "@/components/product/ProductDetail";
 import { ProductGrid } from "@/components/shared/ProductGrid";
+import { RelatedProductsHeader } from "@/components/shared/RelatedProductsHeader";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -11,7 +12,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const product = await productService.getProductBySlug(slug);
-  if (!product) return { title: "Produk tidak ditemukan" };
+  if (!product) return { title: "Not Found" };
   return {
     title: product.name,
     description: product.description,
@@ -31,7 +32,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
       {related.length > 0 && (
         <div className="mt-16">
-          <h2 className="text-xl font-bold mb-6">Produk Serupa</h2>
+          <RelatedProductsHeader />
           <ProductGrid products={related} cols={4} />
         </div>
       )}

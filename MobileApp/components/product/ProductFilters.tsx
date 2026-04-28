@@ -1,5 +1,7 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useUIStore } from "@/store/uiStore";
+import { getT } from "@/lib/i18n";
 import type { Category } from "@prisma/client";
 import type { FilterParams } from "@/types";
 
@@ -8,17 +10,19 @@ interface ProductFiltersProps {
   currentParams: FilterParams;
 }
 
-const sortOptions = [
-  { value: "terbaru", label: "Terbaru" },
-  { value: "terlaris", label: "Terlaris" },
-  { value: "harga-terendah", label: "Harga Terendah" },
-  { value: "harga-tertinggi", label: "Harga Tertinggi" },
-  { value: "rating", label: "Rating" },
-];
-
 export function ProductFilters({ categories, currentParams }: ProductFiltersProps) {
   const router = useRouter();
   const sp = useSearchParams();
+  const { language } = useUIStore();
+  const t = getT(language);
+
+  const sortOptions = [
+    { value: "terbaru", label: t.product.sort_newest },
+    { value: "terlaris", label: t.product.sort_bestseller },
+    { value: "harga-terendah", label: t.product.sort_price_low },
+    { value: "harga-tertinggi", label: t.product.sort_price_high },
+    { value: "rating", label: t.product.sort_rating },
+  ];
 
   const update = (key: string, value: string | undefined) => {
     const params = new URLSearchParams(sp.toString());
@@ -30,7 +34,7 @@ export function ProductFilters({ categories, currentParams }: ProductFiltersProp
   return (
     <div className="space-y-6 sticky top-20">
       <div>
-        <h3 className="text-sm font-semibold mb-3">Kategori</h3>
+        <h3 className="text-sm font-semibold mb-3">{t.product.category_label}</h3>
         <ul className="space-y-1">
           <li>
             <button
@@ -39,7 +43,7 @@ export function ProductFilters({ categories, currentParams }: ProductFiltersProp
                 !currentParams.category ? "bg-primary/10 text-primary font-medium" : "hover:bg-muted text-foreground"
               }`}
             >
-              Semua Kategori
+              {t.product.all_categories}
             </button>
           </li>
           {categories.map((cat) => (
@@ -58,7 +62,7 @@ export function ProductFilters({ categories, currentParams }: ProductFiltersProp
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold mb-3">Urutkan</h3>
+        <h3 className="text-sm font-semibold mb-3">{t.product.sort}</h3>
         <ul className="space-y-1">
           {sortOptions.map((opt) => (
             <li key={opt.value}>

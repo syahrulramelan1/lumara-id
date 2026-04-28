@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createClientComponent } from "@/lib/supabase-browser";
+import { useUIStore } from "@/store/uiStore";
+import { getT } from "@/lib/i18n";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -11,6 +13,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
+  const { language } = useUIStore();
+  const t = getT(language);
 
   const supabase = createClientComponent();
 
@@ -21,15 +25,15 @@ export default function LoginPage() {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        toast.success("Berhasil masuk!");
+        toast.success(t.auth.success_login);
         router.push("/");
       } else {
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        toast.success("Akun dibuat! Cek email untuk verifikasi.");
+        toast.success(t.auth.success_register);
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Terjadi kesalahan");
+      toast.error(err instanceof Error ? err.message : t.auth.error);
     } finally {
       setLoading(false);
     }
@@ -44,14 +48,14 @@ export default function LoginPage() {
           </span>
         </Link>
         <p className="mt-2 text-sm text-muted-foreground">
-          {isLogin ? "Masuk ke akun Anda" : "Buat akun baru"}
+          {isLogin ? t.auth.login_title : t.auth.register_title}
         </p>
       </div>
 
       <div className="bg-card border border-card-border rounded-2xl p-6 shadow-card">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1.5">Email</label>
+            <label className="block text-sm font-medium mb-1.5">{t.auth.email}</label>
             <input
               type="email"
               required
@@ -63,7 +67,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1.5">Password</label>
+            <label className="block text-sm font-medium mb-1.5">{t.auth.password}</label>
             <input
               type="password"
               required
@@ -79,23 +83,23 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full py-3 bg-primary text-white font-semibold rounded-[12px] hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {loading ? "Memproses..." : isLogin ? "Masuk" : "Daftar"}
+            {loading ? t.auth.processing : isLogin ? t.auth.sign_in : t.auth.sign_up}
           </button>
         </form>
 
         <div className="mt-4 text-center text-sm text-muted-foreground">
-          {isLogin ? "Belum punya akun?" : "Sudah punya akun?"}{" "}
+          {isLogin ? t.auth.no_account : t.auth.have_account}{" "}
           <button
             onClick={() => setIsLogin(!isLogin)}
             className="text-primary font-medium hover:underline"
           >
-            {isLogin ? "Daftar sekarang" : "Masuk"}
+            {isLogin ? t.auth.register_link : t.auth.sign_in}
           </button>
         </div>
       </div>
 
       <p className="mt-6 text-center text-xs text-muted-foreground">
-        <Link href="/" className="hover:text-primary transition-colors">← Kembali ke beranda</Link>
+        <Link href="/" className="hover:text-primary transition-colors">{t.auth.back_home}</Link>
       </p>
     </div>
   );

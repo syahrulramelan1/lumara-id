@@ -1,4 +1,7 @@
+"use client";
 import { ProductCard } from "@/components/product/ProductCard";
+import { useUIStore } from "@/store/uiStore";
+import { getT } from "@/lib/i18n";
 import type { ProductWithCategory } from "@/types";
 
 interface ProductGridProps {
@@ -8,6 +11,9 @@ interface ProductGridProps {
 }
 
 export function ProductGrid({ products, cols = 2, priority = 0 }: ProductGridProps) {
+  const { language } = useUIStore();
+  const t = getT(language);
+
   const colClass = {
     2: "grid-cols-2",
     3: "grid-cols-2 sm:grid-cols-3",
@@ -18,8 +24,8 @@ export function ProductGrid({ products, cols = 2, priority = 0 }: ProductGridPro
     return (
       <div className="text-center py-16 text-muted-foreground">
         <p className="text-4xl mb-3">🧕</p>
-        <p className="font-medium">Produk tidak ditemukan</p>
-        <p className="text-sm mt-1">Coba kata kunci atau filter yang berbeda</p>
+        <p className="font-medium">{t.product.not_found}</p>
+        <p className="text-sm mt-1">{t.product.not_found_sub}</p>
       </div>
     );
   }

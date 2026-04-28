@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
+import { useUIStore } from "@/store/uiStore";
+import { getT } from "@/lib/i18n";
 import type { ProductWithReviews } from "@/types";
 
 interface ProductDetailProps {
@@ -18,6 +20,8 @@ export function ProductDetail({ product }: ProductDetailProps) {
   const router = useRouter();
   const { addItem } = useCartStore();
   const { toggle, isWishlisted } = useWishlistStore();
+  const { language } = useUIStore();
+  const t = getT(language);
 
   const parseJsonArr = (val: unknown): string[] =>
     Array.isArray(val) ? (val as string[]) : (() => { try { return JSON.parse(val as string); } catch { return []; } })();
@@ -37,7 +41,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
   const handleAddToCart = () => {
     if (!selectedSize || !selectedColor) {
-      toast.error("Pilih ukuran dan warna terlebih dahulu");
+      toast.error(t.product.select_size_color);
       return;
     }
     addItem({
@@ -49,7 +53,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
       color: selectedColor,
       quantity: qty,
     });
-    toast.success("Ditambahkan ke keranjang!");
+    toast.success(t.product.added_to_cart);
   };
 
   return (
@@ -58,7 +62,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
         onClick={() => router.back()}
         className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
       >
-        <ChevronLeft size={16} /> Kembali
+        <ChevronLeft size={16} /> {t.common.back}
       </button>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
@@ -110,7 +114,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 ))}
               </div>
               <span className="text-sm font-medium">{product.rating.toFixed(1)}</span>
-              <span className="text-sm text-muted-foreground">({product.reviewCount} ulasan)</span>
+              <span className="text-sm text-muted-foreground">({product.reviewCount} {t.product.reviews})</span>
             </div>
           </div>
 
@@ -123,7 +127,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
           {sizes.length > 0 && (
             <div>
-              <p className="text-sm font-semibold mb-2">Ukuran: <span className="font-normal text-muted-foreground">{selectedSize}</span></p>
+              <p className="text-sm font-semibold mb-2">{t.product.size}: <span className="font-normal text-muted-foreground">{selectedSize}</span></p>
               <div className="flex flex-wrap gap-2">
                 {sizes.map((size) => (
                   <button
@@ -142,7 +146,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
           {colors.length > 0 && (
             <div>
-              <p className="text-sm font-semibold mb-2">Warna: <span className="font-normal text-muted-foreground">{selectedColor}</span></p>
+              <p className="text-sm font-semibold mb-2">{t.product.color}: <span className="font-normal text-muted-foreground">{selectedColor}</span></p>
               <div className="flex flex-wrap gap-2">
                 {colors.map((color) => (
                   <button
@@ -160,7 +164,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
           )}
 
           <div className="flex items-center gap-3">
-            <p className="text-sm font-semibold">Jumlah:</p>
+            <p className="text-sm font-semibold">{t.product.qty}:</p>
             <div className="flex items-center border border-border rounded-[10px] overflow-hidden">
               <button
                 onClick={() => setQty(Math.max(1, qty - 1))}
@@ -172,7 +176,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 className="px-3 py-2 hover:bg-muted transition-colors font-bold"
               >+</button>
             </div>
-            <span className="text-xs text-muted-foreground">Stok: {product.stock}</span>
+            <span className="text-xs text-muted-foreground">{t.product.stock}: {product.stock}</span>
           </div>
 
           <div className="flex gap-3">
@@ -181,7 +185,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
               className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-primary text-white font-semibold rounded-[12px] hover:bg-primary/90 transition-colors active:scale-95"
             >
               <ShoppingBag size={18} />
-              Tambah ke Keranjang
+              {t.product.add_to_cart}
             </button>
             <button
               onClick={() => toggle(product.id)}
@@ -194,7 +198,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
           </div>
 
           <div className="border-t border-border pt-4">
-            <p className="text-sm font-semibold mb-2">Deskripsi</p>
+            <p className="text-sm font-semibold mb-2">{t.product.description}</p>
             <p className="text-sm text-muted-foreground leading-relaxed">{product.description}</p>
           </div>
         </div>
@@ -202,7 +206,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
       {product.reviews.length > 0 && (
         <div className="mt-12">
-          <h2 className="text-xl font-bold mb-6">Ulasan ({product.reviewCount})</h2>
+          <h2 className="text-xl font-bold mb-6">{t.product.reviews_section} ({product.reviewCount})</h2>
           <div className="space-y-4">
             {product.reviews.map((review) => (
               <div key={review.id} className="bg-card border border-card-border rounded-[14px] p-4">

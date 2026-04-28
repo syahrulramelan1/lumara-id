@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { productService } from "@/lib/services/ProductService";
 import { ProductGrid } from "@/components/shared/ProductGrid";
 import { SearchBar } from "@/components/shared/SearchBar";
+import { SearchPageHeader } from "@/components/shared/SearchPageHeader";
 
-export const metadata: Metadata = { title: "Cari Produk" };
+export const metadata: Metadata = { title: "Search" };
 export const dynamic = "force-dynamic";
 
 interface Props {
@@ -19,23 +20,9 @@ export default async function SearchPage({ searchParams }: Props) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4">Cari Produk</h1>
-      <SearchBar className="mb-6" placeholder="Cari gamis, hijab, abaya..." autoFocus />
-
-      {q && (
-        <p className="text-sm text-muted-foreground mb-4">
-          {result?.total ?? 0} hasil untuk &ldquo;<strong>{q}</strong>&rdquo;
-        </p>
-      )}
-
+      <SearchPageHeader q={q} total={result?.total} />
+      <SearchBar className="mb-6" autoFocus />
       {result && <ProductGrid products={result.data} cols={3} />}
-
-      {!q && (
-        <div className="text-center py-16 text-muted-foreground">
-          <p className="text-5xl mb-4">🔍</p>
-          <p className="font-medium">Ketik untuk mulai mencari</p>
-        </div>
-      )}
     </div>
   );
 }

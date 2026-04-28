@@ -3,9 +3,10 @@ import { productService } from "@/lib/services/ProductService";
 import { categoryModel } from "@/lib/models/CategoryModel";
 import { ProductGrid } from "@/components/shared/ProductGrid";
 import { ProductFilters } from "@/components/product/ProductFilters";
+import { ProductsPageHeader } from "@/components/shared/ProductsPageHeader";
 import type { FilterParams } from "@/types";
 
-export const metadata: Metadata = { title: "Semua Produk" };
+export const metadata: Metadata = { title: "Products" };
 export const dynamic = "force-dynamic";
 
 interface Props {
@@ -32,10 +33,7 @@ export default async function ProductsPage({ searchParams }: Props) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Semua Produk</h1>
-        <p className="text-sm text-muted-foreground mt-1">{result.total} produk ditemukan</p>
-      </div>
+      <ProductsPageHeader total={result.total} />
 
       <div className="flex gap-6">
         <aside className="hidden md:block w-56 shrink-0">
