@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 
 const WhiteButton = ({
-  link, text, children,
+  link, text, children, textSize: _ts, width: _w, py: _py,
 }: {
   link: string; text: string; children?: React.ReactNode;
+  textSize?: string; width?: string; py?: string;
 }) => {
   return (
     <Link

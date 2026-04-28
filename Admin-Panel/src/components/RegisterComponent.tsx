@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa6";
 import toast from "react-hot-toast";
-import { InputWithLabel, SimpleInput, WhiteButton } from "../components";
+import { InputWithLabel, SimpleInput } from "../components";
 import { supabase } from "../lib/supabase";
 
 const RegisterComponent = () => {
