@@ -14,7 +14,7 @@ export class OrderModel {
       where: { id },
       include: {
         items: { include: { product: { select: { id: true, name: true, images: true } } } },
-        user: { select: { id: true, name: true, email: true } },
+        user: { select: { id: true, name: true, email: true, avatar: true } },
       },
     });
   }
@@ -26,7 +26,7 @@ export class OrderModel {
         where: { userId },
         include: {
           items: { include: { product: { select: { id: true, name: true, images: true } } } },
-          user: { select: { id: true, name: true, email: true } },
+          user: { select: { id: true, name: true, email: true, avatar: true } },
         },
         orderBy: { createdAt: "desc" },
         skip,
@@ -43,7 +43,7 @@ export class OrderModel {
       prisma.order.findMany({
         include: {
           items: { include: { product: { select: { id: true, name: true, images: true } } } },
-          user: { select: { id: true, name: true, email: true } },
+          user: { select: { id: true, name: true, email: true, avatar: true } },
         },
         orderBy: { createdAt: "desc" },
         skip,
@@ -90,7 +90,7 @@ export class OrderModel {
     return prisma.order.findMany({
       include: {
         items: { include: { product: { select: { id: true, name: true, images: true } } } },
-        user: { select: { id: true, name: true, email: true } },
+        user: { select: { id: true, name: true, email: true, avatar: true } },
       },
       orderBy: { createdAt: "desc" },
       take: limit,

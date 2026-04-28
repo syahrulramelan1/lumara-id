@@ -78,7 +78,7 @@ export interface ApiResponse<T = unknown> {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export type OrderWithItems = Order & {
   items: (OrderItem & { product: Pick<Product, "id" | "name" | "images"> })[];
-  user: Pick<User, "id" | "name" | "email">;
+  user: Pick<User, "id" | "name" | "email" | "avatar">;
 };
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

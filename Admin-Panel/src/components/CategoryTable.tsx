@@ -1,110 +1,57 @@
-// *********************
-// Role of the component: The component that displays categories table on the admin category page
-// Name of the component: CategoryTable.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <CategoryTable />
-// Input parameters: No input parameters
-// Output: table with categories
-// *********************
-
-import { nanoid } from "nanoid";
 import { Link } from "react-router-dom";
-import { HiOutlinePencil } from "react-icons/hi";
-import { HiOutlineTrash } from "react-icons/hi";
-import { HiOutlineEye } from "react-icons/hi";
-import { categoryAdminItems } from "../utils/data";
+import { HiOutlinePencil, HiOutlineTrash, HiOutlineEye } from "react-icons/hi";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { categoriesApi, type ApiCategory } from "../lib/api";
 
-const CategoryTable = () => {
+const CategoryTable = ({ categories }: { categories: ApiCategory[] }) => {
+  const queryClient = useQueryClient();
+  const deleteMutation = useMutation({
+    mutationFn: categoriesApi.delete,
+    onSuccess: () => { toast.success("Kategori dihapus"); queryClient.invalidateQueries({ queryKey: ["categories"] }); },
+    onError: () => toast.error("Gagal menghapus kategori"),
+  });
+
   return (
     <table className="mt-6 w-full whitespace-nowrap text-left max-lg:block max-lg:overflow-x-scroll">
-      <colgroup>
-        <col className="w-full sm:w-4/12" />
-        <col className="lg:w-4/12" />
-        <col className="lg:w-2/12" />
-        <col className="lg:w-1/12" />
-        <col className="lg:w-1/12" />
-      </colgroup>
-      <thead className="border-b dark:border-white/10 border-black/10 text-sm leading-6 dark:text-whiteSecondary text-blackPrimary">
+      <thead className="border-b dark:border-white/10 border-gray-200 text-sm dark:text-whiteSecondary text-blackPrimary">
         <tr>
-          <th
-            scope="col"
-            className="py-2 pl-4 pr-8 font-semibold sm:pl-6 lg:pl-8"
-          >
-            Category
-          </th>
-          <th scope="col" className="py-2 pl-0 pr-8 font-semibold table-cell">
-            Slug
-          </th>
-          <th scope="col" className="py-2 pl-0 pr-8 font-semibold table-cell">
-            Number of products
-          </th>
-          <th
-            scope="col"
-            className="py-2 pl-0 pr-8 font-semibold table-cell lg:pr-20"
-          >
-            Parent category
-          </th>
-          <th
-            scope="col"
-            className="py-2 pl-0 pr-4 text-right font-semibold table-cell sm:pr-6 lg:pr-8"
-          >
-            Actions
-          </th>
+          <th className="py-2 pl-4 pr-8 font-semibold sm:pl-6 lg:pl-8">Kategori</th>
+          <th className="py-2 pl-0 pr-8 font-semibold">Slug</th>
+          <th className="py-2 pl-0 pr-8 font-semibold">Jumlah Produk</th>
+          <th className="py-2 pl-0 pr-4 text-right font-semibold sm:pr-6 lg:pr-8">Aksi</th>
         </tr>
       </thead>
-      <tbody className="divide-y divide-white/5">
-        {categoryAdminItems.map((item) => (
-          <tr key={nanoid()}>
+      <tbody className="divide-y dark:divide-white/5 divide-gray-100">
+        {categories.map((cat) => (
+          <tr key={cat.id}>
             <td className="py-4 pl-4 pr-8 sm:pl-6 lg:pl-8">
               <div className="flex items-center gap-x-4">
-                <img
-                  src={item.category.imageUrl}
-                  alt=""
-                  className="h-8 w-8 rounded-full bg-gray-800"
-                />
-                <div className="truncate text-sm font-medium leading-6 dark:text-whiteSecondary text-blackPrimary">
-                  {item.category.name}
-                </div>
+                {cat.image ? (
+                  <img src={cat.image} alt="" className="h-10 w-10 rounded object-cover" />
+                ) : (
+                  <div className="h-10 w-10 rounded dark:bg-gray-700 bg-gray-200" />
+                )}
+                <span className="text-sm font-medium dark:text-whiteSecondary text-blackPrimary">{cat.name}</span>
               </div>
             </td>
-            <td className="py-4 pl-0 pr-4 table-cell pr-8">
-              <div className="flex gap-x-3">
-                <div className="text-sm leading-6 dark:text-whiteSecondary text-blackPrimary">
-                  {item.slug}
-                </div>
-              </div>
-            </td>
-            <td className="py-4 pl-0 pr-4 text-sm leading-6 sm:pr-8 lg:pr-20">
-              <div className="flex items-center gap-x-2 justify-start">
-                <div className="dark:text-whiteSecondary text-blackPrimary block">
-                  {item.productsNumber}
-                </div>
-              </div>
-            </td>
-            <td className="py-4 pl-0 pr-8 text-sm leading-6 dark:text-whiteSecondary text-blackPrimary table-cell lg:pr-20">
-              {item.parentCategory}
-            </td>
-            <td className="py-4 pl-0 pr-4 text-right text-sm leading-6 dark:text-whiteSecondary text-blackPrimary table-cell pr-6 lg:pr-8">
+            <td className="py-4 pl-0 pr-8 text-sm font-mono dark:text-whiteSecondary text-blackPrimary">{cat.slug}</td>
+            <td className="py-4 pl-0 pr-8 text-sm dark:text-whiteSecondary text-blackPrimary">{cat._count?.products ?? 0}</td>
+            <td className="py-4 pl-0 pr-4 text-right sm:pr-6 lg:pr-8">
               <div className="flex gap-x-1 justify-end">
-                <Link
-                  to="/categories/1"
-                  className="dark:bg-blackPrimary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block flex justify-center items-center cursor-pointer dark:hover:border-gray-500 hover:border-gray-400"
-                >
+                <Link to={`/categories/${cat.id}`}
+                  className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border dark:border-gray-600 border-gray-300 w-8 h-8 flex justify-center items-center hover:border-gray-400 transition-colors">
                   <HiOutlinePencil className="text-lg" />
                 </Link>
-                <Link
-                  to="/categories/1"
-                  className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block flex justify-center items-center cursor-pointer dark:hover:border-gray-500 hover:border-gray-400"
-                >
+                <a href={`${import.meta.env.VITE_STORE_URL || ""}/categories/${cat.slug}`} target="_blank" rel="noopener noreferrer"
+                  className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border dark:border-gray-600 border-gray-300 w-8 h-8 flex justify-center items-center hover:border-gray-400 transition-colors">
                   <HiOutlineEye className="text-lg" />
-                </Link>
-                <Link
-                  to="#"
-                  className="dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary border border-gray-600 w-8 h-8 block flex justify-center items-center cursor-pointer dark:hover:border-gray-500 hover:border-gray-400"
-                >
+                </a>
+                <button onClick={() => { if (window.confirm(`Hapus kategori "${cat.name}"?`)) deleteMutation.mutate(cat.id); }}
+                  disabled={deleteMutation.isPending}
+                  className="dark:bg-blackPrimary bg-whiteSecondary dark:text-rose-400 text-rose-500 border dark:border-gray-600 border-gray-300 w-8 h-8 flex justify-center items-center hover:border-rose-400 transition-colors disabled:opacity-50">
                   <HiOutlineTrash className="text-lg" />
-                </Link>
+                </button>
               </div>
             </td>
           </tr>

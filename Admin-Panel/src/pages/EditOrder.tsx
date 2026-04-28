@@ -1,215 +1,213 @@
-import { AiOutlineSave } from "react-icons/ai";
-import { HiOutlineSave } from "react-icons/hi";
-import {
-  InputWithLabel,
-  Sidebar,
-  SimpleInput,
-  TextAreaInput,
-  WhiteButton,
-} from "../components";
-import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { Sidebar } from "../components";
+import { ordersApi } from "../lib/api";
+
+const STATUS_FLOW = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
+
+const statusClass: Record<string, string> = {
+  PENDING:    "bg-yellow-700 text-white",
+  PROCESSING: "bg-blue-700 text-white",
+  SHIPPED:    "bg-indigo-700 text-white",
+  DELIVERED:  "bg-green-700 text-white",
+  CANCELLED:  "bg-red-700 text-white",
+};
+
+function formatPrice(n: number) {
+  return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
+}
+
+function parseImages(raw: string): string[] {
+  try { const a = JSON.parse(raw); return Array.isArray(a) ? a : []; }
+  catch { return []; }
+}
 
 const EditOrder = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const [ inputObject, setInputObject ] = useState({
-    customerName: "Brent",
-    customerLastName: "Fesi",
-    companyName: "NoName Inc.",
-    country: "Portugal",
-    streetAndHouseNumber: "Brent Fesi Street 123",
-    city: "Lisabon",
-    zipCode: "22215",
-    phoneNumber: "678 123 456",
-    emailAddress: "brentfesi@email.com",
-    orderNotice: "Please deliver the package to the back door.",
-    searchProducts: "",
-    quantity: 0,
+  const { data: order, isLoading } = useQuery({
+    queryKey: ["order", id],
+    queryFn: () => ordersApi.get(id!).then((r) => r.data.data),
+    enabled: !!id,
   });
 
-  return (
-    <div className="h-auto border-t border-blackSecondary border-1 flex dark:bg-blackPrimary bg-whiteSecondary">
+  const statusMutation = useMutation({
+    mutationFn: (status: string) => ordersApi.updateStatus(id!, status),
+    onSuccess: (_, status) => {
+      toast.success(`Status diperbarui ke ${status}`);
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["order", id] });
+    },
+    onError: () => toast.error("Gagal memperbarui status"),
+  });
+
+  if (isLoading) return (
+    <div className="flex h-screen dark:bg-blackPrimary bg-whiteSecondary">
       <Sidebar />
-      <div className="dark:bg-blackPrimary bg-whiteSecondary w-full ">
-        <div className="dark:bg-blackPrimary bg-whiteSecondary py-10">
-          <div className="px-4 sm:px-6 lg:px-8 pb-8 border-b border-gray-800 flex justify-between items-center max-sm:flex-col max-sm:gap-5">
-            <div className="flex flex-col gap-3">
-              <h2 className="text-3xl font-bold leading-7 dark:text-whiteSecondary text-blackPrimary">
-                Edit order
-              </h2>
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 dark:border-white border-black border-t-transparent rounded-full animate-spin" />
+      </div>
+    </div>
+  );
+
+  if (!order) return (
+    <div className="flex h-screen dark:bg-blackPrimary bg-whiteSecondary">
+      <Sidebar />
+      <div className="flex-1 flex items-center justify-center dark:text-gray-400 text-gray-500">
+        Pesanan tidak ditemukan
+      </div>
+    </div>
+  );
+
+  const address = (() => {
+    try { return JSON.parse(order.shippingAddress); }
+    catch { return null; }
+  })();
+
+  return (
+    <div className="h-auto border-t dark:border-blackSecondary border-1 flex dark:bg-blackPrimary bg-whiteSecondary">
+      <Sidebar />
+      <div className="dark:bg-blackPrimary bg-whiteSecondary w-full">
+        <div className="py-10">
+          <div className="px-4 sm:px-6 lg:px-8 pb-8 border-b dark:border-gray-800 border-gray-200 flex justify-between items-center max-sm:flex-col max-sm:gap-5">
+            <div>
+              <h2 className="text-3xl font-bold dark:text-whiteSecondary text-blackPrimary">Detail Pesanan</h2>
+              <p className="text-sm dark:text-gray-400 text-gray-500 mt-1">#{order.id.slice(0, 8).toUpperCase()}</p>
             </div>
-            <div className="flex gap-x-2 max-[370px]:flex-col max-[370px]:gap-2 max-[370px]:items-center">
-              <button className="dark:bg-blackPrimary bg-whiteSecondary border border-gray-600 w-48 py-2 text-lg dark:hover:border-gray-500 hover:border-gray-400 duration-200 flex items-center justify-center gap-x-2">
-                <AiOutlineSave className="dark:text-whiteSecondary text-blackPrimary text-xl" />
-                <span className="dark:text-whiteSecondary text-blackPrimary font-medium">
-                  Save draft
-                </span>
-              </button>
-              <WhiteButton
-                link="/orders/add-order"
-                textSize="lg"
-                width="48"
-                py="2"
-                text="Update order"
-              >
-                <HiOutlineSave className="dark:text-blackPrimary text-whiteSecondary text-xl" />
-              </WhiteButton>
-            </div>
+            <button
+              onClick={() => navigate("/orders")}
+              className="dark:bg-blackPrimary bg-whiteSecondary border border-gray-600 w-32 py-2 text-lg hover:border-gray-400 duration-200 flex items-center justify-center dark:text-whiteSecondary text-blackPrimary"
+            >
+              Kembali
+            </button>
           </div>
 
-          {/* Add Product section here  */}
           <div className="px-4 sm:px-6 lg:px-8 pb-8 pt-8 grid grid-cols-2 gap-x-10 max-xl:grid-cols-1 max-xl:gap-y-10">
-            {/* left div */}
-            <div>
-              <h3 className="text-2xl font-bold leading-7 dark:text-whiteSecondary text-blackPrimary">
-                Order information
-              </h3>
+            {/* Left: Info & Status */}
+            <div className="space-y-8">
+              {/* Status Flow */}
+              <section>
+                <h3 className="text-xl font-bold dark:text-whiteSecondary text-blackPrimary mb-4">Status Pesanan</h3>
+                <div className="flex items-center mb-4">
+                  <span className={`text-sm font-semibold px-3 py-1 rounded ${statusClass[order.status] ?? "bg-gray-600 text-white"}`}>
+                    {order.status}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {STATUS_FLOW.map((s) => (
+                    <button
+                      key={s}
+                      disabled={order.status === s || statusMutation.isPending}
+                      onClick={() => statusMutation.mutate(s)}
+                      className={`px-3 py-1.5 text-sm font-medium border transition-colors disabled:opacity-50 ${
+                        order.status === s
+                          ? "border-blue-500 dark:text-blue-400 text-blue-600"
+                          : "dark:border-gray-600 border-gray-300 dark:text-whiteSecondary text-blackPrimary hover:border-gray-400"
+                      }`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </section>
 
-              <div className="mt-4 flex flex-col gap-5">
-                <InputWithLabel label="Customer name">
-                  <SimpleInput
-                    type="text"
-                    placeholder="Enter a customer name..."
-                    value={inputObject.customerName}
-                    onChange={(e) => setInputObject({ ...inputObject, customerName: e.target.value })}
-                  />
-                </InputWithLabel>
+              {/* Customer Info */}
+              <section>
+                <h3 className="text-xl font-bold dark:text-whiteSecondary text-blackPrimary mb-4">Informasi Pelanggan</h3>
+                <div className="flex items-center gap-3 mb-4">
+                  {order.user.avatar ? (
+                    <img src={order.user.avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full dark:bg-gray-600 bg-gray-300 flex items-center justify-center font-bold dark:text-white text-black">
+                      {(order.user.name || order.user.email).charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-medium dark:text-whiteSecondary text-blackPrimary">{order.user.name || "—"}</p>
+                    <p className="text-sm dark:text-gray-400 text-gray-500">{order.user.email}</p>
+                  </div>
+                </div>
+                <div className="space-y-2 text-sm dark:text-whiteSecondary text-blackPrimary">
+                  <div className="flex justify-between">
+                    <span className="dark:text-gray-400 text-gray-500">Metode Bayar</span>
+                    <span className="font-medium">{order.paymentMethod}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="dark:text-gray-400 text-gray-500">Tanggal</span>
+                    <span>{new Date(order.createdAt).toLocaleString("id-ID")}</span>
+                  </div>
+                </div>
+              </section>
 
-                <InputWithLabel label="Customer lastname">
-                  <SimpleInput
-                    type="text"
-                    placeholder="Enter a customer lastname..."
-                    value={inputObject.customerLastName}
-                    onChange={(e) => setInputObject({ ...inputObject, customerLastName: e.target.value })}
-                  />
-                </InputWithLabel>
-
-                <InputWithLabel label="Company name (optional)">
-                  <SimpleInput
-                    type="text"
-                    placeholder="Enter a company name..."
-                    value={inputObject.companyName}
-                    onChange={(e) => setInputObject({ ...inputObject, companyName: e.target.value })}
-                  />
-                </InputWithLabel>
-
-                <InputWithLabel label="Country">
-                  <SimpleInput type="text" placeholder="Enter a country..." value={inputObject.country} onChange={(e) => setInputObject({...inputObject, country: e.target.value})} />
-                </InputWithLabel>
-
-                <InputWithLabel label="Street and house number">
-                  <SimpleInput
-                    type="text"
-                    placeholder="Enter a street and house number..."
-                    value={inputObject.streetAndHouseNumber}
-                    onChange={(e) => setInputObject({ ...inputObject, streetAndHouseNumber: e.target.value })}
-                  />
-                </InputWithLabel>
-
-                <InputWithLabel label="City">
-                  <SimpleInput type="text" placeholder="Enter a city..." value={inputObject.city} onChange={(e) => setInputObject({...inputObject, city: e.target.value})} />
-                </InputWithLabel>
-
-                <InputWithLabel label="Zip code">
-                  <SimpleInput type="text" placeholder="Enter a zip code..." value={inputObject.zipCode} onChange={(e) => setInputObject({...inputObject, zipCode: e.target.value})} />
-                </InputWithLabel>
-
-                <InputWithLabel label="Phone number">
-                  <SimpleInput
-                    type="text"
-                    placeholder="Enter a phone number..."
-                    value={inputObject.phoneNumber}
-                    onChange={(e) => setInputObject({ ...inputObject, phoneNumber: e.target.value })}
-                  />
-                </InputWithLabel>
-
-                <InputWithLabel label="Email address">
-                  <SimpleInput
-                    type="text"
-                    placeholder="Enter a email address..."
-                    value={inputObject.emailAddress}
-                    onChange={(e) => setInputObject({ ...inputObject, emailAddress: e.target.value })}
-                  />
-                </InputWithLabel>
-
-                <InputWithLabel label="Order notice">
-                  <TextAreaInput placeholder="Enter a order notice..." value={inputObject.orderNotice} onChange={(e) => setInputObject({...inputObject, orderNotice: e.target.value})} />
-                </InputWithLabel>
-              </div>
+              {/* Shipping Address */}
+              {address && (
+                <section>
+                  <h3 className="text-xl font-bold dark:text-whiteSecondary text-blackPrimary mb-4">Alamat Pengiriman</h3>
+                  <div className="space-y-1 text-sm dark:text-whiteSecondary text-blackPrimary">
+                    {address.name && <p className="font-medium">{address.name}</p>}
+                    {address.phone && <p className="dark:text-gray-400 text-gray-500">{address.phone}</p>}
+                    {address.address && <p>{address.address}</p>}
+                    {(address.city || address.province) && (
+                      <p>{[address.city, address.province].filter(Boolean).join(", ")}</p>
+                    )}
+                    {address.postalCode && <p>{address.postalCode}</p>}
+                  </div>
+                </section>
+              )}
             </div>
 
-            {/* right div */}
-            <div>
-              <h3 className="text-2xl font-bold leading-7 dark:text-whiteSecondary text-blackPrimary">
-                Products in order
-              </h3>
-
-              <div>
-                <div className="mt-4 flex flex-col gap-5">
-                  <InputWithLabel label="Search products">
-                    <SimpleInput type="text" placeholder="Search products..." value={inputObject.searchProducts} onChange={(e) => setInputObject({...inputObject, searchProducts: e.target.value})} />
-                  </InputWithLabel>
-                  <InputWithLabel label="Quantity">
-                    <SimpleInput
-                      type="text"
-                      placeholder="Enter a quantity..."
-                      value={inputObject.quantity}
-                      onChange={(e) => setInputObject({ ...inputObject, quantity: Number(e.target.value) })}
-                    />
-                  </InputWithLabel>
-                  <WhiteButton
-                    link="/orders/add-order"
-                    textSize="lg"
-                    width="full"
-                    py="2"
-                    text="Add product"
-                  />
-                </div>
-
-                <div className="mt-5">
-                  <h3 className="text-2xl font-bold leading-7 dark:text-whiteSecondary text-blackPrimary">
-                    Products
-                  </h3>
-                  <div className="mt-4 flex flex-col gap-5 max-[450px]:items-start">
-                    <div className="flex justify-between items-center max-[450px]:flex-col">
-                      <div className="flex items-center gap-3 max-[450px]:flex-col">
-                      <img src="/src/assets/tablet (1).jpg" alt="product" className="w-12 h-12" />
-                      <span className="dark:text-whiteSecondary text-blackPrimary">Samsung Galaxy Tab 7</span>
-                      </div>
-                      <span className="dark:text-whiteSecondary text-blackPrimary">Quantity: 2</span>
-                    </div>
-                    <div className="flex justify-between items-center max-[450px]:flex-col">
-                      <div className="flex items-center gap-3  max-[450px]:flex-col">
-                      <img src="/src/assets/tablet (2).jpg" alt="product" className="w-12 h-12" />
-                      <span className="dark:text-whiteSecondary text-blackPrimary">Samsung Galaxy Tab 8</span>
-                      </div>
-                      <span className="dark:text-whiteSecondary text-blackPrimary">Quantity: 1</span>
-                    </div>
-                    <div className="flex justify-between items-center max-[450px]:flex-col">
-                      <div className="flex items-center gap-3  max-[450px]:flex-col">
-                      <img src="/src/assets/tablet (3).jpg" alt="product" className="w-12 h-12" />
-                      <span className="dark:text-whiteSecondary text-blackPrimary">Samsung Galaxy Tab 9</span>
-                      </div>
-                      <span className="dark:text-whiteSecondary text-blackPrimary">Quantity: 1</span>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-              <div className="mt-5">
-                <h3 className="text-2xl font-bold leading-7 dark:text-whiteSecondary text-blackPrimary">
-                  Total
+            {/* Right: Items & Total */}
+            <div className="space-y-8">
+              <section>
+                <h3 className="text-xl font-bold dark:text-whiteSecondary text-blackPrimary mb-4">
+                  Produk Dipesan ({order.items.length})
                 </h3>
-                <div className="mt-4 flex flex-col gap-5">
-                  <div className="flex justify-between items-center">
-                    <span className="dark:text-whiteSecondary text-blackPrimary">Total products</span>
-                    <span className="dark:text-whiteSecondary text-blackPrimary">4</span>
+                <div className="space-y-3">
+                  {order.items.map((item) => {
+                    const imgs = parseImages(item.product.images);
+                    return (
+                      <div key={item.id} className="flex items-center gap-3 p-3 border dark:border-gray-700 border-gray-200">
+                        {imgs[0] ? (
+                          <img src={imgs[0]} alt="" className="w-14 h-14 object-cover rounded" />
+                        ) : (
+                          <div className="w-14 h-14 rounded dark:bg-gray-700 bg-gray-200" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium dark:text-whiteSecondary text-blackPrimary truncate">
+                            {item.product.name}
+                          </p>
+                          <p className="text-xs dark:text-gray-400 text-gray-500">
+                            {[item.size, item.color].filter(Boolean).join(" · ")}
+                          </p>
+                          <p className="text-xs dark:text-gray-400 text-gray-500">
+                            {item.quantity}x {formatPrice(item.price)}
+                          </p>
+                        </div>
+                        <p className="text-sm font-bold dark:text-rose-300 text-rose-600 whitespace-nowrap">
+                          {formatPrice(item.price * item.quantity)}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+
+              <section>
+                <h3 className="text-xl font-bold dark:text-whiteSecondary text-blackPrimary mb-4">Ringkasan</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between dark:text-whiteSecondary text-blackPrimary">
+                    <span>Subtotal ({order.items.reduce((s, i) => s + i.quantity, 0)} item)</span>
+                    <span>{formatPrice(order.items.reduce((s, i) => s + i.price * i.quantity, 0))}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="dark:text-whiteSecondary text-blackPrimary">Total price</span>
-                    <span className="dark:text-whiteSecondary text-blackPrimary">$1899</span>
+                  <div className="flex justify-between pt-2 border-t dark:border-gray-700 border-gray-200">
+                    <span className="font-bold dark:text-whiteSecondary text-blackPrimary">Total</span>
+                    <span className="font-bold text-lg dark:text-rose-300 text-rose-600">{formatPrice(order.total)}</span>
                   </div>
                 </div>
-              </div>
+              </section>
             </div>
           </div>
         </div>

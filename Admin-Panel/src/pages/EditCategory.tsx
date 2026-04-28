@@ -1,163 +1,128 @@
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { HiOutlineSave } from "react-icons/hi";
-import {
-  ImageUpload,
-  InputWithLabel,
-  Sidebar,
-  SimpleInput,
-  TextAreaInput,
-} from "../components";
-import SelectInput from "../components/SelectInput";
-import { selectList } from "../utils/data";
 import { AiOutlineSave } from "react-icons/ai";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import toast from "react-hot-toast";
+import { ImageUpload, InputWithLabel, Sidebar, SimpleInput, TextAreaInput } from "../components";
+import { categoriesApi } from "../lib/api";
 
 const EditCategory = () => {
-  const [inputObject, setInputObject] = useState({
-    title: "PC",
-    description: "This is a category for all computers.",
-    slug: "pc",
-    parentCategory: "",
-    metaTitle: "PC category",
-    metaDescription: "This is a category for all computers.",
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["category", id],
+    queryFn: () => categoriesApi.get(id!).then((r) => r.data.data),
+    enabled: !!id,
   });
 
-  return (
-    <div className="h-auto border-t border-blackSecondary border-1 flex dark:bg-blackPrimary bg-whiteSecondary">
+  const [form, setForm] = useState({
+    name: "", slug: "", description: "", image: "",
+  });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (data) setForm({
+      name: data.name,
+      slug: data.slug,
+      description: data.description ?? "",
+      image: data.image ?? "",
+    });
+  }, [data]);
+
+  const updateMutation = useMutation({
+    mutationFn: (fd: FormData) => categoriesApi.update(id!, fd),
+    onSuccess: () => {
+      toast.success("Kategori berhasil diperbarui");
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      navigate("/categories");
+    },
+    onError: () => toast.error("Gagal memperbarui kategori"),
+  });
+
+  const handleSave = () => {
+    if (!form.name || !form.slug) { toast.error("Nama dan slug wajib diisi"); return; }
+    const fd = new FormData();
+    fd.append("name", form.name);
+    fd.append("slug", form.slug);
+    fd.append("description", form.description);
+    if (imageFile) fd.append("image", imageFile);
+    updateMutation.mutate(fd);
+  };
+
+  if (isLoading) return (
+    <div className="flex h-screen dark:bg-blackPrimary bg-whiteSecondary">
       <Sidebar />
-      <div className="dark:bg-blackPrimary bg-whiteSecondary w-full ">
-        <div className="dark:bg-blackPrimary bg-whiteSecondary py-10">
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 dark:border-white border-black border-t-transparent rounded-full animate-spin" />
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="h-auto border-t dark:border-blackSecondary border-1 flex dark:bg-blackPrimary bg-whiteSecondary">
+      <Sidebar />
+      <div className="dark:bg-blackPrimary bg-whiteSecondary w-full">
+        <div className="py-10">
           <div className="px-4 sm:px-6 lg:px-8 pb-8 border-b border-gray-800 flex justify-between items-center max-sm:flex-col max-sm:gap-5">
-            <div className="flex flex-col gap-3">
-              <h2 className="text-3xl font-bold leading-7 dark:text-whiteSecondary text-blackPrimary">
-                Edit category
-              </h2>
-            </div>
-            <div className="flex gap-x-2 max-[370px]:flex-col max-[370px]:gap-2 max-[370px]:items-center">
-              <button className="dark:bg-blackPrimary bg-whiteSecondary border border-gray-600 w-48 py-2 text-lg dark:hover:border-gray-500 hover:border-gray-400 duration-200 flex items-center justify-center gap-x-2">
+            <h2 className="text-3xl font-bold dark:text-whiteSecondary text-blackPrimary">Edit Kategori</h2>
+            <div className="flex gap-x-2">
+              <button
+                onClick={() => navigate("/categories")}
+                className="dark:bg-blackPrimary bg-whiteSecondary border border-gray-600 w-40 py-2 text-lg dark:hover:border-gray-500 hover:border-gray-400 duration-200 flex items-center justify-center gap-x-2"
+              >
                 <AiOutlineSave className="dark:text-whiteSecondary text-blackPrimary text-xl" />
-                <span className="dark:text-whiteSecondary text-blackPrimary font-medium">
-                  Save draft
-                </span>
+                <span className="dark:text-whiteSecondary text-blackPrimary font-medium">Batal</span>
               </button>
-              <Link
-                to="/categories/add-category"
-                className="dark:bg-whiteSecondary bg-blackPrimary w-48 py-2 text-lg dark:hover:bg-white hover:bg-blackSecondary duration-200 flex items-center justify-center gap-x-2"
+              <button
+                onClick={handleSave}
+                disabled={updateMutation.isPending}
+                className="dark:bg-whiteSecondary bg-blackPrimary w-40 py-2 text-lg dark:hover:bg-white hover:bg-blackSecondary duration-200 flex items-center justify-center gap-x-2 disabled:opacity-50"
               >
                 <HiOutlineSave className="dark:text-blackPrimary text-whiteSecondary text-xl" />
                 <span className="dark:text-blackPrimary text-whiteSecondary font-semibold">
-                  Update category
+                  {updateMutation.isPending ? "Menyimpan..." : "Simpan"}
                 </span>
-              </Link>
+              </button>
             </div>
           </div>
 
-          {/* Add Category section here  */}
           <div className="px-4 sm:px-6 lg:px-8 pb-8 pt-8 grid grid-cols-2 gap-x-10 max-xl:grid-cols-1 max-xl:gap-y-10">
-            {/* left div */}
             <div>
-              <h3 className="text-2xl font-bold leading-7 dark:text-whiteSecondary text-blackPrimary">
-                Basic information
-              </h3>
-
-              <div className="mt-4 flex flex-col gap-5">
-                <InputWithLabel label="Category title">
-                  <SimpleInput
-                    type="text"
-                    placeholder="Enter a category title..."
-                    value={inputObject.title}
-                    onChange={(e) =>
-                      setInputObject({ ...inputObject, title: e.target.value })
-                    }
+              <h3 className="text-2xl font-bold dark:text-whiteSecondary text-blackPrimary mb-5">Informasi Dasar</h3>
+              <div className="flex flex-col gap-5">
+                <InputWithLabel label="Nama Kategori">
+                  <SimpleInput type="text" placeholder="Nama kategori..."
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
                   />
                 </InputWithLabel>
-
-                <InputWithLabel label="Category description">
-                  <TextAreaInput
-                    placeholder="Enter a category description..."
-                    rows={4}
-                    cols={50}
-                    value={inputObject.description}
-                    onChange={(e) =>
-                      setInputObject({
-                        ...inputObject,
-                        description: e.target.value,
-                      })
-                    }
+                <InputWithLabel label="Slug">
+                  <SimpleInput type="text" placeholder="slug-kategori"
+                    value={form.slug}
+                    onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") })}
                   />
                 </InputWithLabel>
-
-                <InputWithLabel label="Category slug">
-                  <SimpleInput
-                    type="text"
-                    placeholder="Enter a category slug..."
-                    value={inputObject.slug}
-                    onChange={(e) =>
-                      setInputObject({ ...inputObject, slug: e.target.value })
-                    }
-                  />
-                </InputWithLabel>
-
-                <InputWithLabel label="Parent category (optional)">
-                  <SelectInput
-                    selectList={selectList}
-                    value={inputObject.parentCategory}
-                    onChange={(e) =>
-                      setInputObject({
-                        ...inputObject,
-                        parentCategory: e.target.value,
-                      })
-                    }
-                  />
-                </InputWithLabel>
-              </div>
-              <h3 className="text-2xl font-bold leading-7 dark:text-whiteSecondary text-blackSecondary mt-16">
-                SEO
-              </h3>
-              <div className="mt-4 flex flex-col gap-5">
-                <InputWithLabel label="Meta title">
-                  <SimpleInput
-                    type="text"
-                    placeholder="Enter a meta title..."
-                    value={inputObject.metaTitle}
-                    onChange={(e) =>
-                      setInputObject({ ...inputObject, title: e.target.value })
-                    }
-                  />
-                </InputWithLabel>
-
-                <InputWithLabel label="Meta description">
-                  <TextAreaInput
-                    placeholder="Enter a meta description..."
-                    rows={4}
-                    cols={50}
-                    value={inputObject.metaDescription}
-                    onChange={(e) =>
-                      setInputObject({
-                        ...inputObject,
-                        description: e.target.value,
-                      })
-                    }
+                <InputWithLabel label="Deskripsi">
+                  <TextAreaInput rows={4} cols={50} placeholder="Deskripsi kategori..."
+                    value={form.description}
+                    onChange={(e) => setForm({ ...form, description: e.target.value })}
                   />
                 </InputWithLabel>
               </div>
             </div>
 
-            {/* right div */}
             <div>
-              <h3 className="text-2xl font-bold leading-7 dark:text-whiteSecondary text-blackPrimary">
-                Category image
-              </h3>
-
-              <ImageUpload />
-
-              <div className="flex justify-center gap-x-2 mt-5 flex-wrap">
-                <img
-                  src="/src/assets/tablet (1).jpg"
-                  alt=""
-                  className="w-36 h-32"
-                />
-              </div>
+              <h3 className="text-2xl font-bold dark:text-whiteSecondary text-blackPrimary mb-5">Gambar Kategori</h3>
+              <ImageUpload onFileSelect={(f) => setImageFile(f)} />
+              {form.image && !imageFile && (
+                <div className="mt-4">
+                  <img src={form.image} alt="current" className="w-36 h-32 object-cover rounded" />
+                  <p className="text-xs dark:text-gray-400 text-gray-500 mt-1">Gambar saat ini</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
