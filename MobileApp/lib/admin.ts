@@ -18,7 +18,7 @@ function getSupabaseAdmin() {
   );
 }
 
-export async function uploadImage(file: File, bucket = "lumara"): Promise<string> {
+export async function uploadImage(file: File, bucket = "lumara-id"): Promise<string> {
   const supabase = getSupabaseAdmin();
   const ext = file.name.split(".").pop() ?? "jpg";
   const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
