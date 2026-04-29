@@ -32,12 +32,7 @@ git subtree split --prefix Admin-Panel -b tmp && git push https://github.com/Use
 ## ⏳ Yang Harus Dijalankan Selanjutnya
 
 ### [WAJIB] Setup sekali — manual oleh user
-- [ ] Jalankan SQL ini di **Supabase → SQL Editor** untuk set admin@lumara.id sebagai ADMIN:
-  ```sql
-  INSERT INTO "User" (id, email, role, "createdAt", "updatedAt")
-  VALUES (gen_random_uuid(), 'admin@lumara.id', 'ADMIN', now(), now())
-  ON CONFLICT (email) DO UPDATE SET role = 'ADMIN';
-  ```
+- [x] SQL sudah dijalankan — `admin@lumara.id` (ADMIN) dan `siti@gmail.com` (USER) sudah ada di DB
 - [ ] Pastikan Supabase **Site URL** sudah diubah ke `https://lumara-id.onrender.com`
 - [ ] Tambah `NEXT_PUBLIC_ADMIN_URL=https://admni-panel.onrender.com` ke MobileApp env di Render
 

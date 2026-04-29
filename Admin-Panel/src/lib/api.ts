@@ -62,13 +62,9 @@ export const productsApi = {
   get: (id: string) =>
     http.get<{ success: boolean; data: ApiProduct }>(`/products/${id}`),
   create: (data: FormData) =>
-    http.post<{ success: boolean; data: ApiProduct }>("/products", data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    }),
+    http.post<{ success: boolean; data: ApiProduct }>("/products", data),
   update: (id: string, data: FormData) =>
-    http.patch<{ success: boolean; data: ApiProduct }>(`/products/${id}`, data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    }),
+    http.patch<{ success: boolean; data: ApiProduct }>(`/products/${id}`, data),
   delete: (id: string) =>
     http.delete<{ success: boolean }>(`/products/${id}`),
 };
@@ -81,13 +77,9 @@ export const categoriesApi = {
   get: (id: string) =>
     http.get<{ success: boolean; data: ApiCategory }>(`/categories/${id}`),
   create: (data: FormData) =>
-    http.post<{ success: boolean; data: ApiCategory }>("/categories", data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    }),
+    http.post<{ success: boolean; data: ApiCategory }>("/categories", data),
   update: (id: string, data: FormData) =>
-    http.patch<{ success: boolean; data: ApiCategory }>(`/categories/${id}`, data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    }),
+    http.patch<{ success: boolean; data: ApiCategory }>(`/categories/${id}`, data),
   delete: (id: string) =>
     http.delete<{ success: boolean }>(`/categories/${id}`),
 };
