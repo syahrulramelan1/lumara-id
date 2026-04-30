@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Sidebar } from "../components";
+import { Sidebar, SearchInput } from "../components";
 import ProductTable from "../components/ProductTable";
-import { HiOutlinePlus, HiOutlineSearch } from "react-icons/hi";
+import { HiOutlinePlus } from "react-icons/hi";
 import { productsApi } from "../lib/api";
 
 const Products = () => {
@@ -36,16 +36,12 @@ const Products = () => {
 
         <div className="p-6 flex flex-col gap-4">
           <div className="flex items-center gap-3 flex-wrap">
-            <div className="relative">
-              <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] text-base pointer-events-none" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="input-base pl-9 w-60"
-                placeholder="Cari produk..."
-              />
-            </div>
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder="Cari produk..."
+              className="w-72"
+            />
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}

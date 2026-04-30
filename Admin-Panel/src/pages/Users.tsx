@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Sidebar } from "../components";
+import { Sidebar, SearchInput } from "../components";
 import UserTable from "../components/UserTable";
-import { HiOutlineSearch } from "react-icons/hi";
 import { usersApi } from "../lib/api";
 
 const Users = () => {
@@ -35,16 +34,12 @@ const Users = () => {
 
         <div className="p-6 flex flex-col gap-4">
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] text-base pointer-events-none" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="input-base pl-9 w-60"
-                placeholder="Cari nama / email..."
-              />
-            </div>
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder="Cari nama / email..."
+              className="w-72"
+            />
           </div>
 
           {isLoading ? (
