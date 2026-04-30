@@ -39,9 +39,13 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-semibold mb-6"
+            className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full text-sm font-semibold mb-6 border border-primary/20 bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 text-primary shadow-sm backdrop-blur-sm"
           >
-            <Sparkles size={14} />
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-60" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+            </span>
+            <Sparkles size={13} className="opacity-80" />
             {t.hero.badge}
           </motion.div>
 
@@ -108,11 +112,11 @@ export function HeroSection() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: STAGGER_DELAY * 5 }}
-            className="flex items-center gap-6 mt-6 text-sm text-muted-foreground flex-wrap"
+            className="flex items-center gap-4 mt-6 text-sm text-muted-foreground flex-wrap"
           >
-            <span className="flex items-center gap-1.5">✅ {t.hero.badge_shipping}</span>
-            <span className="flex items-center gap-1.5">✅ {t.hero.badge_premium}</span>
-            <span className="flex items-center gap-1.5">✅ {t.hero.badge_return}</span>
+            <span className="flex items-center gap-1.5 bg-muted/60 px-3 py-1.5 rounded-full text-xs font-medium">🚚 {t.hero.badge_shipping}</span>
+            <span className="flex items-center gap-1.5 bg-muted/60 px-3 py-1.5 rounded-full text-xs font-medium">💎 {t.hero.badge_premium}</span>
+            <span className="flex items-center gap-1.5 bg-muted/60 px-3 py-1.5 rounded-full text-xs font-medium">🔄 {t.hero.badge_return}</span>
           </motion.div>
         </div>
       </div>

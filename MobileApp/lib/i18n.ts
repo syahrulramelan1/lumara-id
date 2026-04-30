@@ -11,10 +11,10 @@ const translations = {
       theme_purple: "Tema Ungu",
     },
     hero: {
-      badge: "Koleksi Ramadhan 2025 Tersedia",
+      badge: "Koleksi Terbaru 2026 — Modest Fashion Premium",
       title_1: "Tampil Anggun,",
       title_2: "Tetap Syar'i",
-      subtitle: "Koleksi modest fashion premium pilihan untuk muslimah Indonesia. Kualitas terbaik, harga bersahabat.",
+      subtitle: "Temukan koleksi modest fashion eksklusif untuk muslimah Indonesia. Desain kontemporer, bahan premium, harga terjangkau.",
       shop_now: "Belanja Sekarang",
       view_collection: "Lihat Koleksi",
       search_placeholder: "Cari gamis, hijab, abaya...",
@@ -198,7 +198,7 @@ const translations = {
       theme_purple: "Purple Theme",
     },
     hero: {
-      badge: "Ramadan 2025 Collection Available",
+      badge: "New 2026 Collection — Premium Modest Fashion",
       title_1: "Elegant Style,",
       title_2: "Modest Fashion",
       subtitle: "Premium modest fashion collection for modern Muslim women. Best quality, affordable prices.",
