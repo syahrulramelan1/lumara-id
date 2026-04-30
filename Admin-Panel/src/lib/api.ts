@@ -26,10 +26,25 @@ export interface ApiCategory {
   createdAt: string;
 }
 
+export interface ApiOrderTracking {
+  id:          string;
+  orderId:     string;
+  status:      string;
+  description: string;
+  location:    string | null;
+  createdAt:   string;
+}
+
 export interface ApiOrder {
   id: string; status: string; total: number;
   paymentMethod: string; shippingAddress: string;
   createdAt: string;
+  courier:          string | null;
+  courierService:   string | null;
+  trackingNumber:   string | null;
+  shippedAt:        string | null;
+  estimatedArrival: string | null;
+  trackings:        ApiOrderTracking[];
   user: { id: string; name: string | null; email: string; avatar: string | null };
   items: Array<{
     id: string; quantity: number; size: string; color: string; price: number;
@@ -92,7 +107,13 @@ export const ordersApi = {
   get: (id: string) =>
     http.get<{ success: boolean; data: ApiOrder }>(`/orders/${id}`),
   updateStatus: (id: string, status: string) =>
-    http.patch<{ success: boolean; data: ApiOrder }>(`/orders/${id}/status`, { status }),
+    http.patch<{ success: boolean; data: ApiOrder }>(`/orders/${id}`, { status }),
+  ship: (id: string, data: {
+    courier: string; courierService: string; trackingNumber: string;
+    estimatedArrival: string; note?: string;
+  }) => http.post<{ success: boolean; data: ApiOrder }>(`/orders/${id}/ship`, data),
+  addTracking: (id: string, data: { status: string; description: string; location?: string }) =>
+    http.post<{ success: boolean; data: ApiOrderTracking }>(`/orders/${id}/tracking`, data),
   delete: (id: string) =>
     http.delete<{ success: boolean }>(`/orders/${id}`),
 };

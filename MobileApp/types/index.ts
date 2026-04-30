@@ -76,9 +76,26 @@ export interface ApiResponse<T = unknown> {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // ORDER TYPES
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+export interface OrderTracking {
+  id:          string;
+  orderId:     string;
+  status:      string;
+  description: string;
+  location:    string | null;
+  createdAt:   Date | string;
+}
+
 export type OrderWithItems = Order & {
-  items: (OrderItem & { product: Pick<Product, "id" | "name" | "images"> })[];
-  user: Pick<User, "id" | "name" | "email" | "avatar">;
+  items:     (OrderItem & { product: Pick<Product, "id" | "name" | "images"> })[];
+  user:      Pick<User, "id" | "name" | "email" | "avatar">;
+  trackings: OrderTracking[];
+  // kolom pengiriman manual (nullable sampai seller input)
+  courier:          string | null;
+  courierService:   string | null;
+  trackingNumber:   string | null;
+  shippedAt:        Date | string | null;
+  estimatedArrival: Date | string | null;
 };
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

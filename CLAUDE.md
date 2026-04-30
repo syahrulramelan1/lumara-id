@@ -33,6 +33,7 @@ Perbedaan keduanya: production schema pakai `directUrl = env("DIRECT_URL")` dan 
 - Mobile responsiveness — tabel responsive (hide kolom di layar kecil), sidebar overlay di mobile
 - Design system baru — semua halaman pakai CSS variables, card, badge, btn-primary, dll
 - **Maintenance mode toggle** — 1 tombol di dashboard untuk ON/OFF website lumara-id
+- **EditOrder** — form "Tandai Dikirim" (kurir, layanan, no. resi, estimasi), template cepat tracking, tracking timeline
 
 ### MobileApp
 - Semua endpoint `/api/admin/*` (products, categories, orders, reviews, users, dashboard, me, settings)
@@ -44,6 +45,8 @@ Perbedaan keduanya: production schema pakai `directUrl = env("DIRECT_URL")` dan 
 - **Maintenance mode**: cek di `(main)/layout.tsx` → redirect ke `/maintenance` jika aktif
 - **Halaman `/maintenance`**: tampil ke pengunjung saat maintenance ON (di luar group `(main)`)
 - **`/api/admin/settings`**: GET + PATCH untuk baca/tulis maintenance mode
+- **Sistem tracking pengiriman manual** — seller input update dari website kurir, buyer lihat timeline di-app (tidak perlu buka browser eksternal)
+- **`/orders/[id]`**: tampil shipping info card, tracking timeline, tombol "Konfirmasi Pesanan Diterima" (status SHIPPED saja)
 
 ### Database — Tabel `app_settings`
 Sudah dibuat di Supabase. SQL:
@@ -71,8 +74,6 @@ RLS: **enabled, tanpa policy** → blokir akses via REST API (anon key), Prisma 
 - [ ] **Sync user on login** — saat ini hanya sync saat register; panggil `POST /api/auth/sync-user` juga saat login berhasil
 - [ ] **Halaman profil user** — tampilkan nama, avatar, email; edit nama & foto profil
 - [ ] **Checkout flow** — form alamat pengiriman, pilih metode bayar, buat Order di DB
-- [ ] **Halaman pesanan user** (`/orders`) — list pesanan milik user yang login
-- [ ] **Detail pesanan** (`/orders/[id]`) — item-item, status, total
 
 ### [FITUR] Admin-Panel
 - [ ] **Login auto-sync** — setelah admin login, panggil sync-user agar record ada di DB
@@ -80,6 +81,74 @@ RLS: **enabled, tanpa policy** → blokir akses via REST API (anon key), Prisma 
 
 ### [KUALITAS]
 - [ ] **Code splitting Admin-Panel** — chunk 1MB+, pakai `React.lazy` + `Suspense` per route
+
+---
+
+## Arsitektur Sistem Pengiriman Manual
+
+Lumara.id tidak pakai API kurir. Seller cek website kurir secara manual, lalu input update ke admin panel.
+
+```
+Seller antar paket ke kurir → cek website kurir → copy status/lokasi
+    ↓
+Admin panel EditOrder → form "Tandai Dikirim" (kurir, layanan, no. resi, estimasi)
+    → POST /api/admin/orders/[id]/ship
+    → OrderModel.shipOrder() → status "SHIPPED" + auto-tracking "Diserahkan ke Kurir"
+    ↓
+Update berkala (seller copy dari website kurir):
+    Admin panel → template cepat ATAU form manual (status + deskripsi + lokasi opsional)
+    → POST /api/admin/orders/[id]/tracking
+    → OrderModel.addTracking() → buat entri OrderTracking baru
+    ↓
+Buyer buka /orders/[id]:
+    - Shipping info card (kurir, no. resi, estimasi tiba)
+    - Tracking timeline (chronological, oldest at top)
+    - Tombol "Konfirmasi Pesanan Diterima" (hanya saat status SHIPPED)
+    → POST /api/orders/[id]/confirm (dengan Bearer token)
+    → OrderModel.confirmDelivery() → status "DELIVERED" + auto-tracking "Pesanan Diterima"
+```
+
+### Database — Kolom & Tabel Baru (jalankan di Supabase SQL Editor)
+
+```sql
+-- Kolom pengiriman di tabel orders
+ALTER TABLE orders
+  ADD COLUMN IF NOT EXISTS courier          TEXT,
+  ADD COLUMN IF NOT EXISTS courier_service  TEXT,
+  ADD COLUMN IF NOT EXISTS tracking_number  TEXT,
+  ADD COLUMN IF NOT EXISTS shipped_at       TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS estimated_arrival TIMESTAMPTZ;
+
+-- Tabel tracking pengiriman
+CREATE TABLE IF NOT EXISTS order_trackings (
+  id          TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  order_id    TEXT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  status      TEXT NOT NULL,
+  description TEXT NOT NULL,
+  location    TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
+### API Endpoints Baru
+
+| Method | Path | Deskripsi |
+|--------|------|-----------|
+| PATCH | `/api/admin/orders/[id]` | Update status (bukan SHIPPED — pakai /ship) |
+| POST | `/api/admin/orders/[id]/ship` | Tandai dikirim + input resi |
+| POST | `/api/admin/orders/[id]/tracking` | Tambah update tracking manual |
+| POST | `/api/orders/[id]/confirm` | Buyer konfirmasi terima (Bearer token) |
+
+### Auto-Milestones (dibuat otomatis oleh OrderModel)
+
+| Event | Status | Deskripsi |
+|-------|--------|-----------|
+| Order dibuat | Pesanan Masuk | Pesanan kamu berhasil dibuat |
+| Status → PAID | Pembayaran Dikonfirmasi | Pembayaran dikonfirmasi, sedang disiapkan |
+| Status → PROCESSING | Dikemas | Sedang dikemas oleh Lumara.id |
+| shipOrder() | Diserahkan ke Kurir | Paket diserahkan ke kurir + no. resi |
+| Status → DELIVERED | Pesanan Diterima | Pesanan dikonfirmasi diterima |
+| Status → CANCELLED | Dibatalkan | Pesanan dibatalkan |
 
 ---
 

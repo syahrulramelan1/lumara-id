@@ -95,19 +95,45 @@ model Product {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 model Order {
-  id              String   @id @default(cuid())
-  userId          String
-  status          String   @default("PENDING")
-  total           Int
-  shippingAddress Json     @default("{}")
-  paymentMethod   String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               String    @id @default(cuid())
+  userId           String
+  status           String    @default("PENDING")
+  total            Int
+  shippingAddress  Json      @default("{}")
+  paymentMethod    String?
 
-  user  User        @relation(fields: [userId], references: [id])
-  items OrderItem[]
+  // ── Pengiriman manual ──────────────────────
+  courier          String?                          // "JNE", "J&T", "SiCepat", dll
+  courierService   String?   @map("courier_service") // "REG", "YES", "Express"
+  trackingNumber   String?   @map("tracking_number")
+  shippedAt        DateTime? @map("shipped_at")
+  estimatedArrival DateTime? @map("estimated_arrival")
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user      User           @relation(fields: [userId], references: [id])
+  items     OrderItem[]
+  trackings OrderTracking[]
 
   @@map("orders")
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ORDER TRACKING — riwayat pengiriman manual
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+model OrderTracking {
+  id          String   @id @default(cuid())
+  orderId     String   @map("order_id")
+  status      String                          // label singkat: "Dikemas", "Diserahkan", dll
+  description String                          // kalimat yang buyer baca
+  location    String?                         // opsional: "Gudang Jakarta Selatan"
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("order_trackings")
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
