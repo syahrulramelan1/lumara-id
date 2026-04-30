@@ -68,8 +68,8 @@ export class ProductModel {
     else if (category) where.category = { slug: category };
     if (search) {
       where.OR = [
-        { name: { contains: search } },
-        { description: { contains: search } },
+        { name: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
       ];
     }
     if (minPrice !== undefined || maxPrice !== undefined) {
