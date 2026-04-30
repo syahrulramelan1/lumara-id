@@ -13,7 +13,7 @@ const http = axios.create({
 export interface ApiProduct {
   id: string; name: string; slug: string; description: string;
   price: number; originalPrice: number | null; stock: number;
-  sku: string | null; images: string; sizes: string; colors: string;
+  sku: string | null; images: string | string[]; sizes: string | string[]; colors: string | string[];
   isFeatured: boolean; isNew: boolean; rating: number; reviewCount: number;
   categoryId: string; category: { id: string; name: string; slug: string };
   createdAt: string;
@@ -33,14 +33,14 @@ export interface ApiOrder {
   user: { id: string; name: string | null; email: string; avatar: string | null };
   items: Array<{
     id: string; quantity: number; size: string; color: string; price: number;
-    product: { id: string; name: string; images: string };
+    product: { id: string; name: string; images: string | string[] };
   }>;
 }
 
 export interface ApiReview {
-  id: string; rating: number; comment: string; images: string; createdAt: string;
+  id: string; rating: number; comment: string; images: string | string[]; createdAt: string;
   user: { id: string; name: string | null; email: string; avatar: string | null };
-  product: { id: string; name: string; images: string };
+  product: { id: string; name: string; images: string | string[] };
 }
 
 export interface ApiUser {

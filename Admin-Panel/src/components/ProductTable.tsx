@@ -3,11 +3,7 @@ import { HiOutlinePencil, HiOutlineTrash, HiOutlineEye } from "react-icons/hi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { productsApi, type ApiProduct } from "../lib/api";
-
-function parseImages(raw: string): string {
-  try { const arr = JSON.parse(raw); return Array.isArray(arr) ? arr[0] ?? "" : ""; }
-  catch { return raw || ""; }
-}
+import { firstImage } from "../lib/jsonUtils";
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(price);
@@ -41,7 +37,7 @@ const ProductTable = ({ products }: Props) => {
         </thead>
         <tbody>
           {products.map((item) => {
-            const img = parseImages(item.images);
+            const img = firstImage(item.images);
             const inStock = item.stock > 0;
             return (
               <tr key={item.id}>

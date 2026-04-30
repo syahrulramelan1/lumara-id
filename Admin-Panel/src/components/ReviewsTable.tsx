@@ -2,11 +2,7 @@ import { HiOutlineTrash, HiStar } from "react-icons/hi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { reviewsApi, type ApiReview } from "../lib/api";
-
-function parseImages(raw: string): string[] {
-  try { const a = JSON.parse(raw); return Array.isArray(a) ? a : []; }
-  catch { return []; }
-}
+import { parseJsonArr } from "../lib/jsonUtils";
 
 const ReviewsTable = ({ reviews }: { reviews: ApiReview[] }) => {
   const queryClient = useQueryClient();
@@ -31,7 +27,7 @@ const ReviewsTable = ({ reviews }: { reviews: ApiReview[] }) => {
         </thead>
         <tbody>
           {reviews.map((review) => {
-            const productImgs = parseImages(review.product.images);
+            const productImgs = parseJsonArr(review.product.images);
             return (
               <tr key={review.id}>
                 <td>

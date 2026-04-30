@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { HiOutlineSave } from "react-icons/hi";
-import { AiOutlineSave } from "react-icons/ai";
+import { HiOutlineSave, HiOutlineArrowLeft } from "react-icons/hi";
 import toast from "react-hot-toast";
-import { ImageUpload, InputWithLabel, Sidebar, SimpleInput, TextAreaInput } from "../components";
+import { ImageUpload, Sidebar } from "../components";
 import { categoriesApi } from "../lib/api";
 
 const EditCategory = () => {
@@ -18,18 +17,11 @@ const EditCategory = () => {
     enabled: !!id,
   });
 
-  const [form, setForm] = useState({
-    name: "", slug: "", description: "", image: "",
-  });
+  const [form, setForm] = useState({ name: "", slug: "", description: "", image: "" });
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
-    if (data) setForm({
-      name: data.name,
-      slug: data.slug,
-      description: data.description ?? "",
-      image: data.image ?? "",
-    });
+    if (data) setForm({ name: data.name, slug: data.slug, description: data.description ?? "", image: data.image ?? "" });
   }, [data]);
 
   const updateMutation = useMutation({
@@ -39,7 +31,10 @@ const EditCategory = () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       navigate("/categories");
     },
-    onError: () => toast.error("Gagal memperbarui kategori"),
+    onError: (err: unknown) => {
+      const msg = (err as any)?.response?.data?.error || "Gagal memperbarui kategori";
+      toast.error(msg);
+    },
   });
 
   const handleSave = () => {
@@ -53,77 +48,69 @@ const EditCategory = () => {
   };
 
   if (isLoading) return (
-    <div className="flex h-screen dark:bg-blackPrimary bg-whiteSecondary">
+    <div className="min-h-screen flex dark:bg-[#0D0B14] bg-[var(--bg-2)]">
       <Sidebar />
       <div className="flex-1 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 dark:border-white border-black border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin" />
       </div>
     </div>
   );
 
   return (
-    <div className="h-auto border-t dark:border-blackSecondary border-1 flex dark:bg-blackPrimary bg-whiteSecondary">
+    <div className="min-h-screen flex dark:bg-[#0D0B14] bg-[var(--bg-2)]">
       <Sidebar />
-      <div className="dark:bg-blackPrimary bg-whiteSecondary w-full">
-        <div className="py-10">
-          <div className="px-4 sm:px-6 lg:px-8 pb-8 border-b border-gray-800 flex justify-between items-center max-sm:flex-col max-sm:gap-5">
-            <h2 className="text-3xl font-bold dark:text-whiteSecondary text-blackPrimary">Edit Kategori</h2>
-            <div className="flex gap-x-2">
-              <button
-                onClick={() => navigate("/categories")}
-                className="dark:bg-blackPrimary bg-whiteSecondary border border-gray-600 w-40 py-2 text-lg dark:hover:border-gray-500 hover:border-gray-400 duration-200 flex items-center justify-center gap-x-2"
-              >
-                <AiOutlineSave className="dark:text-whiteSecondary text-blackPrimary text-xl" />
-                <span className="dark:text-whiteSecondary text-blackPrimary font-medium">Batal</span>
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={updateMutation.isPending}
-                className="dark:bg-whiteSecondary bg-blackPrimary w-40 py-2 text-lg dark:hover:bg-white hover:bg-blackSecondary duration-200 flex items-center justify-center gap-x-2 disabled:opacity-50"
-              >
-                <HiOutlineSave className="dark:text-blackPrimary text-whiteSecondary text-xl" />
-                <span className="dark:text-blackPrimary text-whiteSecondary font-semibold">
-                  {updateMutation.isPending ? "Menyimpan..." : "Simpan"}
-                </span>
-              </button>
+      <div className="flex-1 flex flex-col">
+        <div className="page-header">
+          <div>
+            <h2 className="page-title">Edit Kategori</h2>
+            <p className="page-subtitle">{data?.name}</p>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => navigate("/categories")} className="btn-ghost flex items-center gap-2 text-sm">
+              <HiOutlineArrowLeft />
+              Batal
+            </button>
+            <button onClick={handleSave} disabled={updateMutation.isPending} className="btn-primary flex items-center gap-2 text-sm">
+              <HiOutlineSave />
+              {updateMutation.isPending ? "Menyimpan..." : "Simpan"}
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6 grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <div className="card p-6">
+            <h3 className="font-semibold text-[var(--text)] mb-4">Informasi Dasar</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Nama Kategori *</label>
+                <input className="input-base" type="text" placeholder="Nama kategori..."
+                  value={form.name}
+                  onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Slug *</label>
+                <input className="input-base" type="text" placeholder="slug-kategori"
+                  value={form.slug}
+                  onChange={(e) => setForm(f => ({ ...f, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") }))} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Deskripsi</label>
+                <textarea className="input-base resize-none" rows={4} placeholder="Deskripsi kategori..."
+                  value={form.description}
+                  onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))} />
+              </div>
             </div>
           </div>
 
-          <div className="px-4 sm:px-6 lg:px-8 pb-8 pt-8 grid grid-cols-2 gap-x-10 max-xl:grid-cols-1 max-xl:gap-y-10">
-            <div>
-              <h3 className="text-2xl font-bold dark:text-whiteSecondary text-blackPrimary mb-5">Informasi Dasar</h3>
-              <div className="flex flex-col gap-5">
-                <InputWithLabel label="Nama Kategori">
-                  <SimpleInput type="text" placeholder="Nama kategori..."
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  />
-                </InputWithLabel>
-                <InputWithLabel label="Slug">
-                  <SimpleInput type="text" placeholder="slug-kategori"
-                    value={form.slug}
-                    onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") })}
-                  />
-                </InputWithLabel>
-                <InputWithLabel label="Deskripsi">
-                  <TextAreaInput rows={4} cols={50} placeholder="Deskripsi kategori..."
-                    value={form.description}
-                    onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  />
-                </InputWithLabel>
+          <div className="card p-6 h-fit">
+            <h3 className="font-semibold text-[var(--text)] mb-4">Gambar Kategori</h3>
+            <ImageUpload onFileSelect={(f) => setImageFile(f)} />
+            {form.image && !imageFile && (
+              <div className="mt-4">
+                <img src={form.image} alt="current" className="w-36 h-32 object-cover rounded-lg border border-[var(--border)]" />
+                <p className="text-xs text-[var(--text-muted)] mt-1">Gambar saat ini</p>
               </div>
-            </div>
-
-            <div>
-              <h3 className="text-2xl font-bold dark:text-whiteSecondary text-blackPrimary mb-5">Gambar Kategori</h3>
-              <ImageUpload onFileSelect={(f) => setImageFile(f)} />
-              {form.image && !imageFile && (
-                <div className="mt-4">
-                  <img src={form.image} alt="current" className="w-36 h-32 object-cover rounded" />
-                  <p className="text-xs dark:text-gray-400 text-gray-500 mt-1">Gambar saat ini</p>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>

@@ -6,6 +6,7 @@ import {
   Profile, Reviews, Users,
 } from "./pages";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 const protect = (el: React.ReactNode) => <ProtectedRoute>{el}</ProtectedRoute>;
 
@@ -39,7 +40,11 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <ErrorBoundary>
+      <RouterProvider router={router} />
+    </ErrorBoundary>
+  );
 }
 
 export default App;
