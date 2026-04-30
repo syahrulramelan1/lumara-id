@@ -10,35 +10,41 @@ import { getT } from "@/lib/i18n";
 import { useMounted } from "@/hooks/useMounted";
 
 export function BottomNav() {
-  const pathname   = usePathname();
-  const mounted    = useMounted();
-  const wishCount  = useWishlistStore((s) => s.count());
-  const language   = useUIStore((s) => s.language);
-  const { dbUser } = useAuthStore();
+  const pathname      = usePathname();
+  const mounted       = useMounted();
+  const wishCount     = useWishlistStore((s) => s.count());
+  const language      = useUIStore((s) => s.language);
+  const { dbUser }    = useAuthStore();
 
   const safeWishCount = mounted ? wishCount : 0;
-  const safeLang      = mounted ? language  : "id";
   const safeUser      = mounted ? dbUser : null;
-  const t = getT(safeLang);
+  const t = getT(mounted ? language : "id");
 
   const navItems = [
-    { href: "/",           icon: Home,     label: t.bottom_nav.home },
-    { href: "/categories", icon: Grid3X3,  label: t.bottom_nav.categories },
-    { href: "/search",     icon: Search,   label: t.bottom_nav.search },
-    { href: "/wishlist",   icon: Heart,    label: t.bottom_nav.wishlist },
-    { href: "/account",    icon: User,     label: t.bottom_nav.account },
+    { href: "/",           icon: Home,    label: t.bottom_nav.home },
+    { href: "/categories", icon: Grid3X3, label: t.bottom_nav.categories },
+    { href: "/search",     icon: Search,  label: t.bottom_nav.search },
+    { href: "/wishlist",   icon: Heart,   label: t.bottom_nav.wishlist },
+    { href: "/account",    icon: User,    label: t.bottom_nav.account },
   ];
 
+  const userInitials = safeUser
+    ? (safeUser.name ?? safeUser.email).slice(0, 2).toUpperCase()
+    : null;
+
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-t border-border safe-area-pb">
-      <div className="flex items-center justify-around h-16 px-2">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-border safe-area-pb">
+      <div className="flex items-center justify-around h-16 px-1">
         {navItems.map(({ href, icon: Icon, label }) => {
           const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
+          const isAccount = href === "/account";
+          const isWishlist = href === "/wishlist";
+
           return (
             <Link
               key={href}
               href={href}
-              className="flex flex-col items-center gap-0.5 px-3 py-2 relative"
+              className="flex flex-col items-center gap-0.5 px-3 py-2 relative min-w-[52px]"
             >
               {active && (
                 <motion.div
@@ -49,31 +55,35 @@ export function BottomNav() {
               )}
 
               <motion.div
-                animate={{ scale: active ? 1.12 : 1, y: active ? -1 : 0 }}
+                animate={{ scale: active ? 1.1 : 1, y: active ? -1 : 0 }}
                 transition={{ type: "spring", stiffness: 400, damping: 20 }}
                 className="relative"
               >
-                <Icon
-                  size={22}
-                  className={active ? "text-primary" : "text-muted-foreground"}
-                  strokeWidth={active ? 2.5 : 1.5}
-                />
+                {/* Account tab: avatar when logged in */}
+                {isAccount && safeUser ? (
+                  <div className={`w-6 h-6 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-primary to-secondary text-white text-[9px] font-bold shrink-0 ring-2 transition-colors ${active ? "ring-primary" : "ring-border"}`}>
+                    {safeUser.avatar
+                      ? <img src={safeUser.avatar} alt="avatar" className="w-full h-full object-cover" />
+                      : userInitials}
+                  </div>
+                ) : (
+                  <Icon
+                    size={22}
+                    className={active ? "text-primary" : "text-muted-foreground"}
+                    strokeWidth={active ? 2.5 : 1.5}
+                  />
+                )}
 
                 {/* Wishlist badge — only when logged in */}
-                {href === "/wishlist" && safeWishCount > 0 && safeUser && (
+                {isWishlist && safeWishCount > 0 && safeUser && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                    className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-3.5 h-3.5 flex items-center justify-center rounded-full"
+                    className="absolute -top-1 -right-1.5 bg-red-500 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full"
                   >
-                    {safeWishCount > 9 ? "9" : safeWishCount}
+                    {safeWishCount > 9 ? "9+" : safeWishCount}
                   </motion.span>
-                )}
-
-                {/* Green dot on Account icon when logged in */}
-                {href === "/account" && safeUser && (
-                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border-2 border-background rounded-full" />
                 )}
               </motion.div>
 
