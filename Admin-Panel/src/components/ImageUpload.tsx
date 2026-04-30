@@ -23,27 +23,25 @@ const ImageUpload = ({ onFileSelect, multiple = false, onFilesSelect }: ImageUpl
   };
 
   return (
-    <div className="mt-5">
+    <div>
       <label
-        htmlFor="dropzone-file"
-        className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-700 border-dashed rounded-lg cursor-pointer dark:bg-blackPrimary bg-whiteSecondary dark:hover:border-gray-500 hover:border-gray-400 transition-colors"
+        className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-[var(--border)] rounded-xl cursor-pointer bg-[var(--bg-3)] hover:border-[var(--brand)] hover:bg-[var(--brand-light)] transition-colors"
         onClick={() => inputRef.current?.click()}
       >
-        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-          <svg className="w-8 h-8 mb-3 dark:text-whiteSecondary text-blackPrimary" aria-hidden="true"
+        <div className="flex flex-col items-center justify-center gap-2">
+          <svg className="w-8 h-8 text-[var(--text-muted)]" aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
             <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
               d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
           </svg>
-          <p className="text-sm dark:text-whiteSecondary text-blackPrimary">
-            <span className="font-semibold">Klik untuk upload</span> atau drag & drop
+          <p className="text-sm text-[var(--text)]">
+            <span className="font-semibold text-[var(--brand)]">Klik untuk upload</span> atau drag & drop
           </p>
-          <p className="text-xs dark:text-gray-400 text-gray-500 mt-1">PNG, JPG, WEBP (maks. 5MB)</p>
+          <p className="text-xs text-[var(--text-muted)]">PNG, JPG, WEBP (maks. 5MB)</p>
         </div>
       </label>
       <input
         ref={inputRef}
-        id="dropzone-file"
         type="file"
         accept="image/*"
         multiple={multiple}
@@ -53,7 +51,7 @@ const ImageUpload = ({ onFileSelect, multiple = false, onFilesSelect }: ImageUpl
       {previews.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-3">
           {previews.map((src, i) => (
-            <img key={i} src={src} alt="" className="w-20 h-20 object-cover rounded border dark:border-gray-600 border-gray-300" />
+            <img key={i} src={src} alt="" className="w-20 h-20 object-cover rounded-lg border border-[var(--border)]" />
           ))}
         </div>
       )}

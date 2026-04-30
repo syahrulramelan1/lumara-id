@@ -1,5 +1,5 @@
 import { HiOutlineSave, HiOutlineCamera } from "react-icons/hi";
-import { InputWithLabel, Sidebar, SimpleInput } from "../components";
+import { Sidebar } from "../components";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
@@ -40,7 +40,7 @@ const Profile = () => {
                 alt="profile"
                 className="w-24 h-24 rounded-full object-cover ring-4 ring-[var(--border)]"
               />
-              <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-gradient-to-br from-brand-700 to-brand-400 flex items-center justify-center text-white shadow-md hover:opacity-90 transition-opacity">
+              <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-gradient-to-br from-violet-600 to-purple-400 flex items-center justify-center text-white shadow-md hover:opacity-90 transition-opacity">
                 <HiOutlineCamera className="text-sm" />
               </button>
             </div>
@@ -55,42 +55,50 @@ const Profile = () => {
           <div className="card p-6 flex-1">
             <h3 className="font-semibold text-[var(--text)] mb-5">Informasi Akun</h3>
             <div className="flex flex-col gap-4">
-              <InputWithLabel label="Nama Pengguna">
-                <SimpleInput
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Nama Pengguna</label>
+                <input
+                  className="input-base"
                   type="text"
                   placeholder="Nama kamu"
                   value={form.username}
                   onChange={(e) => setForm({ ...form, username: e.target.value })}
                 />
-              </InputWithLabel>
-              <InputWithLabel label="Email">
-                <SimpleInput
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Email</label>
+                <input
+                  className="input-base"
                   type="email"
                   placeholder="email@lumara.id"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                 />
-              </InputWithLabel>
+              </div>
 
               <div className="border-t border-[var(--border)] pt-4 mt-2">
                 <h4 className="text-sm font-medium text-[var(--text-muted)] mb-4">Ganti Password</h4>
                 <div className="flex flex-col gap-4">
-                  <InputWithLabel label="Password Baru">
-                    <SimpleInput
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Password Baru</label>
+                    <input
+                      className="input-base"
                       type="password"
                       placeholder="Minimal 6 karakter"
                       value={form.password}
                       onChange={(e) => setForm({ ...form, password: e.target.value })}
                     />
-                  </InputWithLabel>
-                  <InputWithLabel label="Konfirmasi Password">
-                    <SimpleInput
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Konfirmasi Password</label>
+                    <input
+                      className="input-base"
                       type="password"
                       placeholder="Ulangi password baru"
                       value={form.confirmPassword}
                       onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
                     />
-                  </InputWithLabel>
+                  </div>
                 </div>
               </div>
             </div>

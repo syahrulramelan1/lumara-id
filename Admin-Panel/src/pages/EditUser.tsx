@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { HiOutlineSave } from "react-icons/hi";
+import { HiOutlineSave, HiOutlineArrowLeft, HiOutlineMail, HiOutlinePhone, HiOutlineCalendar, HiOutlineShieldCheck } from "react-icons/hi";
 import toast from "react-hot-toast";
-import { InputWithLabel, Sidebar, SimpleInput } from "../components";
-import SelectInput from "../components/SelectInput";
+import { Sidebar } from "../components";
 import { usersApi } from "../lib/api";
 
-const roleList = [
-  { label: "User", value: "USER" },
-  { label: "Admin", value: "ADMIN" },
+const ROLE_OPTIONS = [
+  { value: "USER", label: "User" },
+  { value: "ADMIN", label: "Admin" },
 ];
 
 const EditUser = () => {
@@ -40,92 +39,120 @@ const EditUser = () => {
   });
 
   if (isLoading) return (
-    <div className="flex h-screen dark:bg-blackPrimary bg-whiteSecondary">
+    <div className="min-h-screen flex dark:bg-[#0D0B14] bg-[var(--bg-2)]">
       <Sidebar />
       <div className="flex-1 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 dark:border-white border-black border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin" />
       </div>
     </div>
   );
 
   if (!user) return (
-    <div className="flex h-screen dark:bg-blackPrimary bg-whiteSecondary">
+    <div className="min-h-screen flex dark:bg-[#0D0B14] bg-[var(--bg-2)]">
       <Sidebar />
-      <div className="flex-1 flex items-center justify-center dark:text-gray-400 text-gray-500">
+      <div className="flex-1 flex items-center justify-center text-[var(--text-muted)]">
         Pengguna tidak ditemukan
       </div>
     </div>
   );
 
+  const initials = (user.name || user.email).charAt(0).toUpperCase();
+
   return (
-    <div className="h-auto border-t dark:border-blackSecondary border-1 flex dark:bg-blackPrimary bg-whiteSecondary">
+    <div className="min-h-screen flex dark:bg-[#0D0B14] bg-[var(--bg-2)]">
       <Sidebar />
-      <div className="dark:bg-blackPrimary bg-whiteSecondary w-full">
-        <div className="py-10">
-          <div className="px-4 sm:px-6 lg:px-8 pb-8 border-b dark:border-gray-800 border-gray-200 flex justify-between items-center max-sm:flex-col max-sm:gap-5">
-            <h2 className="text-3xl font-bold dark:text-whiteSecondary text-blackPrimary">Edit Pengguna</h2>
-            <div className="flex gap-x-2">
-              <button
-                onClick={() => navigate("/users")}
-                className="dark:bg-blackPrimary bg-whiteSecondary border border-gray-600 w-32 py-2 text-lg hover:border-gray-400 duration-200 flex items-center justify-center dark:text-whiteSecondary text-blackPrimary"
-              >
-                Batal
-              </button>
-              <button
-                onClick={() => updateMutation.mutate(role)}
-                disabled={updateMutation.isPending}
-                className="dark:bg-whiteSecondary bg-blackPrimary w-44 py-2 text-lg dark:hover:bg-white hover:bg-blackSecondary duration-200 flex items-center justify-center gap-x-2 disabled:opacity-50"
-              >
-                <HiOutlineSave className="dark:text-blackPrimary text-whiteSecondary text-xl" />
-                <span className="dark:text-blackPrimary text-whiteSecondary font-semibold">
-                  {updateMutation.isPending ? "Menyimpan..." : "Simpan"}
+      <div className="flex-1 flex flex-col">
+        <div className="page-header">
+          <div>
+            <h2 className="page-title">Edit Pengguna</h2>
+            <p className="page-subtitle">{user.email}</p>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => navigate("/users")} className="btn-ghost flex items-center gap-2 text-sm">
+              <HiOutlineArrowLeft />
+              Batal
+            </button>
+            <button
+              onClick={() => updateMutation.mutate(role)}
+              disabled={updateMutation.isPending}
+              className="btn-primary flex items-center gap-2 text-sm"
+            >
+              <HiOutlineSave />
+              {updateMutation.isPending ? "Menyimpan..." : "Simpan"}
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6 grid grid-cols-1 xl:grid-cols-2 gap-6">
+          {/* User info card (read-only) */}
+          <div className="card p-6">
+            <h3 className="font-semibold text-[var(--text)] mb-5">Informasi Pengguna</h3>
+
+            <div className="flex items-center gap-4 mb-6 pb-5 border-b border-[var(--border)]">
+              {user.avatar ? (
+                <img src={user.avatar} alt="" className="w-16 h-16 rounded-full object-cover flex-shrink-0" />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-xl font-bold text-white flex-shrink-0">
+                  {initials}
+                </div>
+              )}
+              <div>
+                <p className="font-semibold text-[var(--text)]">{user.name || "—"}</p>
+                <p className="text-sm text-[var(--text-muted)]">{user.email}</p>
+                <span className={`badge mt-1 inline-block ${user.role === "ADMIN" ? "badge-purple" : "badge-gray"}`}>
+                  {user.role}
                 </span>
-              </button>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 text-sm">
+                <HiOutlineMail className="text-[var(--text-muted)] flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-[var(--text-muted)] mb-0.5">Email</p>
+                  <p className="text-[var(--text)]">{user.email}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <HiOutlinePhone className="text-[var(--text-muted)] flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-[var(--text-muted)] mb-0.5">Telepon</p>
+                  <p className="text-[var(--text)]">{user.phone || "—"}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <HiOutlineCalendar className="text-[var(--text-muted)] flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-[var(--text-muted)] mb-0.5">Bergabung</p>
+                  <p className="text-[var(--text)]">{new Date(user.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="px-4 sm:px-6 lg:px-8 pb-8 pt-8 grid grid-cols-2 gap-x-10 max-xl:grid-cols-1 max-xl:gap-y-10">
+          {/* Role editor */}
+          <div className="card p-6 h-fit">
+            <div className="flex items-center gap-2 mb-5">
+              <HiOutlineShieldCheck className="text-[var(--brand)]" />
+              <h3 className="font-semibold text-[var(--text)]">Ubah Role</h3>
+            </div>
+            <p className="text-sm text-[var(--text-muted)] mb-4">
+              Nama, email, dan telepon dikelola oleh Supabase Auth dan tidak dapat diubah dari sini.
+            </p>
             <div>
-              <h3 className="text-2xl font-bold dark:text-whiteSecondary text-blackPrimary mb-5">Informasi Pengguna</h3>
-              <div className="flex flex-col gap-5">
-                <div className="flex items-center gap-4 mb-2">
-                  {user.avatar ? (
-                    <img src={user.avatar} alt="" className="w-16 h-16 rounded-full object-cover" />
-                  ) : (
-                    <div className="w-16 h-16 rounded-full dark:bg-gray-600 bg-gray-300 flex items-center justify-center text-2xl font-bold dark:text-white text-black">
-                      {(user.name || user.email).charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <div>
-                    <p className="font-medium dark:text-whiteSecondary text-blackPrimary">{user.name || "—"}</p>
-                    <p className="text-sm dark:text-gray-400 text-gray-500">{user.email}</p>
-                  </div>
-                </div>
-
-                <InputWithLabel label="Nama">
-                  <SimpleInput type="text" placeholder="" value={user.name || ""} onChange={() => {}} />
-                </InputWithLabel>
-
-                <InputWithLabel label="Email">
-                  <SimpleInput type="text" placeholder="" value={user.email} onChange={() => {}} />
-                </InputWithLabel>
-
-                <InputWithLabel label="Telepon">
-                  <SimpleInput type="text" placeholder="" value={user.phone || ""} onChange={() => {}} />
-                </InputWithLabel>
-
-                <InputWithLabel label="Role">
-                  <SelectInput
-                    selectList={roleList}
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                  />
-                </InputWithLabel>
-
-                <div className="text-xs dark:text-gray-400 text-gray-500">
-                  Bergabung: {new Date(user.createdAt).toLocaleDateString("id-ID")}
-                </div>
-              </div>
+              <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Role *</label>
+              <select
+                className="input-base"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+              >
+                {ROLE_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+              <p className="text-xs text-[var(--text-muted)] mt-2">
+                Admin memiliki akses penuh ke panel ini.
+              </p>
             </div>
           </div>
         </div>

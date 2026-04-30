@@ -133,10 +133,12 @@ body {
 .badge-red    { background: #fee2e2; color: #991b1b; }
 .badge-yellow { background: #fef9c3; color: #92400e; }
 .badge-blue   { background: #dbeafe; color: #1e40af; }
+.badge-gray   { background: #f1f5f9; color: #475569; }
 .dark .badge-green  { background: #064e3b; color: #6ee7b7; }
 .dark .badge-red    { background: #450a0a; color: #fca5a5; }
 .dark .badge-yellow { background: #422006; color: #fcd34d; }
 .dark .badge-blue   { background: #1e3a5f; color: #93c5fd; }
+.dark .badge-gray   { background: #1e293b; color: #94a3b8; }
 
 /* ── Table ─────────────────────────────────────────────── */
 .tbl { width: 100%; border-collapse: collapse; }
