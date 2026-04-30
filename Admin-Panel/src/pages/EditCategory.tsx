@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { HiOutlineSave, HiOutlineArrowLeft } from "react-icons/hi";
+import { HiOutlineSave, HiOutlineArrowLeft, HiOutlinePlus, HiOutlinePencil } from "react-icons/hi";
 import toast from "react-hot-toast";
 import { ImageUpload, Sidebar } from "../components";
-import { categoriesApi } from "../lib/api";
+import { categoriesApi, productsApi } from "../lib/api";
+import { firstImage } from "../lib/jsonUtils";
 
 const EditCategory = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,6 +15,12 @@ const EditCategory = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["category", id],
     queryFn: () => categoriesApi.get(id!).then((r) => r.data.data),
+    enabled: !!id,
+  });
+
+  const { data: productsData } = useQuery({
+    queryKey: ["products-by-category", id],
+    queryFn: () => productsApi.list({ categoryId: id, limit: 50 }).then((r) => r.data),
     enabled: !!id,
   });
 
@@ -29,6 +36,7 @@ const EditCategory = () => {
     onSuccess: () => {
       toast.success("Kategori berhasil diperbarui");
       queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["category", id] });
       navigate("/categories");
     },
     onError: (err: unknown) => {
@@ -50,6 +58,8 @@ const EditCategory = () => {
       updateMutation.mutate({ name: form.name, slug: form.slug, description: form.description });
     }
   };
+
+  const products = productsData?.data ?? [];
 
   if (isLoading) return (
     <div className="min-h-screen flex dark:bg-[#0D0B14] bg-[var(--bg-2)]">
@@ -81,39 +91,117 @@ const EditCategory = () => {
           </div>
         </div>
 
-        <div className="p-6 grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <div className="card p-6">
-            <h3 className="font-semibold text-[var(--text)] mb-4">Informasi Dasar</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Nama Kategori *</label>
-                <input className="input-base" type="text" placeholder="Nama kategori..."
-                  value={form.name}
-                  onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))} />
+        <div className="p-6 space-y-6">
+          {/* Top row: form + image */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="card p-6">
+              <h3 className="font-semibold text-[var(--text)] mb-4">Informasi Dasar</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Nama Kategori *</label>
+                  <input className="input-base" type="text" placeholder="Nama kategori..."
+                    value={form.name}
+                    onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Slug *</label>
+                  <input className="input-base" type="text" placeholder="slug-kategori"
+                    value={form.slug}
+                    onChange={(e) => setForm(f => ({ ...f, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") }))} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Deskripsi</label>
+                  <textarea className="input-base resize-none" rows={4} placeholder="Deskripsi kategori..."
+                    value={form.description}
+                    onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))} />
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Slug *</label>
-                <input className="input-base" type="text" placeholder="slug-kategori"
-                  value={form.slug}
-                  onChange={(e) => setForm(f => ({ ...f, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") }))} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Deskripsi</label>
-                <textarea className="input-base resize-none" rows={4} placeholder="Deskripsi kategori..."
-                  value={form.description}
-                  onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))} />
-              </div>
+            </div>
+
+            <div className="card p-6 h-fit">
+              <h3 className="font-semibold text-[var(--text)] mb-4">Gambar Kategori</h3>
+              <ImageUpload onFileSelect={(f) => setImageFile(f)} />
+              {form.image && !imageFile && (
+                <div className="mt-4">
+                  <img src={form.image} alt="current" className="w-36 h-32 object-cover rounded-lg border border-[var(--border)]" />
+                  <p className="text-xs text-[var(--text-muted)] mt-1">Gambar saat ini</p>
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="card p-6 h-fit">
-            <h3 className="font-semibold text-[var(--text)] mb-4">Gambar Kategori</h3>
-            <ImageUpload onFileSelect={(f) => setImageFile(f)} />
-            {form.image && !imageFile && (
-              <div className="mt-4">
-                <img src={form.image} alt="current" className="w-36 h-32 object-cover rounded-lg border border-[var(--border)]" />
-                <p className="text-xs text-[var(--text-muted)] mt-1">Gambar saat ini</p>
+          {/* Products in this category */}
+          <div className="card overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
+              <div>
+                <h3 className="font-semibold text-[var(--text)]">Produk dalam Kategori</h3>
+                <p className="text-xs text-[var(--text-muted)] mt-0.5">{products.length} produk</p>
               </div>
+              <Link
+                to={`/products/create-product?categoryId=${id}`}
+                className="btn-primary flex items-center gap-2 text-sm"
+              >
+                <HiOutlinePlus />
+                Tambah Produk
+              </Link>
+            </div>
+
+            {products.length === 0 ? (
+              <div className="p-12 text-center text-[var(--text-muted)]">
+                <p className="mb-3">Belum ada produk di kategori ini</p>
+                <Link to={`/products/create-product?categoryId=${id}`} className="btn-primary text-sm inline-flex items-center gap-2">
+                  <HiOutlinePlus />
+                  Tambah Produk Pertama
+                </Link>
+              </div>
+            ) : (
+              <table className="tbl">
+                <thead>
+                  <tr>
+                    <th>Produk</th>
+                    <th>Harga</th>
+                    <th>Stok</th>
+                    <th className="text-right pr-4">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map((p) => {
+                    const img = firstImage(p.images);
+                    return (
+                      <tr key={p.id}>
+                        <td>
+                          <div className="flex items-center gap-3">
+                            {img ? (
+                              <img src={img} alt="" className="w-10 h-10 object-cover rounded-lg flex-shrink-0" />
+                            ) : (
+                              <div className="w-10 h-10 rounded-lg bg-[var(--bg-3)] flex-shrink-0" />
+                            )}
+                            <div>
+                              <p className="text-sm font-medium text-[var(--text)] truncate max-w-[200px]">{p.name}</p>
+                              <p className="text-xs text-[var(--text-muted)]">{p.sku || "—"}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="text-sm text-[var(--text)]">
+                          {new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(p.price)}
+                        </td>
+                        <td>
+                          <span className={`badge ${p.stock > 0 ? "badge-green" : "badge-red"}`}>
+                            {p.stock} pcs
+                          </span>
+                        </td>
+                        <td>
+                          <div className="flex items-center justify-end pr-4">
+                            <Link to={`/products/${p.id}`} className="btn-icon" title="Edit produk">
+                              <HiOutlinePencil />
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             )}
           </div>
         </div>

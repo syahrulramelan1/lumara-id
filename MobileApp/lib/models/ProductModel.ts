@@ -57,13 +57,15 @@ export class ProductModel {
     });
   }
 
-  async findWithFilters(params: FilterParams): Promise<PaginationResult<ProductWithCategory>> {
-    const { category, search, minPrice, maxPrice, sortBy = "terbaru", page = 1, limit = 12 } = params;
+  async findWithFilters(params: FilterParams & { categoryId?: string }): Promise<PaginationResult<ProductWithCategory>> {
+    const { category, categoryId, search, minPrice, maxPrice, sortBy = "terbaru", page = 1, limit = 12 } = params;
     const skip = (page - 1) * limit;
 
-    const where: Record<string, unknown> = { stock: { gt: 0 } };
+    // Admin requests (categoryId) show all products; public requests filter to in-stock only
+    const where: Record<string, unknown> = categoryId ? {} : { stock: { gt: 0 } };
 
-    if (category) where.category = { slug: category };
+    if (categoryId) where.categoryId = categoryId;
+    else if (category) where.category = { slug: category };
     if (search) {
       where.OR = [
         { name: { contains: search } },

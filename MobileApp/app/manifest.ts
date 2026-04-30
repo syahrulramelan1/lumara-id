@@ -13,13 +13,13 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ["shopping", "fashion"],
     icons: [
       {
-        src: "/app-icon.svg",
+        src: "/api/app-icon",
         sizes: "any",
         type: "image/svg+xml",
         purpose: "any",
       },
       {
-        src: "/app-icon.svg",
+        src: "/api/app-icon",
         sizes: "any",
         type: "image/svg+xml",
         purpose: "maskable",

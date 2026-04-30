@@ -8,6 +8,7 @@ export async function GET(req: NextRequest) {
     const sp = req.nextUrl.searchParams;
     const result = await productModel.findWithFilters({
       search: sp.get("search") ?? undefined,
+      categoryId: sp.get("categoryId") ?? undefined,
       sortBy: (sp.get("sortBy") as "terbaru") ?? "terbaru",
       page: sp.get("page") ? Number(sp.get("page")) : 1,
       limit: sp.get("limit") ? Number(sp.get("limit")) : 50,

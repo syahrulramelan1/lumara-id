@@ -57,7 +57,7 @@ export interface DashboardStats {
 // ─── Products ────────────────────────────────────────────────────────────────
 
 export const productsApi = {
-  list: (params?: Record<string, string | number>) =>
+  list: (params?: Record<string, string | number | undefined>) =>
     http.get<{ success: boolean; data: ApiProduct[]; total: number }>("/products", { params }),
   get: (id: string) =>
     http.get<{ success: boolean; data: ApiProduct }>(`/products/${id}`),

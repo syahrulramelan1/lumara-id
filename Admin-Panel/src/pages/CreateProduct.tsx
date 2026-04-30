@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HiOutlineSave, HiOutlineArrowLeft } from "react-icons/hi";
 import toast from "react-hot-toast";
@@ -10,6 +10,8 @@ import { parseJsonArr } from "../lib/jsonUtils";
 const CreateProduct = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
+  const defaultCategoryId = searchParams.get("categoryId") ?? "";
 
   const { data: catData } = useQuery({
     queryKey: ["categories"],
@@ -17,7 +19,7 @@ const CreateProduct = () => {
   });
 
   const [form, setForm] = useState({
-    name: "", slug: "", description: "", categoryId: "",
+    name: "", slug: "", description: "", categoryId: defaultCategoryId,
     price: "", originalPrice: "", stock: "", sku: "",
     sizes: "", colors: "", isFeatured: false, isNew: false,
   });
