@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { Home, Grid3X3, Search, Heart, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { useWishlistStore } from "@/store/wishlistStore";
+import { useAuthStore } from "@/store/authStore";
 import { useUIStore } from "@/store/uiStore";
 import { getT } from "@/lib/i18n";
 import { useMounted } from "@/hooks/useMounted";
@@ -13,10 +14,11 @@ export function BottomNav() {
   const mounted    = useMounted();
   const wishCount  = useWishlistStore((s) => s.count());
   const language   = useUIStore((s) => s.language);
+  const { dbUser } = useAuthStore();
 
-  // Safe values: match server render until hydration completes
   const safeWishCount = mounted ? wishCount : 0;
   const safeLang      = mounted ? language  : "id";
+  const safeUser      = mounted ? dbUser : null;
   const t = getT(safeLang);
 
   const navItems = [
@@ -38,7 +40,6 @@ export function BottomNav() {
               href={href}
               className="flex flex-col items-center gap-0.5 px-3 py-2 relative"
             >
-              {/* Sliding pill indicator */}
               {active && (
                 <motion.div
                   layoutId="bottom-nav-pill"
@@ -57,7 +58,9 @@ export function BottomNav() {
                   className={active ? "text-primary" : "text-muted-foreground"}
                   strokeWidth={active ? 2.5 : 1.5}
                 />
-                {href === "/wishlist" && safeWishCount > 0 && (
+
+                {/* Wishlist badge — only when logged in */}
+                {href === "/wishlist" && safeWishCount > 0 && safeUser && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -66,6 +69,11 @@ export function BottomNav() {
                   >
                     {safeWishCount > 9 ? "9" : safeWishCount}
                   </motion.span>
+                )}
+
+                {/* Green dot on Account icon when logged in */}
+                {href === "/account" && safeUser && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border-2 border-background rounded-full" />
                 )}
               </motion.div>
 

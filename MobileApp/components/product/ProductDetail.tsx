@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
+import { useAuthStore } from "@/store/authStore";
 import { useUIStore } from "@/store/uiStore";
 import { getT } from "@/lib/i18n";
 import type { ProductWithReviews } from "@/types";
@@ -20,6 +21,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
   const router = useRouter();
   const { addItem } = useCartStore();
   const { toggle, isWishlisted } = useWishlistStore();
+  const { dbUser } = useAuthStore();
   const { language } = useUIStore();
   const t = getT(language);
 
@@ -202,13 +204,17 @@ export function ProductDetail({ product }: ProductDetailProps) {
               {t.product.add_to_cart}
             </motion.button>
             <motion.button
-              onClick={() => toggle(product.id)}
+              onClick={() => {
+                if (!dbUser) { router.push(`/login?redirect=/products/${product.slug}`); return; }
+                toggle(product.id);
+              }}
               whileTap={{ scale: 0.8 }}
               animate={wishlisted ? { scale: [1, 1.3, 1] } : { scale: 1 }}
               transition={{ duration: 0.3 }}
               className={`p-3.5 rounded-[12px] border-2 transition-colors ${
                 wishlisted ? "border-red-500 bg-red-50 text-red-500 dark:bg-red-950" : "border-border hover:border-primary"
               }`}
+              title={!dbUser ? "Masuk untuk menyimpan ke wishlist" : undefined}
             >
               <Heart size={20} className={wishlisted ? "fill-red-500" : ""} />
             </motion.button>

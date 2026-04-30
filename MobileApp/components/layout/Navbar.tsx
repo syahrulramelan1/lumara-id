@@ -1,17 +1,21 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Search, ShoppingBag, Heart, Menu, X, Globe, Sun, Moon, Home, Grid3X3, Tag, User, Package, LayoutDashboard } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Search, ShoppingBag, Heart, Menu, X, Globe, Sun, Moon, Home, Grid3X3, Tag, User, Package, LayoutDashboard, LogOut, LogIn } from "lucide-react";
 import { useTheme } from "next-themes";
+import { toast } from "sonner";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
+import { useAuthStore } from "@/store/authStore";
 import { useUIStore } from "@/store/uiStore";
 import { getT } from "@/lib/i18n";
 import { useMounted } from "@/hooks/useMounted";
+import { createClientComponent } from "@/lib/supabase-browser";
 
 export function Navbar() {
   const pathname   = usePathname();
+  const router     = useRouter();
   const mounted    = useMounted();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -19,12 +23,14 @@ export function Navbar() {
   const wishCount  = useWishlistStore((s) => s.count());
   const { language, toggleLanguage } = useUIStore();
   const { resolvedTheme, setTheme }  = useTheme();
+  const { dbUser, loading: authLoading } = useAuthStore();
 
-  // Use safe (SSR-consistent) values before mount
+  // Safe (SSR-consistent) values before hydration
   const safeCartCount  = mounted ? cartCount  : 0;
   const safeWishCount  = mounted ? wishCount  : 0;
   const safeLang       = mounted ? language   : "id";
   const safeTheme      = mounted ? resolvedTheme : undefined;
+  const safeUser       = mounted ? dbUser : null;
   const t = getT(safeLang);
 
   // Close drawer on route change
@@ -38,6 +44,13 @@ export function Navbar() {
     return () => { document.body.style.overflow = ""; };
   }, [drawerOpen]);
 
+  const handleLogout = async () => {
+    const supabase = createClientComponent();
+    await supabase.auth.signOut();
+    toast.success("Berhasil keluar");
+    router.push("/");
+  };
+
   const mobileNavItems = [
     { href: "/",          icon: Home,      label: t.bottom_nav.home },
     { href: "/products",  icon: Package,   label: t.nav.products },
@@ -46,6 +59,10 @@ export function Navbar() {
     { href: "/wishlist",  icon: Heart,     label: t.bottom_nav.wishlist },
     { href: "/account",   icon: User,      label: t.bottom_nav.account },
   ];
+
+  const userInitials = safeUser
+    ? (safeUser.name ?? safeUser.email).slice(0, 2).toUpperCase()
+    : null;
 
   return (
     <>
@@ -97,7 +114,7 @@ export function Navbar() {
 
             <Link href="/wishlist" className="p-2 hover:bg-muted rounded-full transition-colors relative" aria-label={t.bottom_nav.wishlist}>
               <Heart size={20} />
-              {safeWishCount > 0 && (
+              {safeWishCount > 0 && safeUser && (
                 <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
                   {safeWishCount > 9 ? "9+" : safeWishCount}
                 </span>
@@ -113,9 +130,35 @@ export function Navbar() {
               )}
             </Link>
 
-            <Link href="/login" className="hidden md:block ml-1 px-4 py-1.5 bg-primary text-white text-sm font-medium rounded-[12px] hover:bg-primary/90 transition-colors">
-              {t.nav.login}
-            </Link>
+            {/* Desktop: auth button */}
+            <div className="hidden md:flex items-center gap-2 ml-1">
+              {mounted && !authLoading && safeUser ? (
+                <>
+                  <Link
+                    href="/account"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-[12px] hover:bg-muted transition-colors"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xs font-bold overflow-hidden shrink-0">
+                      {safeUser.avatar
+                        ? <img src={safeUser.avatar} alt="avatar" className="w-full h-full object-cover" />
+                        : userInitials}
+                    </div>
+                    <span className="text-sm font-medium max-w-[80px] truncate">{safeUser.name ?? safeUser.email.split("@")[0]}</span>
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    title="Keluar"
+                    className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-red-500"
+                  >
+                    <LogOut size={17} />
+                  </button>
+                </>
+              ) : mounted && !authLoading ? (
+                <Link href="/login" className="px-4 py-1.5 bg-primary text-white text-sm font-medium rounded-[12px] hover:bg-primary/90 transition-colors">
+                  {t.nav.login}
+                </Link>
+              ) : null}
+            </div>
 
             {/* Hamburger — mobile only */}
             <button
@@ -158,6 +201,21 @@ export function Navbar() {
           </button>
         </div>
 
+        {/* User info strip (when logged in) */}
+        {mounted && safeUser && (
+          <Link href="/account" className="flex items-center gap-3 px-5 py-3.5 border-b border-border hover:bg-muted transition-colors">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-sm font-bold overflow-hidden shrink-0">
+              {safeUser.avatar
+                ? <img src={safeUser.avatar} alt="avatar" className="w-full h-full object-cover" />
+                : userInitials}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold truncate">{safeUser.name ?? "—"}</p>
+              <p className="text-xs text-muted-foreground truncate">{safeUser.email}</p>
+            </div>
+          </Link>
+        )}
+
         {/* Nav items */}
         <nav className="flex flex-col px-3 py-4 gap-1">
           {mobileNavItems.map(({ href, icon: Icon, label }) => {
@@ -172,7 +230,7 @@ export function Navbar() {
               >
                 <Icon size={18} strokeWidth={active ? 2.5 : 1.5} />
                 {label}
-                {href === "/wishlist" && safeWishCount > 0 && (
+                {href === "/wishlist" && safeWishCount > 0 && safeUser && (
                   <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
                     {safeWishCount > 9 ? "9+" : safeWishCount}
                   </span>
@@ -207,12 +265,24 @@ export function Navbar() {
             {safeLang === "id" ? "Switch to English" : "Ganti ke Indonesia"}
           </button>
 
-          <Link
-            href="/login"
-            className="block w-full text-center py-3 bg-primary text-white text-sm font-semibold rounded-[12px] hover:bg-primary/90 transition-colors"
-          >
-            {t.nav.login}
-          </Link>
+          {/* Login / Logout */}
+          {mounted && safeUser ? (
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-[12px] text-sm font-semibold text-red-500 border border-red-200 dark:border-red-900/40 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+            >
+              <LogOut size={18} />
+              Keluar
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              className="flex items-center justify-center gap-2 w-full py-3 bg-primary text-white text-sm font-semibold rounded-[12px] hover:bg-primary/90 transition-colors"
+            >
+              <LogIn size={16} />
+              {t.nav.login}
+            </Link>
+          )}
 
           {/* Admin Panel cross-redirect */}
           <a

@@ -2,9 +2,11 @@
 import { useEffect } from "react";
 import { createClientComponent } from "@/lib/supabase-browser";
 import { useAuthStore } from "@/store/authStore";
+import { useWishlistStore } from "@/store/wishlistStore";
 
 export function UIProvider({ children }: { children: React.ReactNode }) {
   const { setUser, setDbUser, setLoading, clear } = useAuthStore();
+  const { syncFromServer } = useWishlistStore();
 
   useEffect(() => {
     const supabase = createClientComponent();
@@ -30,7 +32,11 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
 
     // Listen perubahan auth (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session?.user) { clear(); return; }
+      if (event === "SIGNED_OUT" || !session?.user) {
+        clear();
+        syncFromServer([]); // bersihkan wishlist saat logout
+        return;
+      }
       setUser(session.user);
       if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
         syncUser(session.access_token);

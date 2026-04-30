@@ -1,14 +1,16 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { createClientComponent } from "@/lib/supabase-browser";
 import { useUIStore } from "@/store/uiStore";
 import { getT } from "@/lib/i18n";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") ?? "/account";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
@@ -26,23 +28,29 @@ export default function LoginPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success(t.auth.success_login);
-        router.push("/");
+        router.push(redirectTo);
       } else {
         const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
 
-        // Sync user ke database dengan role USER
         if (data.session?.access_token) {
           await fetch("/api/auth/sync-user", {
             method: "POST",
-            headers: { "Authorization": `Bearer ${data.session.access_token}` },
+            headers: { Authorization: `Bearer ${data.session.access_token}` },
           });
         }
 
         toast.success(t.auth.success_register);
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t.auth.error);
+      const msg = err instanceof Error ? err.message : t.auth.error;
+      if (msg.toLowerCase().includes("invalid login credentials")) {
+        toast.error("Email atau password salah");
+      } else if (msg.toLowerCase().includes("email not confirmed")) {
+        toast.error("Email belum dikonfirmasi. Cek inbox kamu.");
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -119,5 +127,13 @@ export default function LoginPage() {
         <Link href="/" className="hover:text-primary transition-colors">{t.auth.back_home}</Link>
       </p>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="w-full max-w-sm h-96 bg-card border border-card-border rounded-2xl animate-pulse" />}>
+      <LoginForm />
+    </Suspense>
   );
 }

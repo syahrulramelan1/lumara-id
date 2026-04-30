@@ -1,16 +1,20 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { Trash2, ShoppingBag } from "lucide-react";
+import { Trash2, ShoppingBag, LogIn } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
+import { useAuthStore } from "@/store/authStore";
 import { useUIStore } from "@/store/uiStore";
 import { getT } from "@/lib/i18n";
 import { formatPrice } from "@/lib/utils";
+import { useMounted } from "@/hooks/useMounted";
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, total, count } = useCartStore();
+  const { dbUser } = useAuthStore();
   const { language } = useUIStore();
   const t = getT(language);
+  const mounted = useMounted();
   const totalAmount = total();
   const totalItems = count();
 
@@ -90,12 +94,21 @@ export default function CartPage() {
               <span className="text-primary">{formatPrice(totalAmount)}</span>
             </div>
           </div>
-          <Link
-            href="/checkout"
-            className="block mt-4 w-full text-center py-3 bg-primary text-white font-semibold rounded-[12px] hover:bg-primary/90 transition-colors"
-          >
-            {t.cart.checkout_now}
-          </Link>
+          {mounted && !dbUser ? (
+            <Link
+              href="/login?redirect=/checkout"
+              className="mt-4 flex items-center justify-center gap-2 w-full py-3 bg-primary text-white font-semibold rounded-[12px] hover:bg-primary/90 transition-colors"
+            >
+              <LogIn size={16} /> Masuk untuk Checkout
+            </Link>
+          ) : (
+            <Link
+              href="/checkout"
+              className="block mt-4 w-full text-center py-3 bg-primary text-white font-semibold rounded-[12px] hover:bg-primary/90 transition-colors"
+            >
+              {t.cart.checkout_now}
+            </Link>
+          )}
           <Link
             href="/products"
             className="block mt-2 w-full text-center py-2.5 text-primary text-sm font-medium hover:underline"
