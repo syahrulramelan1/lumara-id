@@ -1,26 +1,31 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { HiOutlineArrowLeft } from "react-icons/hi";
 import toast from "react-hot-toast";
 import { Sidebar } from "../components";
 import { ordersApi } from "../lib/api";
+import { parseJsonArr } from "../lib/jsonUtils";
 
 const STATUS_FLOW = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
 
-const statusClass: Record<string, string> = {
-  PENDING:    "bg-yellow-700 text-white",
-  PROCESSING: "bg-blue-700 text-white",
-  SHIPPED:    "bg-indigo-700 text-white",
-  DELIVERED:  "bg-green-700 text-white",
-  CANCELLED:  "bg-red-700 text-white",
+const statusBadge: Record<string, string> = {
+  PENDING:    "badge-yellow",
+  PROCESSING: "badge-blue",
+  SHIPPED:    "badge badge-purple",
+  DELIVERED:  "badge-green",
+  CANCELLED:  "badge-red",
+};
+
+const statusLabel: Record<string, string> = {
+  PENDING:    "Pending",
+  PROCESSING: "Diproses",
+  SHIPPED:    "Dikirim",
+  DELIVERED:  "Selesai",
+  CANCELLED:  "Dibatalkan",
 };
 
 function formatPrice(n: number) {
   return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
-}
-
-function parseImages(raw: string): string[] {
-  try { const a = JSON.parse(raw); return Array.isArray(a) ? a : []; }
-  catch { return []; }
 }
 
 const EditOrder = () => {
@@ -37,7 +42,7 @@ const EditOrder = () => {
   const statusMutation = useMutation({
     mutationFn: (status: string) => ordersApi.updateStatus(id!, status),
     onSuccess: (_, status) => {
-      toast.success(`Status diperbarui ke ${status}`);
+      toast.success(`Status diperbarui ke ${statusLabel[status] ?? status}`);
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["order", id] });
     },
@@ -45,169 +50,161 @@ const EditOrder = () => {
   });
 
   if (isLoading) return (
-    <div className="flex h-screen dark:bg-blackPrimary bg-whiteSecondary">
+    <div className="min-h-screen flex dark:bg-[#0D0B14] bg-[var(--bg-2)]">
       <Sidebar />
       <div className="flex-1 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 dark:border-white border-black border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin" />
       </div>
     </div>
   );
 
   if (!order) return (
-    <div className="flex h-screen dark:bg-blackPrimary bg-whiteSecondary">
+    <div className="min-h-screen flex dark:bg-[#0D0B14] bg-[var(--bg-2)]">
       <Sidebar />
-      <div className="flex-1 flex items-center justify-center dark:text-gray-400 text-gray-500">
+      <div className="flex-1 flex items-center justify-center text-[var(--text-muted)]">
         Pesanan tidak ditemukan
       </div>
     </div>
   );
 
   const address = (() => {
-    try { return JSON.parse(order.shippingAddress); }
+    try { return JSON.parse(order.shippingAddress as string); }
     catch { return null; }
   })();
 
   return (
-    <div className="h-auto border-t dark:border-blackSecondary border-1 flex dark:bg-blackPrimary bg-whiteSecondary">
+    <div className="min-h-screen flex dark:bg-[#0D0B14] bg-[var(--bg-2)]">
       <Sidebar />
-      <div className="dark:bg-blackPrimary bg-whiteSecondary w-full">
-        <div className="py-10">
-          <div className="px-4 sm:px-6 lg:px-8 pb-8 border-b dark:border-gray-800 border-gray-200 flex justify-between items-center max-sm:flex-col max-sm:gap-5">
-            <div>
-              <h2 className="text-3xl font-bold dark:text-whiteSecondary text-blackPrimary">Detail Pesanan</h2>
-              <p className="text-sm dark:text-gray-400 text-gray-500 mt-1">#{order.id.slice(0, 8).toUpperCase()}</p>
+      <div className="flex-1 flex flex-col">
+        <div className="page-header">
+          <div>
+            <h2 className="page-title">Detail Pesanan</h2>
+            <p className="page-subtitle">#{order.id.slice(0, 8).toUpperCase()}</p>
+          </div>
+          <button onClick={() => navigate("/orders")} className="btn-ghost flex items-center gap-2 text-sm">
+            <HiOutlineArrowLeft />
+            Kembali
+          </button>
+        </div>
+
+        <div className="p-6 grid grid-cols-1 xl:grid-cols-2 gap-6">
+          {/* Left: Status + Customer + Address */}
+          <div className="space-y-6">
+            <div className="card p-6">
+              <h3 className="font-semibold text-[var(--text)] mb-4">Status Pesanan</h3>
+              <div className="flex items-center gap-2 mb-4">
+                <span className={`badge ${statusBadge[order.status] ?? "badge-purple"}`}>
+                  {statusLabel[order.status] ?? order.status}
+                </span>
+              </div>
+              <p className="text-xs text-[var(--text-muted)] mb-3">Ubah status:</p>
+              <div className="flex flex-wrap gap-2">
+                {STATUS_FLOW.map((s) => (
+                  <button
+                    key={s}
+                    disabled={order.status === s || statusMutation.isPending}
+                    onClick={() => statusMutation.mutate(s)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors disabled:opacity-50 ${
+                      order.status === s
+                        ? "border-[var(--brand)] text-[var(--brand)] bg-[var(--brand-light)]"
+                        : "border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--brand)] hover:text-[var(--brand)]"
+                    }`}
+                  >
+                    {statusLabel[s] ?? s}
+                  </button>
+                ))}
+              </div>
             </div>
-            <button
-              onClick={() => navigate("/orders")}
-              className="dark:bg-blackPrimary bg-whiteSecondary border border-gray-600 w-32 py-2 text-lg hover:border-gray-400 duration-200 flex items-center justify-center dark:text-whiteSecondary text-blackPrimary"
-            >
-              Kembali
-            </button>
+
+            <div className="card p-6">
+              <h3 className="font-semibold text-[var(--text)] mb-4">Informasi Pelanggan</h3>
+              <div className="flex items-center gap-3 mb-4">
+                {order.user.avatar ? (
+                  <img src={order.user.avatar} alt="" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--brand)] to-[var(--brand-2)] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                    {(order.user.name || order.user.email).charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div>
+                  <p className="font-medium text-[var(--text)]">{order.user.name || "—"}</p>
+                  <p className="text-sm text-[var(--text-muted)]">{order.user.email}</p>
+                </div>
+              </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-[var(--text-muted)]">Metode Bayar</span>
+                  <span className="font-medium text-[var(--text)]">{order.paymentMethod}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[var(--text-muted)]">Tanggal</span>
+                  <span className="text-[var(--text)]">{new Date(order.createdAt).toLocaleString("id-ID")}</span>
+                </div>
+              </div>
+            </div>
+
+            {address && (
+              <div className="card p-6">
+                <h3 className="font-semibold text-[var(--text)] mb-4">Alamat Pengiriman</h3>
+                <div className="space-y-1 text-sm text-[var(--text)]">
+                  {address.name && <p className="font-medium">{address.name}</p>}
+                  {address.phone && <p className="text-[var(--text-muted)]">{address.phone}</p>}
+                  {address.address && <p>{address.address}</p>}
+                  {(address.city || address.province) && (
+                    <p>{[address.city, address.province].filter(Boolean).join(", ")}</p>
+                  )}
+                  {address.postalCode && <p>{address.postalCode}</p>}
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="px-4 sm:px-6 lg:px-8 pb-8 pt-8 grid grid-cols-2 gap-x-10 max-xl:grid-cols-1 max-xl:gap-y-10">
-            {/* Left: Info & Status */}
-            <div className="space-y-8">
-              {/* Status Flow */}
-              <section>
-                <h3 className="text-xl font-bold dark:text-whiteSecondary text-blackPrimary mb-4">Status Pesanan</h3>
-                <div className="flex items-center mb-4">
-                  <span className={`text-sm font-semibold px-3 py-1 rounded ${statusClass[order.status] ?? "bg-gray-600 text-white"}`}>
-                    {order.status}
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {STATUS_FLOW.map((s) => (
-                    <button
-                      key={s}
-                      disabled={order.status === s || statusMutation.isPending}
-                      onClick={() => statusMutation.mutate(s)}
-                      className={`px-3 py-1.5 text-sm font-medium border transition-colors disabled:opacity-50 ${
-                        order.status === s
-                          ? "border-blue-500 dark:text-blue-400 text-blue-600"
-                          : "dark:border-gray-600 border-gray-300 dark:text-whiteSecondary text-blackPrimary hover:border-gray-400"
-                      }`}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </section>
-
-              {/* Customer Info */}
-              <section>
-                <h3 className="text-xl font-bold dark:text-whiteSecondary text-blackPrimary mb-4">Informasi Pelanggan</h3>
-                <div className="flex items-center gap-3 mb-4">
-                  {order.user.avatar ? (
-                    <img src={order.user.avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full dark:bg-gray-600 bg-gray-300 flex items-center justify-center font-bold dark:text-white text-black">
-                      {(order.user.name || order.user.email).charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <div>
-                    <p className="font-medium dark:text-whiteSecondary text-blackPrimary">{order.user.name || "—"}</p>
-                    <p className="text-sm dark:text-gray-400 text-gray-500">{order.user.email}</p>
-                  </div>
-                </div>
-                <div className="space-y-2 text-sm dark:text-whiteSecondary text-blackPrimary">
-                  <div className="flex justify-between">
-                    <span className="dark:text-gray-400 text-gray-500">Metode Bayar</span>
-                    <span className="font-medium">{order.paymentMethod}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="dark:text-gray-400 text-gray-500">Tanggal</span>
-                    <span>{new Date(order.createdAt).toLocaleString("id-ID")}</span>
-                  </div>
-                </div>
-              </section>
-
-              {/* Shipping Address */}
-              {address && (
-                <section>
-                  <h3 className="text-xl font-bold dark:text-whiteSecondary text-blackPrimary mb-4">Alamat Pengiriman</h3>
-                  <div className="space-y-1 text-sm dark:text-whiteSecondary text-blackPrimary">
-                    {address.name && <p className="font-medium">{address.name}</p>}
-                    {address.phone && <p className="dark:text-gray-400 text-gray-500">{address.phone}</p>}
-                    {address.address && <p>{address.address}</p>}
-                    {(address.city || address.province) && (
-                      <p>{[address.city, address.province].filter(Boolean).join(", ")}</p>
-                    )}
-                    {address.postalCode && <p>{address.postalCode}</p>}
-                  </div>
-                </section>
-              )}
-            </div>
-
-            {/* Right: Items & Total */}
-            <div className="space-y-8">
-              <section>
-                <h3 className="text-xl font-bold dark:text-whiteSecondary text-blackPrimary mb-4">
-                  Produk Dipesan ({order.items.length})
-                </h3>
-                <div className="space-y-3">
-                  {order.items.map((item) => {
-                    const imgs = parseImages(item.product.images);
-                    return (
-                      <div key={item.id} className="flex items-center gap-3 p-3 border dark:border-gray-700 border-gray-200">
-                        {imgs[0] ? (
-                          <img src={imgs[0]} alt="" className="w-14 h-14 object-cover rounded" />
-                        ) : (
-                          <div className="w-14 h-14 rounded dark:bg-gray-700 bg-gray-200" />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium dark:text-whiteSecondary text-blackPrimary truncate">
-                            {item.product.name}
-                          </p>
-                          <p className="text-xs dark:text-gray-400 text-gray-500">
-                            {[item.size, item.color].filter(Boolean).join(" · ")}
-                          </p>
-                          <p className="text-xs dark:text-gray-400 text-gray-500">
-                            {item.quantity}x {formatPrice(item.price)}
-                          </p>
-                        </div>
-                        <p className="text-sm font-bold dark:text-rose-300 text-rose-600 whitespace-nowrap">
-                          {formatPrice(item.price * item.quantity)}
+          {/* Right: Items + Total */}
+          <div className="space-y-6">
+            <div className="card p-6">
+              <h3 className="font-semibold text-[var(--text)] mb-4">
+                Produk Dipesan ({order.items.length})
+              </h3>
+              <div className="space-y-3">
+                {order.items.map((item) => {
+                  const imgs = parseJsonArr(item.product.images);
+                  return (
+                    <div key={item.id} className="flex items-center gap-3 p-3 rounded-lg bg-[var(--bg-2)] border border-[var(--border)]">
+                      {imgs[0] ? (
+                        <img src={imgs[0]} alt="" className="w-14 h-14 object-cover rounded-lg flex-shrink-0" />
+                      ) : (
+                        <div className="w-14 h-14 rounded-lg bg-[var(--bg-3)] flex-shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-[var(--text)] truncate">{item.product.name}</p>
+                        <p className="text-xs text-[var(--text-muted)]">
+                          {[item.size, item.color].filter(Boolean).join(" · ")}
+                        </p>
+                        <p className="text-xs text-[var(--text-muted)]">
+                          {item.quantity}x {formatPrice(item.price)}
                         </p>
                       </div>
-                    );
-                  })}
-                </div>
-              </section>
+                      <p className="text-sm font-bold text-[var(--brand)] whitespace-nowrap">
+                        {formatPrice(item.price * item.quantity)}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
 
-              <section>
-                <h3 className="text-xl font-bold dark:text-whiteSecondary text-blackPrimary mb-4">Ringkasan</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between dark:text-whiteSecondary text-blackPrimary">
-                    <span>Subtotal ({order.items.reduce((s, i) => s + i.quantity, 0)} item)</span>
-                    <span>{formatPrice(order.items.reduce((s, i) => s + i.price * i.quantity, 0))}</span>
-                  </div>
-                  <div className="flex justify-between pt-2 border-t dark:border-gray-700 border-gray-200">
-                    <span className="font-bold dark:text-whiteSecondary text-blackPrimary">Total</span>
-                    <span className="font-bold text-lg dark:text-rose-300 text-rose-600">{formatPrice(order.total)}</span>
-                  </div>
+            <div className="card p-6">
+              <h3 className="font-semibold text-[var(--text)] mb-4">Ringkasan</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between text-[var(--text)]">
+                  <span>Subtotal ({order.items.reduce((s, i) => s + i.quantity, 0)} item)</span>
+                  <span>{formatPrice(order.items.reduce((s, i) => s + i.price * i.quantity, 0))}</span>
                 </div>
-              </section>
+                <div className="flex justify-between pt-3 border-t border-[var(--border)]">
+                  <span className="font-bold text-[var(--text)]">Total</span>
+                  <span className="font-bold text-base text-[var(--brand)]">{formatPrice(order.total)}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
