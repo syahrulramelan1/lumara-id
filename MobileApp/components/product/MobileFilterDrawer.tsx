@@ -80,8 +80,7 @@ export function MobileFilterDrawer({ categories, currentParams, activeCount = 0 
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", stiffness: 420, damping: 38 }}
-              className="fixed bottom-0 left-0 right-0 z-[70] bg-background rounded-t-[24px] shadow-2xl flex flex-col"
-              style={{ maxHeight: "80dvh" }}
+              className="fixed bottom-0 left-0 right-0 z-[70] bg-background rounded-t-[24px] shadow-2xl flex flex-col max-h-[75vh]"
             >
               {/* Handle */}
               <div className="flex justify-center pt-3 pb-1 shrink-0">
@@ -100,7 +99,7 @@ export function MobileFilterDrawer({ categories, currentParams, activeCount = 0 
               </div>
 
               {/* Scrollable content */}
-              <div className="overflow-y-auto flex-1 px-5 py-5 space-y-6">
+              <div className="overflow-y-auto flex-1 min-h-0 px-5 py-5 space-y-6">
 
                 {/* Sort */}
                 <section>
