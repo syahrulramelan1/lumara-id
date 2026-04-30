@@ -11,10 +11,10 @@ const Categories = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ["categories"],
-    queryFn: () => categoriesApi.list().then((r) => r.data),
+    queryFn: () => categoriesApi.list().then((r) => r.data.data),
   });
 
-  const categories = (data?.data ?? []).filter((c) =>
+  const categories = (data ?? []).filter((c: any) =>
     search ? c.name.toLowerCase().includes(search.toLowerCase()) : true
   );
 
@@ -26,7 +26,7 @@ const Categories = () => {
           <div>
             <h2 className="page-title">Semua Kategori</h2>
             <p className="page-subtitle">
-              {data?.data ? `${data.data.length} kategori terdaftar` : "Kelola kategori produk"}
+              {data ? `${data.length} kategori terdaftar` : "Kelola kategori produk"}
             </p>
           </div>
           <Link to="/categories/create-category" className="btn-primary flex items-center gap-2 text-sm">
