@@ -35,7 +35,17 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true, role: dbUser.role });
+    return NextResponse.json({
+      success: true,
+      user: {
+        id: dbUser.id,
+        email: dbUser.email,
+        name: dbUser.name,
+        avatar: dbUser.avatar,
+        phone: dbUser.phone,
+        role: dbUser.role,
+      },
+    });
   } catch {
     return NextResponse.json({ success: false, error: "Server error" }, { status: 500 });
   }
