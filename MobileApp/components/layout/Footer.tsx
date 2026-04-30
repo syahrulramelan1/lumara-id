@@ -9,7 +9,7 @@ export function Footer() {
   const t = getT(language);
   return (
     <footer className="bg-dark text-white mt-16 pb-20 md:pb-0">
-      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
           <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-3">
             Lumara.id
@@ -26,19 +26,6 @@ export function Footer() {
               <Youtube size={16} />
             </a>
           </div>
-        </div>
-
-        <div>
-          <h4 className="font-semibold mb-3 text-sm">{t.footer.shop}</h4>
-          <ul className="space-y-2 text-sm text-white/60">
-            {["Gamis", "Hijab", "Abaya", "Aksesoris", "Bundle"].map((item) => (
-              <li key={item}>
-                <Link href={`/categories/${item.toLowerCase()}`} className="hover:text-white transition-colors">
-                  {item}
-                </Link>
-              </li>
-            ))}
-          </ul>
         </div>
 
         <div>
