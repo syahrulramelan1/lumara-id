@@ -110,12 +110,25 @@ const Landing = () => {
 
               {/* Chart */}
               <div className="card p-6">
-                <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
                   <div>
                     <h3 className="font-semibold text-[var(--text)]">Ikhtisar Penjualan</h3>
-                    <p className="text-xs text-[var(--text-muted)] mt-0.5">Data penjualan bulanan</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-0.5">Pendapatan & keuntungan bulanan (IDR)</p>
                   </div>
-                  <span className="badge badge-purple">2025</span>
+                  <div className="flex items-center gap-4">
+                    {/* Legend */}
+                    <div className="flex items-center gap-3 text-xs text-[var(--text-muted)]">
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-violet-600 inline-block" />
+                        Pendapatan
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
+                        Keuntungan
+                      </span>
+                    </div>
+                    <span className="badge badge-purple">2026</span>
+                  </div>
                 </div>
                 <div style={{ height: 300 }}>
                   <RechartsBarChart />
