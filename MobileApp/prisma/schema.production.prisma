@@ -65,6 +65,7 @@ model Product {
   originalPrice Int?
   images        Json     @default("[]")
   stock         Int      @default(0)
+  sku           String?
   categoryId    String
   sizes         Json     @default("[]")
   colors        Json     @default("[]")
@@ -137,6 +138,18 @@ model Wishlist {
 
   @@unique([userId, productId])
   @@map("wishlists")
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// APP SETTING
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("app_settings")
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
