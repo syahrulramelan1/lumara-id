@@ -32,7 +32,7 @@ export function ProductFilters({ categories, currentParams }: ProductFiltersProp
   };
 
   return (
-    <div className="space-y-6 sticky top-20">
+    <div className="space-y-6">
       <div>
         <h3 className="text-sm font-semibold mb-3">{t.product.category_label}</h3>
         <ul className="space-y-1">

@@ -74,7 +74,7 @@ export default async function ProductsPage({ searchParams }: Props) {
 
       <div className="flex gap-6">
         {/* Desktop sidebar */}
-        <aside className="hidden md:block w-56 shrink-0">
+        <aside className="hidden md:block w-56 shrink-0 sticky top-20 self-start">
           <Suspense fallback={null}>
             <ProductFilters categories={categories} currentParams={params} />
           </Suspense>
