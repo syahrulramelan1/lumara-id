@@ -60,14 +60,12 @@ function buildSearchTerms(query: string): string[] {
 
 /**
  * Bangun kondisi OR Prisma dari daftar istilah.
- * Tiap istilah dicari di: nama produk, deskripsi, nama kategori, SKU.
+ * Tiap istilah dicari di: nama produk dan deskripsi.
  */
 function buildSearchOR(terms: string[]): object[] {
   return terms.flatMap((term) => [
     { name:        { contains: term, mode: "insensitive" } },
     { description: { contains: term, mode: "insensitive" } },
-    { sku:         { contains: term, mode: "insensitive" } },
-    { category:    { name: { contains: term, mode: "insensitive" } } },
   ]);
 }
 

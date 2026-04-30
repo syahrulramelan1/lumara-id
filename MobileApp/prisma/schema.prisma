@@ -8,7 +8,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -68,11 +68,12 @@ model Product {
   description   String
   price         Int
   originalPrice Int?
-  images        String   @default("[]")
+  images        Json     @default("[]")
   stock         Int      @default(0)
+  sku           String?
   categoryId    String
-  sizes         String   @default("[]")
-  colors        String   @default("[]")
+  sizes         Json     @default("[]")
+  colors        Json     @default("[]")
   rating        Float    @default(0)
   reviewCount   Int      @default(0)
   isFeatured    Boolean  @default(false)
@@ -98,7 +99,7 @@ model Order {
   userId          String
   status          String   @default("PENDING")
   total           Int
-  shippingAddress String   @default("{}")
+  shippingAddress Json     @default("{}")
   paymentMethod   String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -155,7 +156,7 @@ model Review {
   productId String
   rating    Int
   comment   String
-  images    String   @default("[]")
+  images    Json     @default("[]")
   createdAt DateTime @default(now())
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
