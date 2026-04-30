@@ -82,7 +82,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" suppressHydrationWarning>
-      <body className={`${jakarta.variable} font-sans antialiased min-h-screen bg-background text-text-primary`}>
+      <body className={`${jakarta.variable} font-sans antialiased min-h-screen bg-background text-text-primary`} suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
