@@ -3,6 +3,7 @@ import { categoryModel } from "@/lib/models/CategoryModel";
 import { CategoriesClientPage } from "@/components/shared/CategoriesClientPage";
 
 export const metadata: Metadata = { title: "Categories" };
+export const dynamic = "force-dynamic";
 
 export default async function CategoriesPage() {
   const categories = await categoryModel.findAllWithCount();
