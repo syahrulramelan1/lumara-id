@@ -15,15 +15,28 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   if (!checkAdminSecret(req)) return adminUnauthorized();
   try {
-    const fd = await req.formData();
-    const name = fd.get("name") as string;
-    const slug = fd.get("slug") as string;
-    const description = (fd.get("description") as string) || undefined;
-
+    const ct = req.headers.get("content-type") ?? "";
+    let name: string, slug: string, description: string | undefined;
     let image: string | undefined;
-    const imageFile = fd.get("image") as File | null;
-    if (imageFile instanceof File && imageFile.size > 0) {
-      image = await uploadImage(imageFile, "lumara");
+
+    if (ct.includes("multipart/form-data")) {
+      const fd = await req.formData();
+      name = fd.get("name") as string;
+      slug = fd.get("slug") as string;
+      description = (fd.get("description") as string) || undefined;
+      const imageFile = fd.get("image") as File | null;
+      if (imageFile instanceof File && imageFile.size > 0) {
+        image = await uploadImage(imageFile, "lumara-id");
+      }
+    } else {
+      const body = await req.json();
+      name = body.name;
+      slug = body.slug;
+      description = body.description || undefined;
+    }
+
+    if (!name || !slug) {
+      return NextResponse.json({ success: false, error: "Nama dan slug wajib diisi" }, { status: 400 });
     }
 
     const category = await categoryModel.create({ name, slug, description, image });

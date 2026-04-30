@@ -76,9 +76,9 @@ export const categoriesApi = {
     http.get<{ success: boolean; data: ApiCategory[] }>("/categories"),
   get: (id: string) =>
     http.get<{ success: boolean; data: ApiCategory }>(`/categories/${id}`),
-  create: (data: FormData) =>
+  create: (data: FormData | Record<string, string>) =>
     http.post<{ success: boolean; data: ApiCategory }>("/categories", data),
-  update: (id: string, data: FormData) =>
+  update: (id: string, data: FormData | Record<string, string>) =>
     http.patch<{ success: boolean; data: ApiCategory }>(`/categories/${id}`, data),
   delete: (id: string) =>
     http.delete<{ success: boolean }>(`/categories/${id}`),

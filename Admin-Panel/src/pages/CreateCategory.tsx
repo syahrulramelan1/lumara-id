@@ -16,7 +16,7 @@ const CreateCategory = () => {
   const set = (key: string, val: string) => setForm(f => ({ ...f, [key]: val }));
 
   const createMutation = useMutation({
-    mutationFn: (fd: FormData) => categoriesApi.create(fd),
+    mutationFn: (payload: FormData | Record<string, string>) => categoriesApi.create(payload),
     onSuccess: () => {
       toast.success("Kategori berhasil dibuat!");
       queryClient.invalidateQueries({ queryKey: ["categories"] });
@@ -30,12 +30,16 @@ const CreateCategory = () => {
 
   const handleSubmit = () => {
     if (!form.name || !form.slug) { toast.error("Nama dan slug wajib diisi"); return; }
-    const fd = new FormData();
-    fd.append("name", form.name);
-    fd.append("slug", form.slug);
-    fd.append("description", form.description);
-    if (imageFile) fd.append("image", imageFile);
-    createMutation.mutate(fd);
+    if (imageFile) {
+      const fd = new FormData();
+      fd.append("name", form.name);
+      fd.append("slug", form.slug);
+      fd.append("description", form.description);
+      fd.append("image", imageFile);
+      createMutation.mutate(fd);
+    } else {
+      createMutation.mutate({ name: form.name, slug: form.slug, description: form.description });
+    }
   };
 
   return (

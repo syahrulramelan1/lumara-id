@@ -25,7 +25,7 @@ const EditCategory = () => {
   }, [data]);
 
   const updateMutation = useMutation({
-    mutationFn: (fd: FormData) => categoriesApi.update(id!, fd),
+    mutationFn: (payload: FormData | Record<string, string>) => categoriesApi.update(id!, payload),
     onSuccess: () => {
       toast.success("Kategori berhasil diperbarui");
       queryClient.invalidateQueries({ queryKey: ["categories"] });
@@ -39,12 +39,16 @@ const EditCategory = () => {
 
   const handleSave = () => {
     if (!form.name || !form.slug) { toast.error("Nama dan slug wajib diisi"); return; }
-    const fd = new FormData();
-    fd.append("name", form.name);
-    fd.append("slug", form.slug);
-    fd.append("description", form.description);
-    if (imageFile) fd.append("image", imageFile);
-    updateMutation.mutate(fd);
+    if (imageFile) {
+      const fd = new FormData();
+      fd.append("name", form.name);
+      fd.append("slug", form.slug);
+      fd.append("description", form.description);
+      fd.append("image", imageFile);
+      updateMutation.mutate(fd);
+    } else {
+      updateMutation.mutate({ name: form.name, slug: form.slug, description: form.description });
+    }
   };
 
   if (isLoading) return (

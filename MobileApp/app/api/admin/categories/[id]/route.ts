@@ -20,15 +20,26 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
   if (!checkAdminSecret(req)) return adminUnauthorized();
   try {
     const { id } = await params;
-    const fd = await req.formData();
-    const name = fd.get("name") as string | null;
-    const slug = fd.get("slug") as string | null;
-    const description = fd.get("description") as string | null;
-
+    const ct = req.headers.get("content-type") ?? "";
+    let name: string | null = null;
+    let slug: string | null = null;
+    let description: string | null = null;
     let image: string | undefined;
-    const imageFile = fd.get("image") as File | null;
-    if (imageFile instanceof File && imageFile.size > 0) {
-      image = await uploadImage(imageFile, "lumara");
+
+    if (ct.includes("multipart/form-data")) {
+      const fd = await req.formData();
+      name = fd.get("name") as string | null;
+      slug = fd.get("slug") as string | null;
+      description = fd.get("description") as string | null;
+      const imageFile = fd.get("image") as File | null;
+      if (imageFile instanceof File && imageFile.size > 0) {
+        image = await uploadImage(imageFile, "lumara-id");
+      }
+    } else {
+      const body = await req.json();
+      name = body.name ?? null;
+      slug = body.slug ?? null;
+      description = body.description ?? null;
     }
 
     const category = await categoryModel.update(id, {
