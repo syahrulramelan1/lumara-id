@@ -83,7 +83,7 @@ const EditUser = () => {
           </div>
         </div>
 
-        <div className="p-6 grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="p-3 sm:p-6 grid grid-cols-1 xl:grid-cols-2 gap-6">
           {/* User info card (read-only) */}
           <div className="card p-6">
             <h3 className="font-semibold text-[var(--text)] mb-5">Informasi Pengguna</h3>

@@ -18,10 +18,10 @@ const ReviewsTable = ({ reviews }: { reviews: ApiReview[] }) => {
         <thead>
           <tr>
             <th>Pengguna</th>
-            <th>Produk</th>
+            <th className="hidden sm:table-cell">Produk</th>
             <th>Rating</th>
-            <th>Komentar</th>
-            <th>Tanggal</th>
+            <th className="hidden md:table-cell">Komentar</th>
+            <th className="hidden lg:table-cell">Tanggal</th>
             <th className="text-right pr-4">Aksi</th>
           </tr>
         </thead>
@@ -41,11 +41,11 @@ const ReviewsTable = ({ reviews }: { reviews: ApiReview[] }) => {
                     )}
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-[var(--text)]">{review.user.name || "—"}</p>
-                      <p className="text-xs text-[var(--text-muted)] truncate max-w-[120px]">{review.user.email}</p>
+                      <p className="text-xs text-[var(--text-muted)] truncate max-w-[100px]">{review.user.email}</p>
                     </div>
                   </div>
                 </td>
-                <td>
+                <td className="hidden sm:table-cell">
                   <div className="flex items-center gap-2">
                     {productImgs[0] ? (
                       <img src={productImgs[0]} alt="" className="h-9 w-9 rounded-lg object-cover bg-[var(--bg-3)] flex-shrink-0" />
@@ -62,14 +62,14 @@ const ReviewsTable = ({ reviews }: { reviews: ApiReview[] }) => {
                     ))}
                   </div>
                 </td>
-                <td className="text-[var(--text-muted)] max-w-[200px]">
+                <td className="hidden md:table-cell text-[var(--text-muted)] max-w-[200px]">
                   <p className="truncate">{review.comment}</p>
                 </td>
-                <td className="text-[var(--text-muted)]">
+                <td className="hidden lg:table-cell text-[var(--text-muted)]">
                   {new Date(review.createdAt).toLocaleDateString("id-ID")}
                 </td>
                 <td>
-                  <div className="flex items-center justify-end pr-4">
+                  <div className="flex items-center justify-end pr-2 sm:pr-4">
                     <button
                       onClick={() => { if (window.confirm("Hapus ulasan ini?")) deleteMutation.mutate(review.id); }}
                       disabled={deleteMutation.isPending}

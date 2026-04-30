@@ -91,7 +91,7 @@ const EditCategory = () => {
           </div>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-3 sm:p-6 space-y-6">
           {/* Top row: form + image */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             <div className="card p-6">

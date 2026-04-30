@@ -90,7 +90,7 @@ const CreateProduct = () => {
           </div>
         </div>
 
-        <div className="p-6 grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="p-3 sm:p-6 grid grid-cols-1 xl:grid-cols-2 gap-6">
           <div className="space-y-6">
             <div className="card p-6">
               <h3 className="font-semibold text-[var(--text)] mb-4">Informasi Dasar</h3>

@@ -31,7 +31,7 @@ const Profile = () => {
           </button>
         </div>
 
-        <div className="p-6 flex flex-col xl:flex-row gap-6 max-w-5xl">
+        <div className="p-3 sm:p-6 flex flex-col xl:flex-row gap-6 max-w-5xl">
           {/* Avatar card */}
           <div className="card p-6 flex flex-col items-center gap-4 w-full xl:w-64 shrink-0 h-fit">
             <div className="relative">

@@ -87,7 +87,7 @@ const EditOrder = () => {
           </button>
         </div>
 
-        <div className="p-6 grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="p-3 sm:p-6 grid grid-cols-1 xl:grid-cols-2 gap-6">
           {/* Left: Status + Customer + Address */}
           <div className="space-y-6">
             <div className="card p-6">

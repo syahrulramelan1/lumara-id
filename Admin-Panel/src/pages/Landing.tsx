@@ -50,7 +50,7 @@ const Landing = () => {
           </div>
         </div>
 
-        <div className="p-6 flex flex-col gap-6">
+        <div className="p-3 sm:p-6 flex flex-col gap-6">
           {isLoading ? (
             <div className="flex justify-center py-20">
               <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />

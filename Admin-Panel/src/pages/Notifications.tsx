@@ -29,7 +29,7 @@ const Notifications = () => {
           </button>
         </div>
 
-        <div className="p-6 max-w-2xl">
+        <div className="p-3 sm:p-6 max-w-2xl">
           <div className="card overflow-hidden">
             <div className="flex flex-col divide-y divide-[var(--border)]">
               {notifications.map((n) => (

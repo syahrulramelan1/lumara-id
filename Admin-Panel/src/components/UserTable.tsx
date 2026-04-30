@@ -18,10 +18,10 @@ const UserTable = ({ users }: { users: ApiUser[] }) => {
         <thead>
           <tr>
             <th>Pengguna</th>
-            <th>Email</th>
+            <th className="hidden sm:table-cell">Email</th>
             <th>Role</th>
-            <th>Telepon</th>
-            <th>Bergabung</th>
+            <th className="hidden md:table-cell">Telepon</th>
+            <th className="hidden lg:table-cell">Bergabung</th>
             <th className="text-right pr-4">Aksi</th>
           </tr>
         </thead>
@@ -37,19 +37,22 @@ const UserTable = ({ users }: { users: ApiUser[] }) => {
                       {(user.name || user.email).charAt(0).toUpperCase()}
                     </div>
                   )}
-                  <span className="text-sm font-medium text-[var(--text)]">{user.name || "—"}</span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-[var(--text)]">{user.name || "—"}</p>
+                    <p className="text-xs text-[var(--text-muted)] truncate max-w-[100px] sm:hidden">{user.email}</p>
+                  </div>
                 </div>
               </td>
-              <td className="text-[var(--text-muted)] text-xs">{user.email}</td>
+              <td className="hidden sm:table-cell text-[var(--text-muted)] text-xs">{user.email}</td>
               <td>
                 <span className={`badge ${user.role === "ADMIN" ? "badge-purple" : "badge-blue"}`}>
                   {user.role}
                 </span>
               </td>
-              <td className="text-[var(--text-muted)]">{user.phone || "—"}</td>
-              <td className="text-[var(--text-muted)]">{new Date(user.createdAt).toLocaleDateString("id-ID")}</td>
+              <td className="hidden md:table-cell text-[var(--text-muted)]">{user.phone || "—"}</td>
+              <td className="hidden lg:table-cell text-[var(--text-muted)]">{new Date(user.createdAt).toLocaleDateString("id-ID")}</td>
               <td>
-                <div className="flex items-center justify-end gap-1.5 pr-4">
+                <div className="flex items-center justify-end gap-1.5 pr-2 sm:pr-4">
                   <Link to={`/users/${user.id}`} className="btn-icon" title="Edit">
                     <HiOutlinePencil />
                   </Link>

@@ -9,9 +9,7 @@ function formatPrice(price: number) {
   return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(price);
 }
 
-interface Props { products: ApiProduct[] }
-
-const ProductTable = ({ products }: Props) => {
+const ProductTable = ({ products }: { products: ApiProduct[] }) => {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
@@ -29,9 +27,9 @@ const ProductTable = ({ products }: Props) => {
         <thead>
           <tr>
             <th>Produk</th>
-            <th>SKU</th>
+            <th className="hidden md:table-cell">SKU</th>
             <th>Status</th>
-            <th>Harga</th>
+            <th className="hidden sm:table-cell">Harga</th>
             <th className="text-right pr-4">Aksi</th>
           </tr>
         </thead>
@@ -49,20 +47,20 @@ const ProductTable = ({ products }: Props) => {
                       <div className="h-10 w-10 rounded-lg bg-[var(--bg-3)] flex-shrink-0" />
                     )}
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-[var(--text)] truncate max-w-[200px]">{item.name}</p>
+                      <p className="text-sm font-medium text-[var(--text)] truncate max-w-[140px] sm:max-w-[200px]">{item.name}</p>
                       <p className="text-xs text-[var(--text-muted)] mt-0.5">{item.category?.name}</p>
                     </div>
                   </div>
                 </td>
-                <td className="font-mono text-xs text-[var(--text-muted)]">{item.sku || "—"}</td>
+                <td className="hidden md:table-cell font-mono text-xs text-[var(--text-muted)]">{item.sku || "—"}</td>
                 <td>
                   <span className={`badge ${inStock ? "badge-green" : "badge-red"}`}>
-                    {inStock ? `Stok: ${item.stock}` : "Habis"}
+                    {inStock ? `${item.stock}` : "Habis"}
                   </span>
                 </td>
-                <td className="font-semibold text-brand-600 dark:text-brand-400">{formatPrice(item.price)}</td>
+                <td className="hidden sm:table-cell font-semibold text-brand-600 dark:text-brand-400">{formatPrice(item.price)}</td>
                 <td>
-                  <div className="flex items-center justify-end gap-1.5 pr-4">
+                  <div className="flex items-center justify-end gap-1.5 pr-2 sm:pr-4">
                     <Link to={`/products/${item.id}`} className="btn-icon" title="Edit">
                       <HiOutlinePencil />
                     </Link>
@@ -70,7 +68,7 @@ const ProductTable = ({ products }: Props) => {
                       href={`${import.meta.env.VITE_STORE_URL || ""}/products/${item.slug}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-icon"
+                      className="btn-icon hidden sm:flex"
                       title="Lihat"
                     >
                       <HiOutlineEye />

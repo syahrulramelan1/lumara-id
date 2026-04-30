@@ -18,7 +18,7 @@ const CategoryTable = ({ categories }: { categories: ApiCategory[] }) => {
         <thead>
           <tr>
             <th>Kategori</th>
-            <th>Slug</th>
+            <th className="hidden sm:table-cell">Slug</th>
             <th>Jumlah Produk</th>
             <th className="text-right pr-4">Aksi</th>
           </tr>
@@ -33,15 +33,15 @@ const CategoryTable = ({ categories }: { categories: ApiCategory[] }) => {
                   ) : (
                     <div className="h-10 w-10 rounded-lg bg-[var(--bg-3)] flex-shrink-0" />
                   )}
-                  <span className="text-sm font-medium text-[var(--text)]">{cat.name}</span>
+                  <span className="text-sm font-medium text-[var(--text)] truncate max-w-[120px] sm:max-w-none">{cat.name}</span>
                 </div>
               </td>
-              <td className="font-mono text-xs text-[var(--text-muted)]">{cat.slug}</td>
+              <td className="hidden sm:table-cell font-mono text-xs text-[var(--text-muted)]">{cat.slug}</td>
               <td>
                 <span className="badge badge-purple">{cat._count?.products ?? 0} produk</span>
               </td>
               <td>
-                <div className="flex items-center justify-end gap-1.5 pr-4">
+                <div className="flex items-center justify-end gap-1.5 pr-2 sm:pr-4">
                   <Link to={`/categories/${cat.id}`} className="btn-icon" title="Edit">
                     <HiOutlinePencil />
                   </Link>
@@ -49,7 +49,7 @@ const CategoryTable = ({ categories }: { categories: ApiCategory[] }) => {
                     href={`${import.meta.env.VITE_STORE_URL || ""}/categories/${cat.slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-icon"
+                    className="btn-icon hidden sm:flex"
                     title="Lihat"
                   >
                     <HiOutlineEye />

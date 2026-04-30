@@ -39,8 +39,8 @@ const OrderTable = ({ orders }: { orders: ApiOrder[] }) => {
           <tr>
             <th>Pelanggan</th>
             <th>Status</th>
-            <th>Total</th>
-            <th>Tanggal</th>
+            <th className="hidden sm:table-cell">Total</th>
+            <th className="hidden md:table-cell">Tanggal</th>
             <th className="text-right pr-4">Aksi</th>
           </tr>
         </thead>
@@ -58,7 +58,7 @@ const OrderTable = ({ orders }: { orders: ApiOrder[] }) => {
                   )}
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-[var(--text)]">{order.user.name || "—"}</p>
-                    <p className="text-xs text-[var(--text-muted)] truncate max-w-[160px]">{order.user.email}</p>
+                    <p className="text-xs text-[var(--text-muted)] truncate max-w-[120px] sm:max-w-[160px]">{order.user.email}</p>
                   </div>
                 </div>
               </td>
@@ -67,14 +67,14 @@ const OrderTable = ({ orders }: { orders: ApiOrder[] }) => {
                   {statusLabel[order.status] ?? order.status}
                 </span>
               </td>
-              <td className="font-semibold text-brand-600 dark:text-brand-400">{formatPrice(order.total)}</td>
-              <td className="text-[var(--text-muted)]">{new Date(order.createdAt).toLocaleDateString("id-ID")}</td>
+              <td className="hidden sm:table-cell font-semibold text-brand-600 dark:text-brand-400">{formatPrice(order.total)}</td>
+              <td className="hidden md:table-cell text-[var(--text-muted)]">{new Date(order.createdAt).toLocaleDateString("id-ID")}</td>
               <td>
-                <div className="flex items-center justify-end gap-1.5 pr-4">
+                <div className="flex items-center justify-end gap-1.5 pr-2 sm:pr-4">
                   <Link to={`/orders/${order.id}`} className="btn-icon" title="Edit">
                     <HiOutlinePencil />
                   </Link>
-                  <Link to={`/orders/${order.id}`} className="btn-icon" title="Detail">
+                  <Link to={`/orders/${order.id}`} className="btn-icon hidden sm:flex" title="Detail">
                     <HiOutlineEye />
                   </Link>
                   <button
