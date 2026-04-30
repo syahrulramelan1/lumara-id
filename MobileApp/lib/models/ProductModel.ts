@@ -2,6 +2,77 @@ import { prisma } from "@/lib/prisma";
 import type { Product, Prisma } from "@prisma/client";
 import type { ProductWithCategory, ProductWithReviews, FilterParams, PaginationResult } from "@/types";
 
+// ─── Search Utilities ─────────────────────────────────────────────────────────
+
+// Variasi ejaan umum produk fashion Indonesia
+const FASHION_ALIASES: Record<string, string[]> = {
+  pasmina:   ["pashmina"],
+  pashmina:  ["pasmina"],
+  sifon:     ["chiffon", "syifon", "shiffon"],
+  chiffon:   ["sifon", "syifon"],
+  syifon:    ["sifon", "chiffon"],
+  voal:      ["voile"],
+  voile:     ["voal"],
+  brokat:    ["brocade", "brukat"],
+  brukat:    ["brokat", "brocade"],
+  ceruti:    ["cerutti"],
+  cerutti:   ["ceruti"],
+  katun:     ["cotton"],
+  cotton:    ["katun"],
+  abaya:     ["abayah"],
+  abayah:    ["abaya"],
+  gamis:     ["dress"],
+  hijab:     ["jilbab", "kerudung"],
+  jilbab:    ["hijab", "kerudung"],
+  kerudung:  ["hijab", "jilbab"],
+  premium:   ["mewah"],
+  lasercut:  ["laser cut", "laser-cut"],
+};
+
+/**
+ * Ubah query menjadi daftar istilah yang diperluas:
+ * - Tiap kata dipisah dan dicari sendiri (token)
+ * - Variasi ejaan umum fashion Indonesia ditambahkan
+ * - Duplikat dihilangkan
+ */
+function buildSearchTerms(query: string): string[] {
+  const q = query.trim().toLowerCase();
+  const words = q.split(/\s+/).filter((w) => w.length >= 2);
+  const terms = new Set<string>();
+
+  // Tambah query asli dan tiap kata
+  terms.add(q);
+  words.forEach((w) => terms.add(w));
+
+  // Tambah alias untuk tiap kata
+  words.forEach((w) => {
+    (FASHION_ALIASES[w] ?? []).forEach((alias) => terms.add(alias));
+  });
+
+  // Jika query adalah 1 kata panjang (>= 5 huruf), tambah prefix 4 huruf pertama
+  // agar "pasmi" cocok dengan "pashmina" dst (partial prefix matching)
+  if (words.length === 1 && q.length >= 5) {
+    terms.add(q.slice(0, 4));
+  }
+
+  return [...terms];
+}
+
+/**
+ * Bangun kondisi OR Prisma dari daftar istilah.
+ * Tiap istilah dicari di: nama produk, deskripsi, nama kategori, SKU.
+ */
+function buildSearchOR(terms: string[]): object[] {
+  return terms.flatMap((term) => [
+    { name:        { contains: term, mode: "insensitive" } },
+    { description: { contains: term, mode: "insensitive" } },
+    { sku:         { contains: term, mode: "insensitive" } },
+    { category:    { name: { contains: term, mode: "insensitive" } } },
+  ]);
+}
+
+// ─── Model ────────────────────────────────────────────────────────────────────
+
 export class ProductModel {
   private static instance: ProductModel;
   static getInstance() {
@@ -66,12 +137,12 @@ export class ProductModel {
 
     if (categoryId) where.categoryId = categoryId;
     else if (category) where.category = { slug: category };
+
     if (search) {
-      where.OR = [
-        { name: { contains: search, mode: "insensitive" } },
-        { description: { contains: search, mode: "insensitive" } },
-      ];
+      const terms = buildSearchTerms(search);
+      where.OR = buildSearchOR(terms);
     }
+
     if (minPrice !== undefined || maxPrice !== undefined) {
       where.price = {};
       if (minPrice !== undefined) (where.price as Record<string, number>).gte = minPrice;
@@ -79,19 +150,19 @@ export class ProductModel {
     }
 
     const orderBy: Record<string, string> = {
-      terbaru: "createdAt",
-      terlaris: "reviewCount",
+      terbaru:         "createdAt",
+      terlaris:        "reviewCount",
       "harga-terendah": "price",
       "harga-tertinggi": "price",
-      rating: "rating",
+      rating:          "rating",
     };
 
     const orderDir: Record<string, string> = {
-      terbaru: "desc",
-      terlaris: "desc",
+      terbaru:          "desc",
+      terlaris:         "desc",
       "harga-terendah": "asc",
       "harga-tertinggi": "desc",
-      rating: "desc",
+      rating:           "desc",
     };
 
     const [data, total] = await Promise.all([
