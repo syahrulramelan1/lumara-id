@@ -1,11 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Sidebar } from "../components";
 import { RechartsBarChart } from "../components/chart";
-import { dashboardApi } from "../lib/api";
+import { dashboardApi, settingsApi } from "../lib/api";
 import {
   HiOutlineShoppingBag, HiOutlineTag, HiOutlineClipboardList,
   HiOutlineCurrencyDollar, HiOutlineClock, HiOutlineUsers,
 } from "react-icons/hi";
+import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 import { useAuth } from "../context/AuthContext";
 
 function formatPrice(n: number) {
@@ -26,10 +27,26 @@ const statCards = (stats: {
 
 const Landing = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+
   const { data, isLoading } = useQuery({
     queryKey: ["dashboard"],
     queryFn: () => dashboardApi.stats().then((r) => r.data.data),
   });
+
+  const { data: settingsData, isLoading: settingsLoading } = useQuery({
+    queryKey: ["settings"],
+    queryFn: () => settingsApi.get().then((r) => r.data.data),
+  });
+
+  const toggleMaintenance = useMutation({
+    mutationFn: (active: boolean) => settingsApi.setMaintenance(active).then((r) => r.data.data),
+    onSuccess: (updated) => {
+      queryClient.setQueryData(["settings"], { maintenance: updated.maintenance });
+    },
+  });
+
+  const isMaintenance = settingsData?.maintenance ?? false;
 
   const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "Admin";
   const hour = new Date().getHours();
@@ -45,8 +62,27 @@ const Landing = () => {
             <h2 className="page-title">{greeting}, {displayName} 👋</h2>
             <p className="page-subtitle">Berikut ringkasan toko Anda hari ini</p>
           </div>
-          <div className="text-xs text-[var(--text-muted)] bg-[var(--bg-3)] px-3 py-1.5 rounded-lg border border-[var(--border)]">
-            {new Date().toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+          <div className="flex items-center gap-3 flex-wrap justify-end">
+            {/* Maintenance Toggle */}
+            <button
+              onClick={() => toggleMaintenance.mutate(!isMaintenance)}
+              disabled={settingsLoading || toggleMaintenance.isPending}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
+                isMaintenance
+                  ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 hover:bg-red-200 dark:hover:bg-red-900/50"
+                  : "bg-[var(--bg-3)] text-[var(--text-muted)] border-[var(--border)] hover:bg-[var(--bg-2)]"
+              }`}
+            >
+              <HiOutlineWrenchScrewdriver className="text-base" />
+              {toggleMaintenance.isPending || settingsLoading
+                ? "Memproses..."
+                : isMaintenance
+                ? "Maintenance ON — Klik untuk Matikan"
+                : "Mode Maintenance"}
+            </button>
+            <div className="text-xs text-[var(--text-muted)] bg-[var(--bg-3)] px-3 py-1.5 rounded-lg border border-[var(--border)]">
+              {new Date().toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+            </div>
           </div>
         </div>
 

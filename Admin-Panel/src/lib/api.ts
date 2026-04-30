@@ -127,3 +127,16 @@ export const dashboardApi = {
   stats: () =>
     http.get<{ success: boolean; data: DashboardStats }>("/dashboard"),
 };
+
+// ─── Settings ─────────────────────────────────────────────────────────────────
+
+export interface ApiSettings {
+  maintenance: boolean;
+}
+
+export const settingsApi = {
+  get: () =>
+    http.get<{ success: boolean; data: ApiSettings }>("/settings"),
+  setMaintenance: (maintenance: boolean) =>
+    http.patch<{ success: boolean; data: ApiSettings }>("/settings", { maintenance }),
+};
