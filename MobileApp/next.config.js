@@ -30,6 +30,7 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: "2mb",
     },
+    earlyHints: false,
   },
 };
 
