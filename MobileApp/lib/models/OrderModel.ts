@@ -2,7 +2,16 @@ import { prisma } from "@/lib/prisma";
 import type { Order } from "@prisma/client";
 import type { OrderWithItems, OrderTracking, ShippingAddress, CartItem } from "@/types";
 
-const TRACKING_INCLUDE = {
+// List-mode: tidak include array trackings (hemat memory di Render free tier).
+// Hanya hitung jumlahnya untuk badge optional.
+const LIST_INCLUDE = {
+  items: { include: { product: { select: { id: true, name: true, images: true } } } },
+  user:  { select: { id: true, name: true, email: true, avatar: true } },
+  _count: { select: { trackings: true } },
+};
+
+// Detail-mode: include semua tracking entries (dipakai oleh /orders/[id])
+const DETAIL_INCLUDE = {
   items: { include: { product: { select: { id: true, name: true, images: true } } } },
   user:  { select: { id: true, name: true, email: true, avatar: true } },
   trackings: { orderBy: { createdAt: "desc" as const } },
@@ -18,7 +27,7 @@ export class OrderModel {
   async findById(id: string): Promise<OrderWithItems | null> {
     return prisma.order.findUnique({
       where: { id },
-      include: TRACKING_INCLUDE,
+      include: DETAIL_INCLUDE,
     }) as Promise<OrderWithItems | null>;
   }
 
@@ -27,7 +36,7 @@ export class OrderModel {
     const [data, total] = await Promise.all([
       prisma.order.findMany({
         where: { userId },
-        include: TRACKING_INCLUDE,
+        include: LIST_INCLUDE,
         orderBy: { createdAt: "desc" },
         skip,
         take: limit,
@@ -41,7 +50,7 @@ export class OrderModel {
     const skip = (page - 1) * limit;
     const [data, total] = await Promise.all([
       prisma.order.findMany({
-        include: TRACKING_INCLUDE,
+        include: LIST_INCLUDE,
         orderBy: { createdAt: "desc" },
         skip,
         take: limit,
@@ -162,7 +171,7 @@ export class OrderModel {
 
   async findRecent(limit = 5): Promise<OrderWithItems[]> {
     return prisma.order.findMany({
-      include: TRACKING_INCLUDE,
+      include: LIST_INCLUDE,
       orderBy: { createdAt: "desc" },
       take: limit,
     }) as unknown as Promise<OrderWithItems[]>;

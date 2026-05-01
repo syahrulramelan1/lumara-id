@@ -1,60 +1,102 @@
-// *********************
-// Role of the component: Pagination component that displays the page numbers and navigation buttons
-// Name of the component: Pagination.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <Pagination />
-// Input parameters: no input parameters
-// Output: Pagination component that displays the page numbers and navigation buttons
-// *********************
+import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 
-import { useState } from 'react';
+interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  totalItems?: number;
+  perPage?: number;
+}
 
-const Pagination = () => {
-    const totalPages = 10; // Total number of pages
-    const [currentPage, setCurrentPage] = useState(1);
-  
-    // Calculate the range of page numbers to display
-    let startPage = currentPage - 1;
-    if (startPage <= 0) startPage = 1;
-    let endPage = startPage + 2;
-    if (endPage > totalPages) {
-        endPage = totalPages;
-        startPage = totalPages - 2 > 0 ? totalPages - 2 : 1;
-    }
-  
-    const pageNumbers = [];
-    for (let i = startPage; i <= endPage; i++) {
-      pageNumbers.push(i);
-    }
-  
-    return (
-      <div className="flex gap-2 items-center">
+const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, perPage }: PaginationProps) => {
+  if (totalPages <= 1) return null;
+
+  // Window 5 nomor halaman dengan currentPage di tengah kalau bisa
+  const windowSize = 5;
+  let startPage = Math.max(1, currentPage - Math.floor(windowSize / 2));
+  let endPage = Math.min(totalPages, startPage + windowSize - 1);
+  if (endPage - startPage + 1 < windowSize) {
+    startPage = Math.max(1, endPage - windowSize + 1);
+  }
+
+  const pageNumbers: number[] = [];
+  for (let i = startPage; i <= endPage; i++) pageNumbers.push(i);
+
+  // Range info "Menampilkan 1-20 dari 100"
+  const rangeInfo = (() => {
+    if (!totalItems || !perPage) return null;
+    const from = (currentPage - 1) * perPage + 1;
+    const to   = Math.min(currentPage * perPage, totalItems);
+    return `${from}–${to} dari ${totalItems}`;
+  })();
+
+  const btnBase = "min-w-[36px] h-9 px-2 flex items-center justify-center text-sm font-medium rounded-lg border transition-colors disabled:opacity-40 disabled:cursor-not-allowed";
+
+  return (
+    <div className="flex items-center justify-between gap-3 flex-wrap">
+      {rangeInfo && (
+        <p className="text-xs text-[var(--text-muted)]">{rangeInfo}</p>
+      )}
+
+      <div className="flex items-center gap-1.5 ml-auto">
         <button
-          className="dark:bg-blackPrimary bg-whiteSecondary border border-gray-600 dark:text-whiteSecondary text-blackPrimary py-1 px-3 hover:border-gray-500"
-          onClick={() => setCurrentPage(currentPage - 1)}
+          onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
+          className={`${btnBase} border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--brand)] hover:text-[var(--brand)]`}
+          aria-label="Halaman sebelumnya"
         >
-          Prev
+          <HiChevronLeft className="w-4 h-4" />
         </button>
-        {pageNumbers.map(number => (
+
+        {startPage > 1 && (
+          <>
+            <button
+              onClick={() => onPageChange(1)}
+              className={`${btnBase} border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--brand)] hover:text-[var(--brand)]`}
+            >
+              1
+            </button>
+            {startPage > 2 && <span className="text-[var(--text-muted)] px-1">…</span>}
+          </>
+        )}
+
+        {pageNumbers.map((p) => (
           <button
-            key={number}
-            className={`border border-gray-600 py-1 px-3 hover:border-gray-500 ${currentPage === number ? 'dark:bg-whiteSecondary bg-blackPrimary dark:text-blackPrimary text-whiteSecondary' : 'dark:bg-blackPrimary bg-whiteSecondary dark:text-whiteSecondary text-blackPrimary'}`}
-            onClick={() => setCurrentPage(number)}
+            key={p}
+            onClick={() => onPageChange(p)}
+            className={`${btnBase} ${
+              p === currentPage
+                ? "border-[var(--brand)] bg-[var(--brand)] text-white"
+                : "border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--brand)] hover:text-[var(--brand)]"
+            }`}
           >
-            {number}
+            {p}
           </button>
         ))}
+
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && <span className="text-[var(--text-muted)] px-1">…</span>}
+            <button
+              onClick={() => onPageChange(totalPages)}
+              className={`${btnBase} border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--brand)] hover:text-[var(--brand)]`}
+            >
+              {totalPages}
+            </button>
+          </>
+        )}
+
         <button
-          className="dark:bg-blackPrimary bg-whiteSecondary border border-gray-600 dark:text-whiteSecondary text-blackPrimary py-1 px-3 hover:border-gray-500"
-          onClick={() => setCurrentPage(currentPage + 1)}
+          onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
+          className={`${btnBase} border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--brand)] hover:text-[var(--brand)]`}
+          aria-label="Halaman berikutnya"
         >
-          Next
+          <HiChevronRight className="w-4 h-4" />
         </button>
       </div>
-    );
+    </div>
+  );
 };
-  
+
 export default Pagination;

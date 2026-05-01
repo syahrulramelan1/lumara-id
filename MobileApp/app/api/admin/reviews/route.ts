@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
   if (!checkAdminSecret(req)) return adminUnauthorized();
   try {
     const page = Number(req.nextUrl.searchParams.get("page") ?? 1);
-    const limit = 50;
+    const limit = 20;
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([

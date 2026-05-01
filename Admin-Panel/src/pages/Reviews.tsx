@@ -1,16 +1,22 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Sidebar, SearchInput } from "../components";
+import { Sidebar, SearchInput, Pagination } from "../components";
 import ReviewsTable from "../components/ReviewsTable";
 import { reviewsApi } from "../lib/api";
 
+const PER_PAGE = 20;
+
 const Reviews = () => {
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["reviews"],
-    queryFn: () => reviewsApi.list().then((r) => r.data),
+    queryKey: ["reviews", page],
+    queryFn: () => reviewsApi.list(page).then((r) => r.data),
   });
+
+  const total = data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
 
   const reviews = (data?.data ?? []).filter((r) =>
     search
@@ -28,7 +34,7 @@ const Reviews = () => {
           <div>
             <h2 className="page-title">Semua Ulasan</h2>
             <p className="page-subtitle">
-              {data?.total !== undefined ? `${data.total} ulasan produk` : "Kelola ulasan pelanggan"}
+              {total > 0 ? `${total} ulasan produk` : "Kelola ulasan pelanggan"}
             </p>
           </div>
         </div>
@@ -38,21 +44,30 @@ const Reviews = () => {
             <SearchInput
               value={search}
               onChange={setSearch}
-              placeholder="Cari pengguna / produk..."
+              placeholder="Cari di halaman ini..."
               className="w-72"
             />
           </div>
 
           {isLoading ? (
             <div className="flex justify-center py-20">
-              <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-10 h-10 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin" />
             </div>
           ) : reviews.length === 0 ? (
             <div className="card p-12 text-center text-[var(--text-muted)]">Tidak ada ulasan ditemukan</div>
           ) : (
-            <div className="card overflow-hidden">
-              <ReviewsTable reviews={reviews} />
-            </div>
+            <>
+              <div className="card overflow-hidden">
+                <ReviewsTable reviews={reviews} />
+              </div>
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                totalItems={total}
+                perPage={PER_PAGE}
+                onPageChange={setPage}
+              />
+            </>
           )}
         </div>
       </div>

@@ -1,19 +1,24 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Sidebar, SearchInput } from "../components";
+import { Sidebar, SearchInput, Pagination } from "../components";
 import OrderTable from "../components/OrderTable";
 import { ordersApi } from "../lib/api";
 
-const statusOptions = ["SEMUA", "PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
+const statusOptions = ["SEMUA", "PENDING", "PAID", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
+const PER_PAGE = 20;
 
 const Orders = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("SEMUA");
+  const [page, setPage] = useState(1);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["orders"],
-    queryFn: () => ordersApi.list().then((r) => r.data),
+    queryKey: ["orders", page],
+    queryFn: () => ordersApi.list(page).then((r) => r.data),
   });
+
+  const total = data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
 
   const orders = (data?.data ?? []).filter((o) => {
     const matchStatus = statusFilter === "SEMUA" || o.status === statusFilter;
@@ -32,7 +37,7 @@ const Orders = () => {
           <div>
             <h2 className="page-title">Semua Pesanan</h2>
             <p className="page-subtitle">
-              {data?.total !== undefined ? `${data.total} pesanan masuk` : "Kelola pesanan pelanggan"}
+              {total > 0 ? `${total} pesanan masuk` : "Kelola pesanan pelanggan"}
             </p>
           </div>
         </div>
@@ -42,7 +47,7 @@ const Orders = () => {
             <SearchInput
               value={search}
               onChange={setSearch}
-              placeholder="Cari nama / email..."
+              placeholder="Cari di halaman ini..."
               className="w-72"
             />
             <select
@@ -58,14 +63,23 @@ const Orders = () => {
 
           {isLoading ? (
             <div className="flex justify-center py-20">
-              <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-10 h-10 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin" />
             </div>
           ) : orders.length === 0 ? (
             <div className="card p-12 text-center text-[var(--text-muted)]">Tidak ada pesanan ditemukan</div>
           ) : (
-            <div className="card overflow-hidden">
-              <OrderTable orders={orders} />
-            </div>
+            <>
+              <div className="card overflow-hidden">
+                <OrderTable orders={orders} />
+              </div>
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                totalItems={total}
+                perPage={PER_PAGE}
+                onPageChange={setPage}
+              />
+            </>
           )}
         </div>
       </div>
