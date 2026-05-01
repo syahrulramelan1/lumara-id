@@ -4,6 +4,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { Footer } from "@/components/layout/Footer";
 import { PageTransition } from "@/components/motion/PageTransition";
+import { FloatingWhatsApp } from "@/components/shared/FloatingWhatsApp";
 import { appSettingModel } from "@/lib/models/AppSettingModel";
 
 // Layout ini selalu dynamic — supaya maintenance check tidak ter-skip oleh static rendering.
@@ -30,6 +31,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
       </main>
       <Footer />
       <BottomNav />
+      <FloatingWhatsApp />
     </>
   );
 }

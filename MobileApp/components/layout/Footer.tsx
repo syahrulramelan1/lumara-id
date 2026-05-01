@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
-import { Instagram, Twitter, Youtube } from "lucide-react";
 import { getT } from "@/lib/i18n";
 import { useUIStore } from "@/store/uiStore";
+import { SocialLinks } from "@/components/shared/SocialLinks";
 
 export function Footer() {
   const language = useUIStore((s) => s.language);
@@ -14,18 +14,8 @@ export function Footer() {
           <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-3">
             Lumara.id
           </h3>
-          <p className="text-sm text-white/60 leading-relaxed">{t.footer.tagline}</p>
-          <div className="flex gap-3 mt-4">
-            <a href="#" className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors" aria-label="Instagram">
-              <Instagram size={16} />
-            </a>
-            <a href="#" className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors" aria-label="Twitter">
-              <Twitter size={16} />
-            </a>
-            <a href="#" className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors" aria-label="YouTube">
-              <Youtube size={16} />
-            </a>
-          </div>
+          <p className="text-sm text-white/60 leading-relaxed mb-4">{t.footer.tagline}</p>
+          <SocialLinks variant="footer" />
         </div>
 
         <div>
