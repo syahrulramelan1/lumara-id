@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { checkAdminSecret, adminUnauthorized } from "@/lib/admin";
 import { appSettingModel } from "@/lib/models/AppSettingModel";
 
@@ -19,7 +20,12 @@ export async function PATCH(req: NextRequest) {
     if (typeof body.maintenance !== "boolean") {
       return NextResponse.json({ success: false, error: "Field 'maintenance' harus boolean" }, { status: 400 });
     }
+
     await appSettingModel.setMaintenanceMode(body.maintenance);
+
+    // Invalidate cache supaya layout langsung pakai value baru — tidak perlu nunggu 60s.
+    revalidateTag("maintenance");
+
     return NextResponse.json({ success: true, data: { maintenance: body.maintenance } });
   } catch {
     return NextResponse.json({ success: false, error: "Gagal update settings" }, { status: 500 });

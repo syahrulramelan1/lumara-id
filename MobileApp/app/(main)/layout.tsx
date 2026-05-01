@@ -6,11 +6,16 @@ import { Footer } from "@/components/layout/Footer";
 import { PageTransition } from "@/components/motion/PageTransition";
 import { appSettingModel } from "@/lib/models/AppSettingModel";
 
-// Cache hasil pengecekan maintenance 30 detik — tidak hit DB setiap request
+// Layout ini selalu dynamic — supaya maintenance check tidak ter-skip oleh static rendering.
+export const dynamic = "force-dynamic";
+
+// Cache hasil pengecekan maintenance — di-tag biar bisa di-invalidate
+// langsung dari endpoint PATCH /api/admin/settings (revalidateTag("maintenance")).
+// Revalidate fallback 60s untuk safety net.
 const getMaintenanceStatus = unstable_cache(
   () => appSettingModel.isMaintenanceMode(),
   ["maintenance-status"],
-  { revalidate: 30 }
+  { revalidate: 60, tags: ["maintenance"] }
 );
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {

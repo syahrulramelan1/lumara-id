@@ -1,28 +1,62 @@
 "use client";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function MaintenancePage() {
-  const router = useRouter();
+  const [checking, setChecking] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
     const check = async () => {
+      if (cancelled) return;
+      setChecking(true);
       try {
-        const res = await fetch("/api/status");
-        const data = await res.json() as { maintenance: boolean };
-        if (!data.maintenance) router.replace("/");
+        // cache:"no-store" — pastikan selalu fresh dari server
+        const res = await fetch("/api/status", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = (await res.json()) as { maintenance: boolean };
+        if (!cancelled && !data.maintenance) {
+          // HARD reload — bukan router.replace — supaya layout di-server di-evaluate
+          // ulang dengan cache yang sudah di-invalidate. router.replace bisa
+          // pakai stale RSC cache dan loop balik ke /maintenance.
+          window.location.href = "/";
+        }
       } catch {
         // gagal fetch — coba lagi nanti
+      } finally {
+        if (!cancelled) setChecking(false);
       }
     };
 
-    // cek langsung saat halaman dibuka
-    check();
+    const schedule = (ms: number) => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(async () => {
+        await check();
+        // Tetap polling kalau masih di halaman ini
+        if (!cancelled && !document.hidden) schedule(30_000);
+      }, ms);
+    };
 
-    // polling setiap 10 detik
-    const interval = setInterval(check, 10_000);
-    return () => clearInterval(interval);
-  }, [router]);
+    // Pause polling saat tab di-minimize/hidden, resume saat balik.
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        if (timer) { clearTimeout(timer); timer = null; }
+      } else {
+        check().then(() => schedule(30_000));
+      }
+    };
+
+    // Cek pertama langsung saat halaman dibuka, lalu polling tiap 30 detik.
+    check().then(() => schedule(30_000));
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4 text-center">
@@ -43,8 +77,8 @@ export default function MaintenancePage() {
         </p>
 
         <div className="flex items-center justify-center gap-1.5 text-xs text-gray-400 mb-6">
-          <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
-          Akan kembali otomatis saat selesai
+          <span className={`w-1.5 h-1.5 rounded-full ${checking ? "bg-green-400" : "bg-yellow-400"} animate-pulse`} />
+          {checking ? "Mengecek status…" : "Akan kembali otomatis saat selesai"}
         </div>
 
         <div className="border-t border-gray-200 pt-5 text-xs text-gray-400">
