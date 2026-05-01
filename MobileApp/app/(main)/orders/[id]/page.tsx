@@ -34,14 +34,14 @@ function formatIDR(n: number) {
   return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
 }
 
-function formatDate(s: string | null | undefined) {
+function formatDate(s: Date | string | null | undefined) {
   if (!s) return "—";
-  return new Date(s).toLocaleString("id-ID", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  return new Date(s as string).toLocaleString("id-ID", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 
-function formatDateOnly(s: string | null | undefined) {
+function formatDateOnly(s: Date | string | null | undefined) {
   if (!s) return "—";
-  return new Date(s).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+  return new Date(s as string).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
 }
 
 function getImage(imgs: unknown): string | null {
