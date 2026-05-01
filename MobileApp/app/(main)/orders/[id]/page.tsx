@@ -167,7 +167,7 @@ export default function OrderDetailPage() {
 
   const shipping = (() => {
     if (!order.shippingAddress) return null;
-    if (typeof order.shippingAddress === "object") return order.shippingAddress as ShippingAddress;
+    if (typeof order.shippingAddress === "object") return order.shippingAddress as unknown as ShippingAddress;
     try { return JSON.parse(order.shippingAddress as string) as ShippingAddress; } catch { return null; }
   })();
 
