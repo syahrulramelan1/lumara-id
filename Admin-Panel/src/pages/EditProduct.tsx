@@ -3,9 +3,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { HiOutlineSave, HiOutlineArrowLeft } from "react-icons/hi";
 import toast from "react-hot-toast";
-import { ImageUpload, Sidebar } from "../components";
+import { ImageUpload, Sidebar, ColorVariantInput } from "../components";
 import { productsApi, categoriesApi } from "../lib/api";
 import { parseJsonArr, parseJsonArrToString } from "../lib/jsonUtils";
+import { parseColors, type ColorVariant } from "../types/colorVariant";
 
 const EditProduct = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,8 +26,9 @@ const EditProduct = () => {
   const [form, setForm] = useState({
     name: "", slug: "", description: "", categoryId: "",
     price: "", originalPrice: "", stock: "", sku: "",
-    sizes: "", colors: "", isFeatured: false, isNew: false,
+    sizes: "", isFeatured: false, isNew: false,
   });
+  const [colors, setColors] = useState<ColorVariant[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
 
@@ -42,10 +44,10 @@ const EditProduct = () => {
         stock: String(product.stock),
         sku: product.sku ?? "",
         sizes: parseJsonArrToString(product.sizes),
-        colors: parseJsonArrToString(product.colors),
         isFeatured: product.isFeatured,
         isNew: product.isNew,
       });
+      setColors(parseColors(product.colors));
       setExistingImages(parseJsonArr(product.images));
     }
   }, [product]);
@@ -74,9 +76,8 @@ const EditProduct = () => {
     const sizesArr = typeof form.sizes === "string"
       ? form.sizes.split(",").map(s => s.trim()).filter(Boolean)
       : parseJsonArr(form.sizes as unknown);
-    const colorsArr = typeof form.colors === "string"
-      ? form.colors.split(",").map(c => c.trim()).filter(Boolean)
-      : parseJsonArr(form.colors as unknown);
+    // Filter out variant warna yang nama-nya kosong (user lupa isi).
+    const colorsArr = colors.filter((c) => c.name.trim().length > 0);
     const fd = new FormData();
     fd.append("name", form.name);
     fd.append("slug", form.slug);
@@ -186,19 +187,25 @@ const EditProduct = () => {
             </div>
 
             <div className="card p-6">
-              <h3 className="font-semibold text-[var(--text)] mb-4">Variasi</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Ukuran (pisahkan dengan koma)</label>
-                  <input className="input-base" type="text" placeholder="S, M, L, XL, XXL" value={form.sizes}
-                    onChange={(e) => set("sizes", e.target.value)} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Warna (pisahkan dengan koma)</label>
-                  <input className="input-base" type="text" placeholder="Hitam, Putih, Navy" value={form.colors}
-                    onChange={(e) => set("colors", e.target.value)} />
-                </div>
+              <h3 className="font-semibold text-[var(--text)] mb-4">Variasi Ukuran</h3>
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Ukuran (pisahkan dengan koma)</label>
+                <input className="input-base" type="text" placeholder="S, M, L, XL, XXL" value={form.sizes}
+                  onChange={(e) => set("sizes", e.target.value)} />
               </div>
+            </div>
+
+            <div className="card p-6">
+              <h3 className="font-semibold text-[var(--text)] mb-1">Variasi Warna</h3>
+              <p className="text-xs text-[var(--text-muted)] mb-4">
+                Setiap warna bisa punya foto khusus & stok sendiri. Kalau cukup nama saja,
+                tinggal isi nama dan biarkan field lain kosong.
+              </p>
+              <ColorVariantInput
+                value={colors}
+                onChange={setColors}
+                availableImages={existingImages}
+              />
             </div>
 
             <div className="card p-6">
