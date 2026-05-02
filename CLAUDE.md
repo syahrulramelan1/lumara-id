@@ -455,44 +455,54 @@ syncUser endpoint:
 
 ## Halaman MobileApp (App Router)
 
-### `(main)` group — wrapped layout dengan Navbar + BottomNav + maintenance check
-- `/` — landing (Hero, Featured, NewArrivals, Categories, Promo)
-- `/products` + `/products/[slug]` — listing & detail
+### Top-level (di luar group, no Navbar/BottomNav)
+- `/` — **Splash linktree** (5 channel equal: WA, IG, TikTok, Shopee, Web). Tampil setiap kunjungan, tidak ada localStorage skip.
+- `/links` — Linktree alias (pakai komponen sama dengan `/`). URL khusus untuk pasang di bio IG/TikTok.
+- `/maintenance` — tampil saat maintenance mode ON
+
+### `(main)` group — wrapped layout dengan Navbar + BottomNav + Footer + FloatingWA + maintenance check
+- `/home` — landing storefront (Hero, Featured, NewArrivals, Categories, Promo)
+- `/products` + `/products/[slug]` — listing & detail (detail page punya inner zoom + lightbox)
 - `/categories` + `/categories/[slug]` — index & per-kategori
 - `/search` — search results
 - `/cart` — keranjang
-- `/checkout` — form alamat + pilih bayar (form sudah ada, **endpoint create order belum sepenuhnya di-wire**)
+- `/checkout` — form alamat + pilih bayar (lengkap: POST /api/orders → clear cart → redirect)
 - `/wishlist` — list wishlist (auth-gated)
 - `/orders` — list pesanan user (auth-gated)
 - `/orders/[id]` — detail + tracking timeline + tombol konfirmasi (status SHIPPED)
-- `/account` — profil user
+- `/account` — profil user (inline edit nama & phone via PATCH /api/profile)
 - `/promo`, `/about`, `/how-to-order`, `/shipping`, `/return`, `/contact` — halaman statis
 
 ### `(auth)` group
 - `/login`, `/forgot-password`, `/reset-password`
 
-### Standalone (di luar group)
-- `/maintenance` — tampil saat maintenance mode ON
-
 ### Middleware
-`MobileApp/middleware.ts` — ada (perlu cek scope-nya saat refactor)
+`MobileApp/middleware.ts` — CORS handler khusus untuk `/api/admin/*` (allow `admni-panel.onrender.com` & localhost). ✅ Sudah benar, tidak perlu diubah.
 
 ---
 
 ## Komponen UI (`MobileApp/components/`)
 
 ### Layout
-- `Navbar.tsx` — desktop dropdown + mobile drawer dengan profile card
-- `BottomNav.tsx` — mobile bottom nav, account icon = avatar gradient
-- `Footer.tsx`
+- `Navbar.tsx` — desktop dropdown + mobile drawer dengan profile card. Logo link ke `/home` (bukan `/` splash).
+- `BottomNav.tsx` — mobile bottom nav, Home tab → `/home`, account icon = avatar gradient
+- `Footer.tsx` — pakai `<SocialLinks variant="footer" />`, kontak `+62 852-8573-3391`
 
 ### Product
-- `ProductCard.tsx`, `ProductDetail.tsx`, `ProductFilters.tsx`, `MobileFilterDrawer.tsx` (pakai createPortal)
+- `ProductCard.tsx` — listing/grid, `aspect-[3/4]` + `object-contain` (no crop)
+- `ProductDetail.tsx` — detail page, pakai `<ProductImageZoom />`
+- `ProductImageZoom.tsx` — **inner hover zoom (Shopee-style)** + **lightbox full-screen** (mobile pinch-zoom + ESC/← →)
+- `ProductFilters.tsx`, `MobileFilterDrawer.tsx` (pakai createPortal)
 
-### Sections (dipakai di landing)
+### Sections (dipakai di /home)
 - `HeroSection`, `FeaturedSection`, `NewArrivalsSection`, `CategorySection`, `PromoSection`
 
+### Splash (top-level entry)
+- `SplashLinkTree.tsx` — Claude-inspired minimalist white. Animated background blobs (4 pastel, blur-3xl, slow infinite), logo glow pulse, gradient shifting brand name, theme toggle pill (kanan-atas, sync ke seluruh website), 5 channel buttons stagger entrance + shimmer hover.
+
 ### Shared
+- `FloatingWhatsApp.tsx` — fixed bottom-right pill (mobile: bottom-24 atas BottomNav; desktop: bottom-6). Pulse ring hijau, label "Chat Sekarang" di desktop. Render di `(main)/layout.tsx` — muncul di semua storefront page.
+- `SocialLinks.tsx` — strip 4 icon brand (WA/IG/TikTok/Shopee). Variant `footer` (small bulat dark bg) dan `compact` (medium dengan label).
 - `ProductGrid`, `SearchBar`, `LoadingSpinner`
 - Page headers: `ProductsPageHeader`, `SearchPageHeader`, `CategoriesClientPage`, `RelatedProductsHeader`
 
@@ -500,7 +510,8 @@ syncUser endpoint:
 - `PageTransition`, `FadeInView`, `SkeletonCard` (Framer Motion)
 
 ### Providers
-- `ThemeProvider` (next-themes), `UIProvider` (Supabase auth listener + wishlist clear on logout)
+- `ThemeProvider` (next-themes, **defaultTheme: "light"**, enableSystem: false)
+- `UIProvider` (Supabase auth listener + wishlist clear on logout + sync user pada SIGNED_IN/TOKEN_REFRESHED)
 
 ---
 
@@ -541,6 +552,7 @@ syncUser endpoint:
 - **Pill radius**: `9999px` (`rounded-pill`)
 - **Mobile-first**: 390px base (iPhone width)
 - **Safe area**: `safe-bottom`, `safe-top` utilities tersedia
+- **Default theme**: light (visitor baru langsung putih, dark mode opt-in via toggle splash)
 
 ### Shadow
 - `shadow-card`, `shadow-card-hover`
@@ -558,8 +570,10 @@ syncUser endpoint:
 ### ✅ Sudah Selesai
 
 #### Storefront (MobileApp)
-- Landing page lengkap (Hero, Featured, NewArrivals, Categories, Promo)
+- **Splash linktree** (`/` & `/links`) — 5 channel equal (WA/IG/TikTok/Shopee/Web), animated background blobs, theme toggle, Claude-inspired light mode.
+- Landing storefront `/home` (Hero, Featured, NewArrivals, Categories, Promo)
 - Listing & detail produk + filter + search multi-strategi (token + alias fashion ID + ILIKE)
+- **Image zoom Shopee-style**: inner hover zoom 2.2× + lightbox full-screen (mobile pinch + keyboard ESC/← →)
 - Wishlist (toggle, persisted, sync server, auth-gated, clear on logout)
 - Cart + **checkout flow lengkap** (form alamat → POST /api/orders → clear cart → redirect /orders)
 - Auth: login/forgot/reset, register sync ke DB, role-based redirect
@@ -568,8 +582,9 @@ syncUser endpoint:
 - Halaman pesanan: `/orders` list, `/orders/[id]` detail
 - **Tracking pengiriman manual**: shipping info card + timeline + tombol konfirmasi terima
 - **Halaman /account** — profile card + inline edit (nama, phone) via PATCH /api/profile
-- **Floating WhatsApp livechat** + **5-channel social bar** (IG, TikTok, WA, Shopee, Tokopedia) di Footer + halaman `/contact` rewrite — single source of truth di `lib/social.ts`
+- **Floating WhatsApp livechat** + **4-channel social bar** (WA, IG, TikTok, Shopee) di Footer + halaman `/contact` rewrite — single source of truth di `lib/social.ts`
 - **Maintenance mode tag-based cache** — toggle dari Admin Panel langsung effective via `revalidateTag("maintenance")`, polling page maintenance hard-reload supaya tidak ke-loop
+- **Default theme light** — visitor baru selalu putih, dark mode opt-in via toggle splash
 
 #### Admin Panel
 - CRUD: Products, Categories, Orders, Reviews, Users, Dashboard
@@ -703,6 +718,21 @@ Admin panel & `/api/*` tidak ter-affect — hanya halaman publik `(main)`.
 ---
 
 ## Catatan dari Sesi Terbaru
+
+### 2026-05-02 — Splash Linktree + Animasi + Theme Toggle (Claude-Style Light)
+**Yang dikerjakan:**
+- **Routing baru**: `/` jadi splash linktree (5 channel equal: WA/IG/TikTok/Shopee/Web), `/home` jadi storefront home (yang dulu di `/`), `/links` alias splash untuk bio sosmed. Update semua navigasi (Navbar logo, BottomNav, logout redirect, dst.) dari `/` ke `/home`.
+- **Splash design Claude-inspired**: pure white background, 4 floating pastel blobs (violet/pink/amber/sky) blur-3xl 30-50% opacity dengan animasi slow 14-22s loop, logo glow pulse, brand name gradient shifting, sparkles tagline pill, soft elevated shadows (bukan border tebal), ArrowUpRight icon, easing organic `cubic-bezier(0.22, 1, 0.36, 1)`.
+- **Theme toggle splash**: pill button kanan-atas dengan `useTheme()` next-themes. `attribute: "class"` jadi toggle di splash sync ke seluruh website (storefront ikut tema saat user navigate).
+- **Default theme `light`**: ThemeProvider config `defaultTheme: "light"`, `enableSystem: false`. Visitor baru selalu masuk dengan light mode. Dark masih ada via toggle.
+- **Hapus channel Tokopedia**: type `SocialChannel.id` union, `SOCIAL_CHANNELS`, switch case di SplashLinkTree/SocialLinks/contact, file `components/icons/BrandIcons.tsx` (TokopediaIcon custom). Sekarang 4 channel saja.
+- **Update handle TikTok/Shopee**: `@lumaraid` (bukan `lumara.id`), URL pakai TikTok deep link.
+- **Ganti nomor WA brand**: ke `0852-8573-3391` (display) / `6285285733391` (wa.me). Sweep semua hardcoded di MobileApp + Refrens mockup.
+- **UTM tracking**: helper `withUtm()` di `lib/social.ts`, splash auto-append `utm_source=lumara_splash&utm_medium=splash_linktree` ke link Shopee/IG/TikTok.
+- **Image zoom Shopee-style**: `ProductImageZoom.tsx` — inner hover zoom 2.2× (transform-origin mengikuti cursor) + lightbox full-screen modal (touch-action pinch-zoom + keyboard ESC/← →).
+- **Image cards no crop**: ProductCard & ProductDetail pakai `object-contain` di `aspect-[3/4]` container — foto upload tidak ke-crop kepala/kaki, gradient soft sebagai padding alami.
+- **Fix delete kategori 400 (FK constraint)**: `CategoryModel.delete` dan `ProductModel.delete` pre-check children count, throw error message yang jelas. Frontend `*Table.tsx` extract `response.data.error` ke toast.
+- **Fix maintenance bugs**: tag-based cache invalidation (`revalidateTag("maintenance")` di PATCH), hard reload bukan `router.replace` (cegah loop), polling 30s pause saat `document.hidden`.
 
 ### 2026-05-02 — Social Channels + Hapus Link Admin Panel + Doc Refresh
 **Yang dikerjakan:**
