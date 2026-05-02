@@ -9,7 +9,12 @@ const CategoryTable = ({ categories }: { categories: ApiCategory[] }) => {
   const deleteMutation = useMutation({
     mutationFn: categoriesApi.delete,
     onSuccess: () => { toast.success("Kategori dihapus"); queryClient.invalidateQueries({ queryKey: ["categories"] }); },
-    onError: () => toast.error("Gagal menghapus kategori"),
+    onError: (e: unknown) => {
+      // Tampilkan error message yang dikembalikan server (kalau ada),
+      // jadi user tahu kenapa gagal — misal "masih ada N produk di kategori ini".
+      const msg = (e as { response?: { data?: { error?: string } } })?.response?.data?.error;
+      toast.error(msg || "Gagal menghapus kategori");
+    },
   });
 
   return (

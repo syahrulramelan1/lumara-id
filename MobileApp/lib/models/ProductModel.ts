@@ -195,6 +195,14 @@ export class ProductModel {
   }
 
   async delete(id: string): Promise<Product> {
+    // Product yang sudah pernah dibeli punya OrderItem yang reference dia
+    // dengan FK Restrict (default). Cek dulu, kasih pesan yang jelas.
+    const orderCount = await prisma.orderItem.count({ where: { productId: id } });
+    if (orderCount > 0) {
+      throw new Error(
+        `Tidak bisa menghapus — produk ini sudah pernah dipesan (${orderCount} order item). Pertimbangkan untuk set stock = 0 atau ubah visibilitas.`
+      );
+    }
     return prisma.product.delete({ where: { id } });
   }
 

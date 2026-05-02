@@ -37,6 +37,15 @@ export class CategoryModel {
   }
 
   async delete(id: string): Promise<Category> {
+    // Pre-check: kategori tidak boleh dihapus kalau masih ada produk yang
+    // pakai kategori ini (FK constraint Restrict default Prisma akan throw
+    // error generic; kita kasih pesan yang jelas dulu).
+    const productCount = await prisma.product.count({ where: { categoryId: id } });
+    if (productCount > 0) {
+      throw new Error(
+        `Tidak bisa menghapus — masih ada ${productCount} produk di kategori ini. Pindahkan atau hapus produknya dulu.`
+      );
+    }
     return prisma.category.delete({ where: { id } });
   }
 }

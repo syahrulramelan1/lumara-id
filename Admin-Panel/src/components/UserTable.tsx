@@ -9,7 +9,10 @@ const UserTable = ({ users }: { users: ApiUser[] }) => {
   const deleteMutation = useMutation({
     mutationFn: usersApi.delete,
     onSuccess: () => { toast.success("Pengguna dihapus"); queryClient.invalidateQueries({ queryKey: ["users"] }); },
-    onError: () => toast.error("Gagal menghapus pengguna"),
+    onError: (e: unknown) => {
+      const msg = (e as { response?: { data?: { error?: string } } })?.response?.data?.error;
+      toast.error(msg || "Gagal menghapus pengguna");
+    },
   });
 
   return (

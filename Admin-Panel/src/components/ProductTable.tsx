@@ -18,7 +18,10 @@ const ProductTable = ({ products }: { products: ApiProduct[] }) => {
       toast.success("Produk dihapus");
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onError: () => toast.error("Gagal menghapus produk"),
+    onError: (e: unknown) => {
+      const msg = (e as { response?: { data?: { error?: string } } })?.response?.data?.error;
+      toast.error(msg || "Gagal menghapus produk");
+    },
   });
 
   return (

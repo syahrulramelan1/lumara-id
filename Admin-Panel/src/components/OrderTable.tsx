@@ -29,7 +29,10 @@ const OrderTable = ({ orders }: { orders: ApiOrder[] }) => {
   const deleteMutation = useMutation({
     mutationFn: ordersApi.delete,
     onSuccess: () => { toast.success("Pesanan dihapus"); queryClient.invalidateQueries({ queryKey: ["orders"] }); },
-    onError: () => toast.error("Gagal menghapus pesanan"),
+    onError: (e: unknown) => {
+      const msg = (e as { response?: { data?: { error?: string } } })?.response?.data?.error;
+      toast.error(msg || "Gagal menghapus pesanan");
+    },
   });
 
   return (

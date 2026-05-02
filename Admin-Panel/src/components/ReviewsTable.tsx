@@ -9,7 +9,10 @@ const ReviewsTable = ({ reviews }: { reviews: ApiReview[] }) => {
   const deleteMutation = useMutation({
     mutationFn: reviewsApi.delete,
     onSuccess: () => { toast.success("Ulasan dihapus"); queryClient.invalidateQueries({ queryKey: ["reviews"] }); },
-    onError: () => toast.error("Gagal menghapus ulasan"),
+    onError: (e: unknown) => {
+      const msg = (e as { response?: { data?: { error?: string } } })?.response?.data?.error;
+      toast.error(msg || "Gagal menghapus ulasan");
+    },
   });
 
   return (
