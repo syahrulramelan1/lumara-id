@@ -8,7 +8,7 @@ export default function NotFound() {
       <p className="text-xl font-semibold mb-2">Halaman Tidak Ditemukan</p>
       <p className="text-muted-foreground mb-8">Maaf, halaman yang kamu cari tidak tersedia.</p>
       <Link
-        href="/"
+        href="/home"
         className="px-6 py-3 bg-primary text-white font-semibold rounded-[12px] hover:bg-primary/90 transition-colors"
       >
         Kembali ke Beranda

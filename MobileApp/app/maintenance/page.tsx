@@ -20,7 +20,7 @@ export default function MaintenancePage() {
           // HARD reload — bukan router.replace — supaya layout di-server di-evaluate
           // ulang dengan cache yang sudah di-invalidate. router.replace bisa
           // pakai stale RSC cache dan loop balik ke /maintenance.
-          window.location.href = "/";
+          window.location.href = "/home";
         }
       } catch {
         // gagal fetch — coba lagi nanti

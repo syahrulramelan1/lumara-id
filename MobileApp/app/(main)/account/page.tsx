@@ -58,7 +58,7 @@ export default function AccountPage() {
   const handleLogout = async () => {
     const supabase = createClientComponent();
     await supabase.auth.signOut();
-    router.push("/");
+    router.push("/home");
     toast.success("Berhasil keluar");
   };
 

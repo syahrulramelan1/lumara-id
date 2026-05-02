@@ -65,11 +65,11 @@ export function Navbar() {
     const supabase = createClientComponent();
     await supabase.auth.signOut();
     toast.success("Berhasil keluar");
-    router.push("/");
+    router.push("/home");
   };
 
   const mobileNavItems = [
-    { href: "/",           icon: Home,    label: t.bottom_nav.home },
+    { href: "/home",       icon: Home,    label: t.bottom_nav.home },
     { href: "/products",   icon: Package, label: t.nav.products },
     { href: "/categories", icon: Grid3X3, label: t.nav.categories },
     { href: "/promo",      icon: Tag,     label: t.nav.promo },
@@ -97,8 +97,8 @@ export function Navbar() {
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
 
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-1.5">
+          {/* Logo — link ke /home (storefront), bukan / (splash linktree) */}
+          <Link href="/home" className="flex items-center gap-1.5">
             <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Lumara
             </span>
@@ -308,7 +308,7 @@ export function Navbar() {
         {/* ── Nav items (scrollable) ── */}
         <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5">
           {mobileNavItems.map(({ href, icon: Icon, label }) => {
-            const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
+            const active = href === "/home" ? pathname === "/home" : pathname.startsWith(href);
             return (
               <Link key={href} href={href}
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-[12px] text-sm font-medium transition-colors ${

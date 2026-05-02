@@ -20,8 +20,31 @@ export function buildWhatsAppUrl(message?: string): string {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
 }
 
+/**
+ * Append UTM parameters ke URL — supaya bisa track di Shopee Insight /
+ * Tokopedia Statistik / Google Analytics berapa traffic dari splash.
+ *
+ * Untuk URL yang bukan http (mis. wa.me, mailto), URL dikembalikan apa adanya.
+ * Untuk wa.me URL kita tetap append (tidak break parsing-nya).
+ */
+export function withUtm(
+  url: string,
+  source = "lumara_splash",
+  medium = "splash_linktree"
+): string {
+  if (!url) return url;
+  try {
+    const u = new URL(url);
+    u.searchParams.set("utm_source", source);
+    u.searchParams.set("utm_medium", medium);
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Channel list — dipakai oleh Footer + halaman /contact
+// Channel list — dipakai oleh Footer + halaman /contact + splash linktree
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export type SocialChannel = {
@@ -29,7 +52,7 @@ export type SocialChannel = {
   label:    string;          // nama tampil di tombol/card
   handle:   string;          // username/handle yang ditampilkan
   url:      string;          // link target
-  desc:     string;          // deskripsi singkat untuk /contact
+  desc:     string;          // deskripsi singkat untuk /contact & splash
   brandHex: string;          // warna brand untuk hover/icon background
 };
 

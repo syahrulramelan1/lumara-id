@@ -124,7 +124,7 @@ function LoginForm() {
       </div>
 
       <p className="mt-6 text-center text-xs text-muted-foreground">
-        <Link href="/" className="hover:text-primary transition-colors">{t.auth.back_home}</Link>
+        <Link href="/home" className="hover:text-primary transition-colors">{t.auth.back_home}</Link>
       </p>
     </div>
   );

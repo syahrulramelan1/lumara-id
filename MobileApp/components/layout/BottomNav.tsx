@@ -21,7 +21,7 @@ export function BottomNav() {
   const t = getT(mounted ? language : "id");
 
   const navItems = [
-    { href: "/",           icon: Home,    label: t.bottom_nav.home },
+    { href: "/home",       icon: Home,    label: t.bottom_nav.home },
     { href: "/categories", icon: Grid3X3, label: t.bottom_nav.categories },
     { href: "/search",     icon: Search,  label: t.bottom_nav.search },
     { href: "/wishlist",   icon: Heart,   label: t.bottom_nav.wishlist },
@@ -36,7 +36,7 @@ export function BottomNav() {
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-border safe-area-pb">
       <div className="flex items-center justify-around h-16 px-1">
         {navItems.map(({ href, icon: Icon, label }) => {
-          const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
+          const active = href === "/home" ? pathname === "/home" : pathname.startsWith(href);
           const isAccount = href === "/account";
           const isWishlist = href === "/wishlist";
 
