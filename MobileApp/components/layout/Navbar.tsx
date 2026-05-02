@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Search, ShoppingBag, Heart, Menu, X, Globe, Sun, Moon,
-  Home, Grid3X3, Tag, User, Package, LayoutDashboard,
+  Home, Grid3X3, Tag, User, Package,
   LogOut, LogIn, ChevronDown, Settings,
 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -354,12 +354,6 @@ export function Navbar() {
               <LogOut size={16} /> Keluar dari Akun
             </button>
           )}
-
-          <a href={process.env.NEXT_PUBLIC_ADMIN_URL || "https://lumara-id-admin.onrender.com"}
-            target="_blank" rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
-            <LayoutDashboard size={13} /> Admin Panel
-          </a>
         </div>
       </div>
     </>

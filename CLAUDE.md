@@ -49,6 +49,31 @@
 
 ---
 
+## Bahasa & Tooling
+
+### MobileApp
+- **Bahasa utama**: TypeScript 5.x dengan `strict: true` (lihat `tsconfig.json`)
+- **Runtime server**: Node 20+ (Render default)
+- **Module resolution**: `bundler` mode dengan path alias `@/*` → root MobileApp/
+- **Rendering**: Next.js App Router server components by default; mark `"use client"` untuk komponen interaktif
+- **Build output**: standalone (`.next/standalone/server.js`) — copy `.next/static` saat start
+- **Komentar code**: Bahasa Indonesia santai (sesuai konvensi proyek)
+
+### Admin-Panel
+- **Bahasa**: TypeScript 5.2 dengan strict mode
+- **Build tool**: Vite 5 (esbuild-based, fast dev/HMR)
+- **Style: SPA** murni — semua route di-handle client-side via react-router-dom
+- **HTTP client**: axios instance di `src/lib/api.ts` dengan baseURL & header `x-admin-secret`
+
+### Convention TS yang Wajib Diikuti
+- Tipe `interface` untuk shape object yang ada method/extension; `type` untuk union/intersection/utility
+- Hindari `any` — pakai `unknown` + narrowing kalau perlu
+- Server actions/route handlers selalu punya try/catch + return shape `{ success: boolean; error?: string; data?: T }`
+- Komponen React: tipe props pakai `interface XxxProps`
+- Singleton services/models: `private static instance` + `static getInstance()` + lowercase named export
+
+---
+
 ## Database Schema (Prisma)
 
 Semua model di `MobileApp/prisma/schema.prisma`. Mapping snake_case ke Postgres via `@map`/`@@map`.
@@ -72,6 +97,102 @@ Semua model di `MobileApp/prisma/schema.prisma`. Mapping snake_case ke Postgres 
 ### Catatan tipe Json
 - `Product.images`, `Product.sizes`, `Product.colors`, `Product.images` (review) → `Json @default("[]")`
 - `Order.shippingAddress` → `Json @default("{}")` (bukan String — sudah migrasi)
+
+---
+
+## Tipe Data Inti (TypeScript)
+
+Semua tipe domain ada di `MobileApp/types/index.ts`. Ringkasan tipe yang sering dipakai:
+
+```ts
+// Enum string literal (bukan Prisma enum)
+type Role = "USER" | "ADMIN";
+type OrderStatus = "PENDING" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+
+// Composite Prisma types
+type ProductWithCategory = Product & { category: Category };
+type ProductWithReviews  = Product & { category: Category; reviews: ReviewWithUser[] };
+type ReviewWithUser      = Review & { user: Pick<User, "id" | "name" | "avatar"> };
+type CategoryWithCount   = Category & { _count: { products: number } };
+type WishlistWithProduct = Wishlist & { product: ProductWithCategory };
+
+// OrderWithItems — dipakai di /orders, /orders/[id], admin EditOrder
+type OrderWithItems = Order & {
+  items: (OrderItem & { product: Pick<Product, "id" | "name" | "images"> })[];
+  user: Pick<User, "id" | "name" | "email" | "avatar">;
+  trackings: OrderTracking[];                 // kosong/tidak ada di list mode
+  courier: string | null;
+  courierService: string | null;
+  trackingNumber: string | null;
+  shippedAt: Date | string | null;
+  estimatedArrival: Date | string | null;
+};
+
+interface OrderTracking {
+  id: string; orderId: string;
+  status: string;              // label pendek: "Dikemas", "Diserahkan", dll
+  description: string;         // kalimat lengkap untuk buyer
+  location: string | null;
+  createdAt: Date | string;
+}
+
+interface CartItem {
+  productId: string; name: string; price: number; image: string;
+  size: string; color: string; quantity: number;
+}
+
+interface ShippingAddress {
+  name: string; phone: string;
+  province: string; city: string; district: string; postalCode: string;
+  address: string; notes?: string;
+}
+
+// API response shape — dipakai di seluruh /api/*
+interface ApiResponse<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+}
+
+// Pagination wrapper untuk list endpoints
+interface PaginationResult<T> {
+  data: T[];
+  total: number;
+  totalPages: number;
+  currentPage: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+```
+
+### Auth State (Zustand)
+File `store/authStore.ts`:
+```ts
+interface DbUser {
+  id: string; email: string;
+  name: string | null; avatar: string | null;
+  phone: string | null; role: string;
+}
+interface AuthStore {
+  user: SupabaseUser | null;        // Supabase Auth user
+  dbUser: DbUser | null;            // Record di Prisma User table
+  loading: boolean;
+  setUser / setDbUser / setLoading / clear: ...
+}
+```
+> `user` (Supabase) ada saat login, `dbUser` (Prisma) ada setelah sync via `/api/auth/sync-user`. UI yang butuh role pakai `dbUser.role`.
+
+### Social Channel (Single Source of Truth)
+File `lib/social.ts`:
+```ts
+const WHATSAPP_NUMBER = "6281234567890";   // format internasional, no plus, no zero
+const WHATSAPP_DEFAULT_MESSAGE = "Halo Lumara.id, ...";
+function buildWhatsAppUrl(message?: string): string;
+type SocialChannel = { id, label, handle, url, desc, brandHex };
+const SOCIAL_CHANNELS: SocialChannel[];     // 5 entry: WA, IG, TikTok, Shopee, Tokopedia
+```
+> Edit nomor WA & link di file ini → `<FloatingWhatsApp>`, `<SocialLinks>`, dan `/contact` semua ikut.
 
 ---
 
@@ -161,6 +282,174 @@ Abstract class dengan static helper `findById<T>` dan `count`.
 | POST | `/api/admin/orders/[id]/tracking` | Tambah update tracking manual |
 | GET/DELETE | `/api/admin/reviews[/id]` | List/hapus review |
 | GET/PATCH/DELETE | `/api/admin/users[/id]` | List/update role/delete user |
+
+---
+
+## Logika Bisnis Utama
+
+### 1. Create Order (Checkout)
+**Trigger**: Buyer klik "Buat Pesanan" di `/checkout`.
+**Files**: `app/(main)/checkout/page.tsx` → `app/api/orders/route.ts` → `OrderService.createOrder()` → `OrderModel.create()`
+
+**Algoritma**:
+```
+1. Frontend: validate auth (dbUser ada), keranjang > 0, paymentMethod terpilih
+2. POST /api/orders {userId, items, shippingAddress, paymentMethod}
+3. Server: validate field tidak kosong → 400 kalau gagal
+4. OrderService:
+   a. Loop tiap item → cek product.stock >= quantity → throw kalau tidak cukup
+   b. Hitung total = sum(price × quantity)
+   c. Buat order dengan status PENDING + nested create OrderItem[]
+   d. Auto-create OrderTracking "Pesanan Masuk"
+   e. Decrement product.stock paralel via Promise.all
+5. Frontend: clearCart() + setDone(true) + redirect /orders setelah 2.5s
+```
+**Race condition risk**: Step 5a-5e tidak transactional. Kalau decrement gagal di tengah, stok inkonsisten. **Acceptable** untuk skala UMKM saat ini.
+
+### 2. Manual Shipping Tracking
+**Trigger**: Admin tandai dikirim di EditOrder.
+**Files**: `Admin-Panel/src/pages/EditOrder.tsx` → `POST /api/admin/orders/[id]/ship` → `OrderModel.shipOrder()`
+
+**Algoritma `shipOrder()`**:
+```
+1. Validate body (courier, courierService, trackingNumber, estimatedArrival wajib)
+2. UPDATE orders SET status='SHIPPED', courier=..., courier_service=...,
+   tracking_number=..., shipped_at=NOW(), estimated_arrival=...
+3. Auto-create OrderTracking "Diserahkan ke Kurir" + deskripsi resi
+```
+
+**Algoritma `addTracking()`**: simple insert ke order_trackings dengan status, description, location?
+**Algoritma `confirmDelivery()`**: cek pemilik order via Bearer token → status SHIPPED → update DELIVERED + auto-tracking
+
+### 3. Auto-Milestones (di OrderModel)
+Saat status order berubah, otomatis buat OrderTracking entry:
+| Status Baru | Tracking yang dibuat |
+|-------------|----------------------|
+| (saat create) | "Pesanan Masuk" |
+| `PAID`        | "Pembayaran Dikonfirmasi" |
+| `PROCESSING`  | "Dikemas" |
+| (shipOrder)   | "Diserahkan ke Kurir" |
+| `DELIVERED`   | "Pesanan Diterima" |
+| `CANCELLED`   | "Dibatalkan" |
+
+### 4. Maintenance Mode (Cache & Toggle Instan)
+**Files**: `app/(main)/layout.tsx` + `app/maintenance/page.tsx` + `app/api/admin/settings/route.ts`
+
+**Algoritma**:
+```
+Layout (server component):
+  - export const dynamic = "force-dynamic" (skip static)
+  - getMaintenanceStatus() = unstable_cache(...) dengan tags:["maintenance"], revalidate:60
+  - if maintenance: redirect("/maintenance")
+
+Admin toggle:
+  - PATCH /api/admin/settings {maintenance: bool}
+  - AppSettingModel.setMaintenanceMode(bool)
+  - revalidateTag("maintenance") → cache di-invalidate INSTAN
+
+/maintenance page (client):
+  - Polling /api/status tiap 30s (cache:"no-store")
+  - Pause saat document.hidden, resume saat visible
+  - Saat detect maintenance:false → window.location.href = "/" (HARD reload, bukan router.replace)
+    → memastikan layout server di-evaluate fresh, no redirect loop
+```
+
+### 5. Auth Sync (Supabase ↔ Prisma)
+**Files**: `components/providers/UIProvider.tsx` + `app/api/auth/sync-user/route.ts`
+
+**Algoritma**:
+```
+UIProvider mount:
+  - getSession() → set user state
+  - syncUser(token) → POST /api/auth/sync-user → setDbUser
+
+onAuthStateChange:
+  - SIGNED_OUT: clear() + wishlist syncFromServer([])
+  - SIGNED_IN | TOKEN_REFRESHED: syncUser(token)
+
+syncUser endpoint:
+  - Verify Bearer token via supabase.auth.getUser
+  - findOrCreate user di Prisma berdasarkan email (default role USER)
+  - Return DbUser shape
+```
+
+### 6. Wishlist Sync
+- Local: Zustand `wishlistStore` (persisted localStorage) — `productIds: string[]`
+- Server: tabel `wishlists` — `userId + productId` unique
+- Sync: saat login → fetch server → `syncFromServer()`. Saat logout → `syncFromServer([])`.
+- Toggle: panggil `POST /api/wishlist` (server) + update local store optimistic
+
+### 7. Search Multi-Strategi (Indonesia Fashion Aliases)
+**File**: `lib/models/ProductModel.ts` → `buildSearchTerms()` + `buildSearchOR()`
+- Token splitting: "pasmina merah" → ["pasmina merah", "pasmina", "merah"]
+- Alias fashion ID: pasmina ↔ pashmina, hijab ↔ jilbab ↔ kerudung, sifon ↔ chiffon, dll
+- Prefix matching untuk query >= 5 huruf: "pasmi" → tambah prefix "pasm"
+- ILIKE PostgreSQL via `mode: "insensitive"`
+- OR di name + description
+
+---
+
+## Validasi
+
+### Form Client (sebelum submit)
+| Halaman | Validasi |
+|---------|----------|
+| `/login` | email format (HTML5 `type="email"`), password required |
+| `/checkout` | semua field address required (kecuali notes), paymentMethod dipilih, items > 0, dbUser ada |
+| `/account` (edit profil) | session ada (Bearer token tersedia) |
+| `EditOrder` (Admin) ship form | courier dipilih, courierService/trackingNumber/estimatedArrival required |
+| `EditOrder` tracking form | status & description tidak kosong (trim) |
+
+### Server (route handler)
+| Endpoint | Validasi |
+|----------|----------|
+| `POST /api/orders` | userId, items.length>0, shippingAddress, paymentMethod ada → 400 kalau tidak |
+| `POST /api/admin/orders/[id]/ship` | semua field shipping wajib (trim) → 400 kalau kosong |
+| `POST /api/admin/orders/[id]/tracking` | status & description wajib (trim) → 400 |
+| `POST /api/orders/[id]/confirm` | Bearer token → verify Supabase user → cek email = dbUser.email = order.userId → status order harus SHIPPED |
+| `PATCH /api/profile` | Bearer token → verify user → patch name/phone (semua opsional) |
+| `PATCH /api/admin/settings` | header `x-admin-secret`, body `{maintenance: boolean}` → 400 kalau bukan boolean |
+| Semua `/api/admin/*` | `checkAdminSecret(req)` → 401 kalau tidak match |
+
+### Service Layer
+| Service Method | Validasi Bisnis |
+|----------------|-----------------|
+| `OrderService.createOrder` | tiap product exists & stock >= qty → throw |
+| `OrderService.updateStatus` | status ∈ valid set → throw "Status tidak valid" |
+| `OrderModel.updateStatus` | sama (defense in depth) |
+
+### Database (Prisma constraint)
+- `User.email` UNIQUE
+- `Product.slug`, `Category.slug` UNIQUE
+- `Wishlist (userId, productId)` UNIQUE compound
+- FK CASCADE: `OrderItem`, `OrderTracking`, `Wishlist`, `Review` ikut hapus saat parent dihapus
+
+---
+
+## Environment Variables
+
+### MobileApp (`/MobileApp/.env.local` lokal, Render env vars production)
+
+| Var | Wajib? | Tujuan |
+|-----|--------|--------|
+| `DATABASE_URL` | ✅ | Connection string Postgres (Supabase pooler) |
+| `DIRECT_URL` | ✅ (production) | Connection string langsung untuk migrasi (Supabase direct) |
+| `NEXT_PUBLIC_SUPABASE_URL` | ✅ | Endpoint Supabase project |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | Public anon key (aman di client) |
+| `SUPABASE_SERVICE_ROLE_KEY` | optional | Untuk operasi yang bypass RLS (saat ini tidak dipakai) |
+| `NEXT_PUBLIC_APP_URL` | recommended | Base URL public (untuk meta tag, dll) |
+| `ADMIN_SECRET` | ✅ | Secret untuk header `x-admin-secret` — harus match `VITE_ADMIN_SECRET` di Admin-Panel |
+
+### Admin-Panel (`/Admin-Panel/.env.local` lokal, Render env vars production)
+
+| Var | Wajib? | Tujuan |
+|-----|--------|--------|
+| `VITE_API_URL` | ✅ | URL MobileApp (`https://lumara-id.onrender.com`) — axios baseURL = `${VITE_API_URL}/api/admin` |
+| `VITE_ADMIN_SECRET` | ✅ | Match `ADMIN_SECRET` di MobileApp |
+| `VITE_SUPABASE_URL` | ✅ | Sama dengan MobileApp `NEXT_PUBLIC_SUPABASE_URL` |
+| `VITE_SUPABASE_ANON_KEY` | ✅ | Sama dengan MobileApp `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+
+> 🔑 **Auth flow Admin Panel**: admin login via Supabase → token dipakai untuk authentication ke Supabase saja. Untuk hit endpoint `/api/admin/*`, dikirim header `x-admin-secret`. Setelah login, panggil `GET /api/admin/me` untuk cek role; kalau `role !== "ADMIN"` → kicked out.
 
 ---
 
@@ -279,6 +568,8 @@ Abstract class dengan static helper `findById<T>` dan `count`.
 - Halaman pesanan: `/orders` list, `/orders/[id]` detail
 - **Tracking pengiriman manual**: shipping info card + timeline + tombol konfirmasi terima
 - **Halaman /account** — profile card + inline edit (nama, phone) via PATCH /api/profile
+- **Floating WhatsApp livechat** + **5-channel social bar** (IG, TikTok, WA, Shopee, Tokopedia) di Footer + halaman `/contact` rewrite — single source of truth di `lib/social.ts`
+- **Maintenance mode tag-based cache** — toggle dari Admin Panel langsung effective via `revalidateTag("maintenance")`, polling page maintenance hard-reload supaya tidak ke-loop
 
 #### Admin Panel
 - CRUD: Products, Categories, Orders, Reviews, Users, Dashboard
@@ -412,6 +703,14 @@ Admin panel & `/api/*` tidak ter-affect — hanya halaman publik `(main)`.
 ---
 
 ## Catatan dari Sesi Terbaru
+
+### 2026-05-02 — Social Channels + Hapus Link Admin Panel + Doc Refresh
+**Yang dikerjakan:**
+- **Floating WhatsApp + 5-channel social bar**: file baru `lib/social.ts` (single source of truth), `components/shared/FloatingWhatsApp.tsx`, `components/shared/SocialLinks.tsx`, `components/icons/BrandIcons.tsx` (custom Tokopedia SVG karena react-icons belum ada). Footer + `/contact` rewrite total dengan grid 5 channel.
+- **Tooling**: tambah `react-icons` v5.6 di MobileApp (tree-shake per import).
+- **Hapus link Admin Panel** dari `Navbar.tsx` (mobile drawer) + `import LayoutDashboard` dihapus + `NEXT_PUBLIC_ADMIN_URL` dihapus dari `.env.example`. Admin Panel tetap accessible langsung via `https://admni-panel.onrender.com` — buyer tidak akan lihat link-nya.
+- **CLAUDE.md upgrade**: tambah section **Bahasa & Tooling**, **Tipe Data Inti (TypeScript)**, **Logika Bisnis Utama** (7 alur kunci dengan pseudocode), **Validasi** (form/server/service/DB), **Environment Variables** lengkap.
+- **Maintenance fix sebelumnya** sudah live: tag-based cache, hard reload, visibility-aware polling.
 
 ### 2026-05-01 — Sweep Progress + Memory & Performance Fix
 **Yang dikerjakan:**
