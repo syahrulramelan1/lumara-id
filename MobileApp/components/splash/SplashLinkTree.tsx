@@ -3,41 +3,33 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
-import { ArrowRight, Sun, Moon } from "lucide-react";
+import { ArrowUpRight, Sun, Moon, Sparkles } from "lucide-react";
 import { FaWhatsapp, FaInstagram, FaTiktok } from "react-icons/fa";
 import { SiShopee } from "react-icons/si";
 import { SOCIAL_CHANNELS, withUtm } from "@/lib/social";
 
 /**
- * Splash linktree — 5 tombol equal:
- *   - WA (livechat), Instagram, TikTok, Shopee, Web
- * Visual ukuran semua sama (full-width pill button), tidak ada hierarchy
- * "skip ke web". Tombol Web jadi pilihan ke-5 setara dengan 4 channel lain.
+ * Splash linktree — Claude-design inspired minimalist white.
  *
- * Animasi:
- *   - Floating gradient blobs di background (slow infinite movement)
- *   - Logo glow pulse (scale + shadow loop)
- *   - Animated gradient text untuk brand name
- *   - Stagger entrance untuk semua channel cards
- *   - Theme toggle (sync dengan seluruh website via next-themes)
+ * Filosofi visual:
+ *   - Background pure white dengan blobs pastel SANGAT soft (opacity 30-50%
+ *     blur-3xl). Bikin background "alive" tanpa noise.
+ *   - Card surface murni putih dengan soft elevated shadow — bukan border
+ *     tebal. Premium feel ala Claude.
+ *   - Generous whitespace, padding besar.
+ *   - Animasi halus & slow — tidak agresif.
+ *   - Brand violet jadi accent, bukan dominan.
  *
- * Dipakai di:
- *   - `/`        → root path, halaman pertama yang dilihat visitor
- *   - `/links`   → URL khusus untuk pasang di bio IG/TikTok (linktree alias)
- *
- * Link Shopee/IG/TikTok auto-append `?utm_source=lumara_splash` supaya
- * bisa dilacak di Shopee Seller Insight & GA4.
+ * Default theme: light (sudah di-set di app/layout.tsx). Dark mode masih
+ * tersedia via theme toggle, tapi splash di-tune optimal untuk light.
  */
 export function SplashLinkTree() {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-
-  // Cegah hydration mismatch — theme baru tau setelah mount.
   useEffect(() => setMounted(true), []);
 
   const channels = SOCIAL_CHANNELS.map((c) => ({
     ...c,
-    // Append UTM cuma ke URL marketplace & sosmed (yang bukan wa.me)
     url: c.id === "whatsapp" ? c.url : withUtm(c.url),
   }));
 
@@ -54,139 +46,166 @@ export function SplashLinkTree() {
   const isDark = mounted && resolvedTheme === "dark";
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5 dark:from-primary/10 dark:via-background dark:to-secondary/10 flex items-center justify-center px-4 py-10 sm:py-16">
+    <div className="relative min-h-screen overflow-hidden bg-white dark:bg-[#0F0A1E] flex items-center justify-center px-4 py-12 sm:py-20">
 
-      {/* ── Animated background blobs ─────────────────────────────────
-          3 lingkaran blur besar yang bergerak slow infinite — bikin
-          background "hidup" tanpa mengganggu readability. */}
+      {/* ── Pastel floating blobs — sangat soft, hampir terasa subliminal ── */}
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute -top-32 -left-32 w-[420px] h-[420px] rounded-full bg-primary/30 dark:bg-primary/20 blur-3xl"
-        animate={{ x: [0, 60, 0], y: [0, 40, 0], scale: [1, 1.1, 1] }}
+        className="pointer-events-none absolute -top-40 -left-32 w-[500px] h-[500px] rounded-full blur-3xl
+                   bg-violet-200/40 dark:bg-primary/20"
+        animate={{ x: [0, 60, 0], y: [0, 50, 0], scale: [1, 1.08, 1] }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute top-1/4 -right-32 w-[420px] h-[420px] rounded-full blur-3xl
+                   bg-pink-200/40 dark:bg-pink-600/15"
+        animate={{ x: [0, -40, 0], y: [0, 60, 0], scale: [1, 1.12, 1] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-32 left-1/3 w-[480px] h-[480px] rounded-full blur-3xl
+                   bg-amber-100/50 dark:bg-amber-500/10"
+        animate={{ x: [0, 50, -30, 0], y: [0, -40, 30, 0] }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full blur-3xl
+                   bg-sky-100/40 dark:bg-sky-600/10"
+        animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.6, 0.4] }}
         transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-32 -right-32 w-[460px] h-[460px] rounded-full bg-secondary/30 dark:bg-secondary/20 blur-3xl"
-        animate={{ x: [0, -50, 0], y: [0, -60, 0], scale: [1, 1.15, 1] }}
-        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-pink-400/20 dark:bg-pink-600/15 blur-3xl"
-        animate={{ x: [0, 40, -30, 0], y: [0, -30, 30, 0] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-      />
 
-      {/* ── Theme toggle — kanan-atas, fixed pada viewport splash ──── */}
-      <button
+      {/* ── Theme toggle — minimalist, warm-white ── */}
+      <motion.button
         onClick={() => setTheme(isDark ? "light" : "dark")}
         suppressHydrationWarning
-        aria-label={isDark ? "Switch ke light mode" : "Switch ke dark mode"}
-        className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20 p-2.5 rounded-full bg-card/80 backdrop-blur-md border border-card-border hover:border-primary/40 hover:scale-110 active:scale-95 transition-all shadow-card"
+        whileTap={{ scale: 0.9 }}
+        whileHover={{ scale: 1.05 }}
+        aria-label={isDark ? "Mode terang" : "Mode gelap"}
+        className="absolute top-5 right-5 sm:top-7 sm:right-7 z-20 p-3 rounded-full bg-white/70 dark:bg-white/5 backdrop-blur-xl border border-violet-100/80 dark:border-white/10 shadow-[0_4px_20px_-8px_rgba(124,58,237,0.15)] hover:shadow-[0_8px_30px_-8px_rgba(124,58,237,0.25)] transition-shadow"
       >
         {!mounted ? (
-          // Placeholder saat SSR — match dimensi tombol
           <div className="w-[18px] h-[18px]" />
         ) : isDark ? (
-          <Sun size={18} className="text-yellow-400" />
+          <Sun size={18} className="text-amber-400" />
         ) : (
-          <Moon size={18} className="text-primary" />
+          <Moon size={18} className="text-violet-600" />
         )}
-      </button>
+      </motion.button>
 
       {/* ── Konten utama ─────────────────────────────────────────────── */}
       <div className="relative z-10 w-full max-w-md">
 
-        {/* Header / branding dengan logo glow pulse */}
+        {/* Header — generous whitespace, refined */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-8"
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="text-center mb-10"
         >
+          {/* Sparkles tagline pill */}
           <motion.div
-            // Glow pulse: logo subtle scale + shadow yang mengembang
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-50 dark:bg-violet-950/40 border border-violet-100 dark:border-violet-900/50 text-xs text-violet-700 dark:text-violet-300 font-medium mb-5"
+          >
+            <Sparkles size={12} />
+            Modest Fashion Premium
+          </motion.div>
+
+          {/* Logo dengan glow halus */}
+          <motion.div
             animate={{
               boxShadow: [
-                "0 10px 30px -10px rgba(124, 58, 237, 0.5)",
-                "0 20px 50px -10px rgba(124, 58, 237, 0.8)",
-                "0 10px 30px -10px rgba(124, 58, 237, 0.5)",
+                "0 8px 30px -8px rgba(124, 58, 237, 0.25)",
+                "0 16px 40px -8px rgba(124, 58, 237, 0.45)",
+                "0 8px 30px -8px rgba(124, 58, 237, 0.25)",
               ],
             }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-            className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-primary to-secondary text-white text-2xl font-bold mb-4"
+            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+            className="inline-flex items-center justify-center w-[72px] h-[72px] rounded-3xl bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500 text-white text-2xl font-bold mb-5"
           >
             L
           </motion.div>
 
-          {/* Brand name — gradient yang "shifting" pelan */}
+          {/* Brand name — refined gradient shifting */}
           <motion.h1
-            className="text-3xl font-bold bg-clip-text text-transparent bg-[length:200%_auto] bg-gradient-to-r from-primary via-secondary to-primary mb-2"
+            className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-[length:200%_auto] bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-600 mb-2"
             animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
           >
             Lumara.id
           </motion.h1>
 
-          <p className="text-sm text-muted-foreground">Modest Fashion Premium Indonesia</p>
-          <p className="text-xs text-muted-foreground mt-1">Pilih cara paling nyaman buat kamu 🙌</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Pilih channel paling nyaman buat kamu
+          </p>
         </motion.div>
 
-        {/* Channel buttons — semua equal weight, full-width */}
-        <div className="space-y-3">
+        {/* Channel buttons — soft white cards, elevated shadow ala Claude */}
+        <div className="space-y-2.5">
           {channels.map((c, i) => (
             <motion.a
               key={c.id}
               href={c.url}
               target="_blank"
               rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.15 + i * 0.07, ease: "easeOut" }}
-              whileTap={{ scale: 0.97 }}
-              whileHover={{ y: -3, scale: 1.01 }}
-              className="relative flex items-center gap-4 w-full px-5 py-4 rounded-2xl bg-card/90 backdrop-blur-sm border border-card-border hover:border-primary/50 hover:shadow-violet-sm transition-colors group overflow-hidden"
+              transition={{ duration: 0.5, delay: 0.2 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              whileTap={{ scale: 0.98 }}
+              whileHover={{ y: -2 }}
+              className="relative flex items-center gap-4 w-full px-5 py-4 rounded-2xl bg-white dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-8px_rgba(124,58,237,0.25)] hover:border-violet-200 dark:hover:border-violet-700/50 transition-all duration-300 group overflow-hidden"
             >
-              {/* Shimmer effect — gradient line yang lewat saat hover */}
-              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out bg-gradient-to-r from-transparent via-white/20 dark:via-white/10 to-transparent pointer-events-none" />
+              {/* Subtle shimmer line — only shows on hover */}
+              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms] ease-in-out bg-gradient-to-r from-transparent via-violet-100/40 dark:via-white/5 to-transparent pointer-events-none" />
 
               <div
-                className="relative w-11 h-11 rounded-xl flex items-center justify-center text-white shrink-0 transition-transform group-hover:scale-110 group-hover:rotate-3"
+                className="relative w-11 h-11 rounded-xl flex items-center justify-center text-white shrink-0 transition-transform duration-300 group-hover:scale-105"
                 style={{ backgroundColor: c.brandHex }}
               >
                 {iconFor(c.id)}
               </div>
               <div className="relative flex-1 min-w-0 text-left">
-                <p className="font-semibold text-sm text-foreground">{c.label}</p>
-                <p className="text-xs text-muted-foreground truncate">{c.handle}</p>
+                <p className="font-semibold text-[15px] text-zinc-900 dark:text-zinc-100">{c.label}</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">{c.handle}</p>
               </div>
-              <ArrowRight size={16} className="relative text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" />
+              <ArrowUpRight
+                size={18}
+                className="relative text-zinc-300 dark:text-zinc-600 group-hover:text-violet-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all shrink-0"
+              />
             </motion.a>
           ))}
 
-          {/* Tombol ke-5: Web — equal weight, NOT a "skip" button. */}
+          {/* Tombol ke-5: Web — gradient brand, sebagai accent terakhir */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.15 + channels.length * 0.07, ease: "easeOut" }}
-            whileTap={{ scale: 0.97 }}
-            whileHover={{ y: -3, scale: 1.01 }}
+            transition={{ duration: 0.5, delay: 0.2 + channels.length * 0.08, ease: [0.22, 1, 0.36, 1] }}
+            whileTap={{ scale: 0.98 }}
+            whileHover={{ y: -2 }}
           >
             <Link
               href="/home"
-              className="relative flex items-center gap-4 w-full px-5 py-4 rounded-2xl bg-card/90 backdrop-blur-sm border border-card-border hover:border-primary/50 hover:shadow-violet-sm transition-colors group overflow-hidden"
+              className="relative flex items-center gap-4 w-full px-5 py-4 rounded-2xl bg-white dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-8px_rgba(124,58,237,0.25)] hover:border-violet-200 dark:hover:border-violet-700/50 transition-all duration-300 group overflow-hidden"
             >
-              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out bg-gradient-to-r from-transparent via-white/20 dark:via-white/10 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms] ease-in-out bg-gradient-to-r from-transparent via-violet-100/40 dark:via-white/5 to-transparent pointer-events-none" />
 
-              <div className="relative w-11 h-11 rounded-xl flex items-center justify-center text-white shrink-0 bg-gradient-to-br from-primary to-secondary transition-transform group-hover:scale-110 group-hover:rotate-3">
+              <div className="relative w-11 h-11 rounded-xl flex items-center justify-center text-white shrink-0 bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500 transition-transform duration-300 group-hover:scale-105">
                 <span className="text-lg font-bold">L</span>
               </div>
               <div className="relative flex-1 min-w-0 text-left">
-                <p className="font-semibold text-sm text-foreground">Lihat Koleksi Web</p>
-                <p className="text-xs text-muted-foreground truncate">lumara-id.onrender.com</p>
+                <p className="font-semibold text-[15px] text-zinc-900 dark:text-zinc-100">Lihat Koleksi Web</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">lumara-id.onrender.com</p>
               </div>
-              <ArrowRight size={16} className="relative text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" />
+              <ArrowUpRight
+                size={18}
+                className="relative text-zinc-300 dark:text-zinc-600 group-hover:text-violet-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all shrink-0"
+              />
             </Link>
           </motion.div>
         </div>
@@ -195,10 +214,10 @@ export function SplashLinkTree() {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.7 }}
-          className="text-center text-xs text-muted-foreground mt-8"
+          transition={{ duration: 0.6, delay: 0.9 }}
+          className="text-center text-xs text-zinc-400 dark:text-zinc-600 mt-10"
         >
-          © {new Date().getFullYear()} Lumara.id
+          © {new Date().getFullYear()} Lumara.id — Modest Fashion Indonesia
         </motion.p>
       </div>
     </div>

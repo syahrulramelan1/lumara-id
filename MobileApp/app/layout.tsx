@@ -85,8 +85,8 @@ export default function RootLayout({
       <body className={`${jakarta.variable} font-sans antialiased min-h-screen bg-background text-text-primary`} suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem={true}
+          defaultTheme="light"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <UIProvider>
