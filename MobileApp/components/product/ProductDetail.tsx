@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { ShoppingBag, Heart, Star, ChevronLeft } from "lucide-react";
 import { motion } from "framer-motion";
@@ -12,7 +12,18 @@ import { useAuthStore } from "@/store/authStore";
 import { useUIStore } from "@/store/uiStore";
 import { getT } from "@/lib/i18n";
 import { ProductImageZoom } from "@/components/product/ProductImageZoom";
+import { ColorSwatch } from "@/components/product/ColorSwatch";
 import type { ProductWithReviews } from "@/types";
+import {
+  type ColorVariant,
+  parseColors,
+  isColorAvailable,
+} from "@/types/colorVariant";
+
+// Fallback gambar saat product.images kosong atau image gagal load.
+// File-nya ada di MobileApp/public/. Mau ganti? Upload file lain ke public/
+// dan update path-nya di sini.
+const PLACEHOLDER_IMAGE = "/placeholder.svg";
 
 interface ProductDetailProps {
   product: ProductWithReviews;
@@ -30,12 +41,38 @@ export function ProductDetail({ product }: ProductDetailProps) {
     Array.isArray(val) ? (val as string[]) : (() => { try { return JSON.parse(val as string); } catch { return []; } })();
   const images: string[] = parseJsonArr(product.images);
   const sizes: string[] = parseJsonArr(product.sizes);
-  const colors: string[] = parseJsonArr(product.colors);
+
+  // Colors → ColorVariant[] (support legacy string[] dan format object baru)
+  const colors: ColorVariant[] = useMemo(() => parseColors(product.colors), [product.colors]);
 
   const [activeImage, setActiveImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(sizes[0] ?? "");
-  const [selectedColor, setSelectedColor] = useState(colors[0] ?? "");
+
+  // Default selected color: varian pertama yang available (stock > 0 atau undefined).
+  // Kalau semua habis, fallback ke yang pertama (untuk display, tapi disabled saat add to cart).
+  const [selectedColor, setSelectedColor] = useState<ColorVariant | null>(() => {
+    const firstAvail = colors.find(isColorAvailable);
+    return firstAvail ?? colors[0] ?? null;
+  });
+
   const [qty, setQty] = useState(1);
+
+  // ── Display images: kalau warna terpilih punya image khusus, taruh di slot
+  // pertama agar saat user pilih warna, gambar utama langsung berubah ke gambar
+  // varian itu. Sisanya tetap dari product.images. Fallback ke placeholder. ──
+  const displayImages = useMemo(() => {
+    const base = images.length > 0 ? images : [PLACEHOLDER_IMAGE];
+    if (selectedColor?.image) {
+      const variantImg = selectedColor.image;
+      return [variantImg, ...base.filter((img) => img !== variantImg)];
+    }
+    return base;
+  }, [selectedColor, images]);
+
+  // Saat warna ganti & varian punya image, reset ke gambar pertama (= variant image).
+  useEffect(() => {
+    if (selectedColor?.image) setActiveImage(0);
+  }, [selectedColor]);
 
   const wishlisted = isWishlisted(product.id);
   const discount = product.originalPrice
@@ -47,13 +84,17 @@ export function ProductDetail({ product }: ProductDetailProps) {
       toast.error(t.product.select_size_color);
       return;
     }
+    if (!isColorAvailable(selectedColor)) {
+      toast.error("Warna ini sedang habis stok");
+      return;
+    }
     addItem({
       productId: product.id,
       name: product.name,
       price: product.price,
-      image: images[0] ?? "",
+      image: displayImages[0] ?? "",
       size: selectedSize,
-      color: selectedColor,
+      color: selectedColor.name,
       quantity: qty,
     });
     toast.success(t.product.added_to_cart);
@@ -69,26 +110,38 @@ export function ProductDetail({ product }: ProductDetailProps) {
       </button>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-        {/* Images */}
+        {/* Images — pakai displayImages (variant image diprioritaskan) */}
         <div className="space-y-3">
           <ProductImageZoom
-            images={images}
+            images={displayImages}
             activeIndex={activeImage}
             productName={product.name}
             discount={discount}
             onIndexChange={setActiveImage}
           />
-          {images.length > 1 && (
+          {displayImages.length > 1 && (
             <div className="flex gap-2 overflow-x-auto pb-1">
-              {images.map((img, i) => (
+              {displayImages.map((img, i) => (
                 <button
-                  key={i}
+                  key={`${img}-${i}`}
                   onClick={() => setActiveImage(i)}
                   className={`relative w-16 h-20 rounded-[10px] overflow-hidden shrink-0 border-2 transition-colors bg-muted ${
                     i === activeImage ? "border-primary" : "border-transparent"
                   }`}
+                  aria-label={`Lihat foto ${i + 1}`}
                 >
-                  <Image src={img} alt="" fill className="object-contain" sizes="64px" />
+                  <Image
+                    src={img}
+                    alt=""
+                    fill
+                    className="object-contain transition-opacity"
+                    sizes="64px"
+                    onError={(e) => {
+                      // Kalau image gagal load, pakai placeholder
+                      const target = e.currentTarget as HTMLImageElement;
+                      if (!target.src.endsWith(PLACEHOLDER_IMAGE)) target.src = PLACEHOLDER_IMAGE;
+                    }}
+                  />
                 </button>
               ))}
             </div>
@@ -139,20 +192,36 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
           {colors.length > 0 && (
             <div>
-              <p className="text-sm font-semibold mb-2">{t.product.color}: <span className="font-normal text-muted-foreground">{selectedColor}</span></p>
-              <div className="flex flex-wrap gap-2">
+              <p className="text-sm font-semibold mb-2">
+                {t.product.color}:{" "}
+                <span className="font-normal text-muted-foreground">
+                  {selectedColor?.name ?? "—"}
+                </span>
+              </p>
+              {/* Radio group — keyboard-friendly, screen-reader friendly */}
+              <div
+                role="radiogroup"
+                aria-label="Pilih warna produk"
+                className="flex flex-wrap gap-3 items-center"
+              >
                 {colors.map((color) => (
-                  <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
-                    className={`px-3 py-1.5 rounded-[999px] text-xs font-medium border-2 transition-colors ${
-                      selectedColor === color ? "border-primary bg-primary/5 text-primary" : "border-border hover:border-primary/50"
-                    }`}
-                  >
-                    {color}
-                  </button>
+                  <ColorSwatch
+                    key={color.name}
+                    color={color}
+                    active={selectedColor?.name === color.name}
+                    onSelect={setSelectedColor}
+                  />
                 ))}
               </div>
+              {/* Stock indicator: kalau varian punya stock tracking, tampilkan
+                  jumlah di bawah swatch. Kalau habis, tampilkan teks merah. */}
+              {selectedColor?.stock !== undefined && (
+                <p className={`text-xs mt-2 ${selectedColor.stock === 0 ? "text-red-500 font-semibold" : "text-muted-foreground"}`}>
+                  {selectedColor.stock === 0
+                    ? "Stok habis untuk warna ini"
+                    : `Stok: ${selectedColor.stock}`}
+                </p>
+              )}
             </div>
           )}
 
@@ -162,11 +231,17 @@ export function ProductDetail({ product }: ProductDetailProps) {
               <button
                 onClick={() => setQty(Math.max(1, qty - 1))}
                 className="px-3 py-2 hover:bg-muted transition-colors font-bold"
+                aria-label="Kurangi jumlah"
               >−</button>
               <span className="px-4 py-2 font-medium text-sm border-x border-border min-w-[48px] text-center">{qty}</span>
               <button
-                onClick={() => setQty(Math.min(product.stock, qty + 1))}
+                // Cap qty: kalau varian punya stock tracking, pakai itu; kalau enggak, pakai product.stock.
+                onClick={() => {
+                  const cap = selectedColor?.stock ?? product.stock;
+                  setQty(Math.min(cap, qty + 1));
+                }}
                 className="px-3 py-2 hover:bg-muted transition-colors font-bold"
+                aria-label="Tambah jumlah"
               >+</button>
             </div>
             <span className="text-xs text-muted-foreground">{t.product.stock}: {product.stock}</span>
@@ -175,9 +250,10 @@ export function ProductDetail({ product }: ProductDetailProps) {
           <div className="flex gap-3">
             <motion.button
               onClick={handleAddToCart}
+              disabled={selectedColor !== null && !isColorAvailable(selectedColor)}
               whileTap={{ scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 20 }}
-              className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-primary text-white font-semibold rounded-[12px] hover:bg-primary/90 transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-primary text-white font-semibold rounded-[12px] hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <ShoppingBag size={18} />
               {t.product.add_to_cart}
