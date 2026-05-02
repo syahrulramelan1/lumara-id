@@ -4,21 +4,20 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { FaWhatsapp, FaInstagram, FaTiktok } from "react-icons/fa";
 import { SiShopee } from "react-icons/si";
-import { TokopediaIcon } from "@/components/icons/BrandIcons";
 import { SOCIAL_CHANNELS, withUtm } from "@/lib/social";
 
 /**
- * Splash linktree — 6 tombol equal:
- *   - WA (livechat), Instagram, TikTok, Shopee, Tokopedia, Web
+ * Splash linktree — 5 tombol equal:
+ *   - WA (livechat), Instagram, TikTok, Shopee, Web
  * Visual ukuran semua sama (full-width pill button), tidak ada hierarchy
- * "skip ke web". Tombol Web jadi pilihan ke-6 setara dengan 5 channel lain.
+ * "skip ke web". Tombol Web jadi pilihan ke-5 setara dengan 4 channel lain.
  *
  * Dipakai di:
  *   - `/`        → root path, halaman pertama yang dilihat visitor
  *   - `/links`   → URL khusus untuk pasang di bio IG/TikTok (linktree alias)
  *
- * Link Shopee + Tokopedia auto-append `?utm_source=lumara_splash` supaya
- * bisa dilacak di Shopee Insight / Tokpedia Statistik.
+ * Link Shopee/IG/TikTok auto-append `?utm_source=lumara_splash` supaya
+ * bisa dilacak di Shopee Seller Insight & GA4.
  */
 export function SplashLinkTree() {
   const channels = SOCIAL_CHANNELS.map((c) => ({
@@ -33,7 +32,6 @@ export function SplashLinkTree() {
       case "instagram": return <FaInstagram size={size} />;
       case "tiktok":    return <FaTiktok    size={size} />;
       case "shopee":    return <SiShopee    size={size} />;
-      case "tokopedia": return <TokopediaIcon size={size} />;
       default:          return null;
     }
   };

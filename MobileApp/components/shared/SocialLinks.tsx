@@ -1,11 +1,10 @@
 "use client";
 import { FaWhatsapp, FaInstagram, FaTiktok, FaShopify } from "react-icons/fa";
 import { SiShopee } from "react-icons/si";
-import { TokopediaIcon } from "@/components/icons/BrandIcons";
 import { SOCIAL_CHANNELS } from "@/lib/social";
 
 /**
- * Strip 5 ikon brand: WhatsApp, Instagram, TikTok, Shopee, Tokopedia.
+ * Strip 4 ikon brand: WhatsApp, Instagram, TikTok, Shopee.
  * Dipakai di Footer dan halaman /contact.
  *
  * Variant:
@@ -20,7 +19,6 @@ export function SocialLinks({ variant = "footer" }: { variant?: "footer" | "comp
       case "instagram": return <FaInstagram size={size} />;
       case "tiktok":    return <FaTiktok    size={size} />;
       case "shopee":    return <SiShopee      size={size} />;
-      case "tokopedia": return <TokopediaIcon size={size} />;
       default:          return <FaShopify     size={size} />;
     }
   };

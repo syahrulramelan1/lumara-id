@@ -21,8 +21,8 @@ export function buildWhatsAppUrl(message?: string): string {
 }
 
 /**
- * Append UTM parameters ke URL — supaya bisa track di Shopee Insight /
- * Tokopedia Statistik / Google Analytics berapa traffic dari splash.
+ * Append UTM parameters ke URL — supaya bisa track di Shopee Seller
+ * Insight / Google Analytics berapa traffic dari splash.
  *
  * Untuk URL yang bukan http (mis. wa.me, mailto), URL dikembalikan apa adanya.
  * Untuk wa.me URL kita tetap append (tidak break parsing-nya).
@@ -48,7 +48,7 @@ export function withUtm(
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export type SocialChannel = {
-  id:       "whatsapp" | "instagram" | "tiktok" | "shopee" | "tokopedia";
+  id:       "whatsapp" | "instagram" | "tiktok" | "shopee";
   label:    string;          // nama tampil di tombol/card
   handle:   string;          // username/handle yang ditampilkan
   url:      string;          // link target
@@ -76,25 +76,17 @@ export const SOCIAL_CHANNELS: SocialChannel[] = [
   {
     id:       "tiktok",
     label:    "TikTok",
-    handle:   "@lumara.id",
-    url:      "https://tiktok.com/@lumara.id",
+    handle:   "@lumaraid",
+    url:      "https://www.tiktok.com/@lumaraid?_r=1&_t=ZS-961guyaB8hY",
     desc:     "Video styling, mix & match outfit, dan konten lifestyle modest.",
     brandHex: "#000000",
   },
   {
     id:       "shopee",
     label:    "Shopee",
-    handle:   "Lumara.id Official",
-    url:      "https://shopee.co.id/lumara.id",
+    handle:   "shopee.co.id/lumaraid",
+    url:      "https://shopee.co.id/lumaraid",
     desc:     "Belanja di Shopee — gratis ongkir, voucher, dan cashback.",
     brandHex: "#EE4D2D",
-  },
-  {
-    id:       "tokopedia",
-    label:    "Tokopedia",
-    handle:   "lumara-id",
-    url:      "https://tokopedia.com/lumara-id",
-    desc:     "Tersedia juga di Tokopedia — pembayaran fleksibel & bebas ongkir.",
-    brandHex: "#03AC0E",
   },
 ];

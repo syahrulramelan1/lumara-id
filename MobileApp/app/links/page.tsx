@@ -4,7 +4,7 @@ import { SplashLinkTree } from "@/components/splash/SplashLinkTree";
 export const metadata: Metadata = {
   title: "Lumara.id — Semua Channel Resmi",
   description:
-    "Linktree resmi Lumara.id — WhatsApp livechat, Instagram, TikTok, Shopee, Tokopedia, dan website resmi.",
+    "Linktree resmi Lumara.id — WhatsApp livechat, Instagram, TikTok, Shopee, dan website resmi.",
 };
 
 /**

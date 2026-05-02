@@ -3,7 +3,6 @@ import Link from "next/link";
 import { FaWhatsapp, FaInstagram, FaTiktok } from "react-icons/fa";
 import { SiShopee } from "react-icons/si";
 import { Mail, MapPin, Clock, ExternalLink } from "lucide-react";
-import { TokopediaIcon } from "@/components/icons/BrandIcons";
 import { SOCIAL_CHANNELS, buildWhatsAppUrl } from "@/lib/social";
 
 export const metadata: Metadata = { title: "Kontak Kami" };
@@ -13,7 +12,6 @@ const ICON_MAP = {
   instagram: FaInstagram,
   tiktok:    FaTiktok,
   shopee:    SiShopee,
-  tokopedia: TokopediaIcon,
 } as const;
 
 export default function ContactPage() {
