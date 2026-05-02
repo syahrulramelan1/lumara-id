@@ -30,7 +30,7 @@ export default function ReturnPage() {
         <div className="bg-card border border-card-border rounded-2xl p-6">
           <h2 className="font-semibold text-base mb-3">Prosedur Pengembalian</h2>
           <ol className="space-y-3 text-muted-foreground list-decimal list-inside">
-            <li>Hubungi tim CS kami via WhatsApp di +62 812-3456-7890</li>
+            <li>Hubungi tim CS kami via WhatsApp di +62 852-8573-3391</li>
             <li>Sertakan nomor pesanan dan foto produk yang bermasalah</li>
             <li>Tim kami akan memverifikasi dalam 1x24 jam</li>
             <li>Kirim produk ke alamat gudang kami setelah mendapat persetujuan</li>

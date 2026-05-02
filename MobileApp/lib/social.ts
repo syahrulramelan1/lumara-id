@@ -3,9 +3,9 @@
 // Single source of truth — edit di sini, semua komponen ikut.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-// ⚠️ Ganti dengan nomor WA real (format internasional, tanpa "+" atau "0").
-// Contoh: 6281234567890 untuk +62 812-3456-7890
-export const WHATSAPP_NUMBER = "6281234567890";
+// Nomor WA Lumara.id (format internasional, tanpa "+" atau "0" di depan).
+// 085285733391 → 6285285733391 (drop leading 0, prepend 62).
+export const WHATSAPP_NUMBER = "6285285733391";
 
 // Default text yang muncul saat klik tombol WA dari halaman umum.
 export const WHATSAPP_DEFAULT_MESSAGE =
@@ -60,7 +60,7 @@ export const SOCIAL_CHANNELS: SocialChannel[] = [
   {
     id:       "whatsapp",
     label:    "WhatsApp",
-    handle:   "+62 812-3456-7890",
+    handle:   "+62 852-8573-3391",
     url:      buildWhatsAppUrl(),
     desc:     "Live chat 24 jam — paling cepat dibalas. Tanya produk, order, atau resi.",
     brandHex: "#25D366",

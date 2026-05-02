@@ -39,7 +39,7 @@ export function Footer() {
           <h4 className="font-semibold mb-3 text-sm">{t.footer.contact_title}</h4>
           <ul className="space-y-2 text-sm text-white/60">
             <li>📍 Jakarta, Indonesia</li>
-            <li>📞 +62 812-3456-7890</li>
+            <li>📞 +62 852-8573-3391</li>
             <li>✉️ hello@lumara.id</li>
             <li className="mt-2 whitespace-pre-line">{t.footer.hours}</li>
           </ul>
