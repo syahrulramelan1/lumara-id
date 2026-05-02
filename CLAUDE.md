@@ -186,11 +186,11 @@ interface AuthStore {
 ### Social Channel (Single Source of Truth)
 File `lib/social.ts`:
 ```ts
-const WHATSAPP_NUMBER = "6281234567890";   // format internasional, no plus, no zero
+const WHATSAPP_NUMBER = "6285285733391";   // format internasional, no plus, no zero
 const WHATSAPP_DEFAULT_MESSAGE = "Halo Lumara.id, ...";
 function buildWhatsAppUrl(message?: string): string;
 type SocialChannel = { id, label, handle, url, desc, brandHex };
-const SOCIAL_CHANNELS: SocialChannel[];     // 5 entry: WA, IG, TikTok, Shopee, Tokopedia
+const SOCIAL_CHANNELS: SocialChannel[];     // 4 entry: WA, IG, TikTok, Shopee
 ```
 > Edit nomor WA & link di file ini → `<FloatingWhatsApp>`, `<SocialLinks>`, dan `/contact` semua ikut.
 
