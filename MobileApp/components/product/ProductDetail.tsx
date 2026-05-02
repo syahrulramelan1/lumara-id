@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ShoppingBag, Heart, Star, ChevronLeft } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/utils";
@@ -11,6 +11,7 @@ import { useWishlistStore } from "@/store/wishlistStore";
 import { useAuthStore } from "@/store/authStore";
 import { useUIStore } from "@/store/uiStore";
 import { getT } from "@/lib/i18n";
+import { ProductImageZoom } from "@/components/product/ProductImageZoom";
 import type { ProductWithReviews } from "@/types";
 
 interface ProductDetailProps {
@@ -70,38 +71,13 @@ export function ProductDetail({ product }: ProductDetailProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
         {/* Images */}
         <div className="space-y-3">
-          {/* Main image — object-contain supaya foto user upload tidak ke-crop
-              (kepala/kaki kepotong). Background gradient soft mengisi area
-              padding kalau aspect ratio foto tidak persis 3:4. */}
-          <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-br from-muted to-primary/5">
-            {/* Crossfade between images using AnimatePresence */}
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={activeImage}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="absolute inset-0"
-              >
-                {images[activeImage] && (
-                  <Image
-                    src={images[activeImage]}
-                    alt={product.name}
-                    fill
-                    className="object-contain"
-                    priority
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-                )}
-              </motion.div>
-            </AnimatePresence>
-            {discount && (
-              <span className="absolute top-3 left-3 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full z-10">
-                -{discount}%
-              </span>
-            )}
-          </div>
+          <ProductImageZoom
+            images={images}
+            activeIndex={activeImage}
+            productName={product.name}
+            discount={discount}
+            onIndexChange={setActiveImage}
+          />
           {images.length > 1 && (
             <div className="flex gap-2 overflow-x-auto pb-1">
               {images.map((img, i) => (
