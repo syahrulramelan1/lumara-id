@@ -70,7 +70,10 @@ export function ProductDetail({ product }: ProductDetailProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
         {/* Images */}
         <div className="space-y-3">
-          <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-muted">
+          {/* Main image — object-contain supaya foto user upload tidak ke-crop
+              (kepala/kaki kepotong). Background gradient soft mengisi area
+              padding kalau aspect ratio foto tidak persis 3:4. */}
+          <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-br from-muted to-primary/5">
             {/* Crossfade between images using AnimatePresence */}
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
@@ -86,7 +89,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                     src={images[activeImage]}
                     alt={product.name}
                     fill
-                    className="object-cover"
+                    className="object-contain"
                     priority
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />
@@ -105,11 +108,11 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 <button
                   key={i}
                   onClick={() => setActiveImage(i)}
-                  className={`relative w-16 h-20 rounded-[10px] overflow-hidden shrink-0 border-2 transition-colors ${
+                  className={`relative w-16 h-20 rounded-[10px] overflow-hidden shrink-0 border-2 transition-colors bg-muted ${
                     i === activeImage ? "border-primary" : "border-transparent"
                   }`}
                 >
-                  <Image src={img} alt="" fill className="object-cover" sizes="64px" />
+                  <Image src={img} alt="" fill className="object-contain" sizes="64px" />
                 </button>
               ))}
             </div>

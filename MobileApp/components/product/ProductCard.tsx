@@ -38,14 +38,17 @@ export function ProductCard({ product, priority = false, index = 0 }: ProductCar
       className="group relative bg-card rounded-card overflow-hidden border border-card-border shadow-card hover:shadow-card-hover transition-shadow duration-300"
     >
       <Link href={`/products/${product.slug}`}>
-        <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+        {/* object-contain supaya foto produk full visible (tidak ke-crop
+            kepala/kaki). Gradient soft sebagai padding alami kalau aspect
+            ratio foto tidak persis 3:4. */}
+        <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-muted to-primary/5">
           {coverImage ? (
             <Image
               src={coverImage}
               alt={product.name}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className="object-contain group-hover:scale-105 transition-transform duration-500"
               priority={priority}
             />
           ) : (
