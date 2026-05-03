@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pulse &amp; Swing Animation</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #F9F9FF;
+      font-family: system-ui, -apple-system, sans-serif;
+      gap: 56px;
+      padding: 48px 24px;
+    }
+
+    /* ── Title ── */
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #151C27;
+      letter-spacing: -0.02em;
+      text-align: center;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #7B7487;
+      text-align: center;
+    }
+
+    /* ── Demo row ── */
+    .demo-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 64px;
+      flex-wrap: wrap;
+    }
+
+    .demo-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #9D95B0;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+    }
+
+    /* ══════════════════════════════════════════
+       1. PULSE — membesar-mengecil + geser
+    ══════════════════════════════════════════ */
+    .pulse-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #7C3AED;
+      animation: pulse 3.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%   {
+        transform: scale(1) translateX(0px);
+        box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.45);
+      }
+      30%  {
+        transform: scale(1.30) translateX(22px);
+        box-shadow: 0 0 0 18px rgba(124, 58, 237, 0);
+      }
+      60%  {
+        transform: scale(0.85) translateX(-12px);
+        box-shadow: 0 0 0 0 rgba(124, 58, 237, 0);
+      }
+      100% {
+        transform: scale(1) translateX(0px);
+        box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.45);
+      }
+    }
+
+    /* ══════════════════════════════════════════
+       2. SWING — berayun seperti pendulum
+    ══════════════════════════════════════════ */
+    .swing-scene {
+      height: 160px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    /* Titik pivot (ujung tali) */
+    .pivot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #CCC3D8;
+      position: relative;
+      /* arm menjulur ke bawah dari sini */
+    }
+
+    .swing-arm {
+      width: 2px;
+      height: 100px;
+      background: #CCC3D8;
+      transform-origin: top center;
+      animation: swing 3s ease-in-out infinite;
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      translate: -50% 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    @keyframes swing {
+      0%   { transform: rotate(-32deg); }
+      50%  { transform: rotate(32deg);  }
+      100% { transform: rotate(-32deg); }
+    }
+
+    .swing-ball {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7C3AED 0%, #E4405F 100%);
+      position: absolute;
+      bottom: -27px;
+      left: 50%;
+      translate: -50% 0;
+      box-shadow: 0 8px 28px rgba(124, 58, 237, 0.40);
+    }
+
+    /* ══════════════════════════════════════════
+       3. PULSE + SWING — gabungan keduanya
+    ══════════════════════════════════════════ */
+    .combo-scene {
+      height: 160px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .combo-pivot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #CCC3D8;
+      position: relative;
+    }
+
+    .combo-arm {
+      width: 2px;
+      height: 100px;
+      background: #CCC3D8;
+      transform-origin: top center;
+      /* swing: sama dengan .swing-arm */
+      animation: swing 3s ease-in-out infinite;
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      translate: -50% 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .combo-ball {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: #7C3AED;
+      position: absolute;
+      bottom: -29px;
+      left: 50%;
+      translate: -50% 0;
+      /* pulse: membesar-mengecil, offset translateX relatif terhadap arm */
+      animation: pulse-ball 3.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-ball {
+      0%   {
+        transform: translateX(0px) scale(1);
+        box-shadow: 0 0 0 0   rgba(124, 58, 237, 0.50);
+      }
+      35%  {
+        transform: translateX(10px) scale(1.30);
+        box-shadow: 0 0 0 16px rgba(124, 58, 237, 0);
+      }
+      65%  {
+        transform: translateX(-8px) scale(0.82);
+        box-shadow: 0 0 0 0   rgba(124, 58, 237, 0);
+      }
+      100% {
+        transform: translateX(0px) scale(1);
+        box-shadow: 0 0 0 0   rgba(124, 58, 237, 0.50);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div>
+    <h1 class="title">Pulse &amp; Swing Animation</h1>
+    <p class="subtitle">Durasi 3–4s · ease-in-out · Violet brand</p>
+  </div>
+
+  <div class="demo-row">
+
+    <!-- 1. Pulse only -->
+    <div class="demo-item">
+      <div style="height:140px; display:flex; align-items:center; justify-content:center;">
+        <div class="pulse-circle"></div>
+      </div>
+      <span class="label">Pulse</span>
+    </div>
+
+    <!-- 2. Swing only -->
+    <div class="demo-item">
+      <div class="swing-scene">
+        <div class="pivot">
+          <div class="swing-arm">
+            <div class="swing-ball"></div>
+          </div>
+        </div>
+      </div>
+      <span class="label">Swing</span>
+    </div>
+
+    <!-- 3. Pulse + Swing -->
+    <div class="demo-item">
+      <div class="combo-scene">
+        <div class="combo-pivot">
+          <div class="combo-arm">
+            <div class="combo-ball"></div>
+          </div>
+        </div>
+      </div>
+      <span class="label">Pulse + Swing</span>
+    </div>
+
+  </div>
+
+</body>
+</html>

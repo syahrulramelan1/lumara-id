@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Search, ShoppingBag, Heart, Menu, X, Globe, Sun, Moon,
@@ -98,11 +99,15 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
 
           {/* Logo — link ke /home (storefront), bukan / (splash linktree) */}
-          <Link href="/home" className="flex items-center gap-1.5">
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              Lumara
-            </span>
-            <span className="text-xs font-medium text-muted-foreground">.id</span>
+          <Link href="/home" className="flex items-center shrink-0">
+            <Image
+              src={safeTheme === "dark" ? "/logo-white.jpeg" : "/logo-dark.jpeg"}
+              alt="Lumara.id"
+              width={130}
+              height={45}
+              className="h-9 w-auto object-contain"
+              priority
+            />
           </Link>
 
           {/* Desktop nav links */}
@@ -252,9 +257,13 @@ export function Navbar() {
       >
         {/* Close button */}
         <div className="flex items-center justify-between px-5 h-14 shrink-0">
-          <span className="text-sm font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            lumara.id
-          </span>
+          <Image
+            src={safeTheme === "dark" ? "/logo-white.jpeg" : "/logo-dark.jpeg"}
+            alt="Lumara.id"
+            width={100}
+            height={35}
+            className="h-7 w-auto object-contain"
+          />
           <button onClick={() => setDrawerOpen(false)}
             className="p-2 hover:bg-muted rounded-full transition-colors">
             <X size={18} />

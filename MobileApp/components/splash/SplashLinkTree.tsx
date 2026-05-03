@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import { ArrowUpRight, Sun, Moon, Sparkles } from "lucide-react";
@@ -111,35 +112,33 @@ export function SplashLinkTree() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-50 dark:bg-violet-950/40 border border-violet-100 dark:border-violet-900/50 text-xs text-violet-700 dark:text-violet-300 font-medium mb-5"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-50 dark:bg-violet-950/40 border border-violet-100 dark:border-violet-900/50 text-xs text-violet-700 dark:text-violet-300 font-medium mb-6"
           >
             <Sparkles size={12} />
             Modest Fashion Premium
           </motion.div>
 
-          {/* Logo dengan glow halus */}
+          {/* Logo wordmark — glow pulse, theme-aware (dark logo untuk light mode) */}
           <motion.div
             animate={{
-              boxShadow: [
-                "0 8px 30px -8px rgba(124, 58, 237, 0.25)",
-                "0 16px 40px -8px rgba(124, 58, 237, 0.45)",
-                "0 8px 30px -8px rgba(124, 58, 237, 0.25)",
+              filter: [
+                "drop-shadow(0 6px 20px rgba(124,58,237,0.18))",
+                "drop-shadow(0 12px 36px rgba(124,58,237,0.44))",
+                "drop-shadow(0 6px 20px rgba(124,58,237,0.18))",
               ],
             }}
             transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-            className="inline-flex items-center justify-center w-[72px] h-[72px] rounded-3xl bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500 text-white text-2xl font-bold mb-5"
+            className="inline-block mb-4"
           >
-            L
+            <Image
+              src={isDark ? "/logo-white.jpeg" : "/logo-dark.jpeg"}
+              alt="Lumara.id"
+              width={200}
+              height={68}
+              className="h-14 w-auto object-contain mx-auto"
+              priority
+            />
           </motion.div>
-
-          {/* Brand name — refined gradient shifting */}
-          <motion.h1
-            className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-[length:200%_auto] bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-600 mb-2"
-            animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-          >
-            Lumara.id
-          </motion.h1>
 
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Pilih channel paling nyaman buat kamu
@@ -195,8 +194,14 @@ export function SplashLinkTree() {
             >
               <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms] ease-in-out bg-gradient-to-r from-transparent via-violet-100/40 dark:via-white/5 to-transparent pointer-events-none" />
 
-              <div className="relative w-11 h-11 rounded-xl flex items-center justify-center text-white shrink-0 bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500 transition-transform duration-300 group-hover:scale-105">
-                <span className="text-lg font-bold">L</span>
+              <div className="relative w-11 h-11 rounded-xl flex items-center justify-center overflow-hidden shrink-0 transition-transform duration-300 group-hover:scale-105">
+                <Image
+                  src="/mawar-icon.jpeg"
+                  alt="Lumara.id"
+                  width={44}
+                  height={44}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="relative flex-1 min-w-0 text-left">
                 <p className="font-semibold text-[15px] text-zinc-900 dark:text-zinc-100">Lihat Koleksi Web</p>

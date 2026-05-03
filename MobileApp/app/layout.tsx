@@ -56,6 +56,11 @@ export const metadata: Metadata = {
     title: "lumara.id — Modest Fashion Premium",
     description: "Tampil Anggun, Tetap Syar'i",
   },
+  icons: {
+    icon: "/mawar-icon.jpeg",
+    shortcut: "/mawar-icon.jpeg",
+    apple: "/mawar-icon.jpeg",
+  },
 };
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

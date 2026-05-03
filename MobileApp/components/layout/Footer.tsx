@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { getT } from "@/lib/i18n";
 import { useUIStore } from "@/store/uiStore";
 import { SocialLinks } from "@/components/shared/SocialLinks";
@@ -11,9 +12,13 @@ export function Footer() {
     <footer className="bg-dark text-white mt-16 pb-20 md:pb-0">
       <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
-          <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-3">
-            Lumara.id
-          </h3>
+          <Image
+            src="/logo-white.jpeg"
+            alt="Lumara.id"
+            width={140}
+            height={48}
+            className="h-10 w-auto object-contain mb-3"
+          />
           <p className="text-sm text-white/60 leading-relaxed mb-4">{t.footer.tagline}</p>
           <SocialLinks variant="footer" />
         </div>

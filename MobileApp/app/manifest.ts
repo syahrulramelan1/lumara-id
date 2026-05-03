@@ -13,15 +13,15 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ["shopping", "fashion"],
     icons: [
       {
-        src: "/api/app-icon",
-        sizes: "any",
-        type: "image/svg+xml",
+        src: "/mawar-icon.jpeg",
+        sizes: "512x512",
+        type: "image/jpeg",
         purpose: "any",
       },
       {
-        src: "/api/app-icon",
-        sizes: "any",
-        type: "image/svg+xml",
+        src: "/mawar-icon.jpeg",
+        sizes: "512x512",
+        type: "image/jpeg",
         purpose: "maskable",
       },
     ],
