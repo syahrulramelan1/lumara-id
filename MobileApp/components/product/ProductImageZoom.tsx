@@ -61,7 +61,7 @@ export function ProductImageZoom({
         onMouseLeave={() => setHoverZoom(false)}
         onMouseMove={handleMouseMove}
         onClick={() => setLightboxOpen(true)}
-        className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-br from-muted to-primary/5 cursor-zoom-in select-none"
+        className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-br from-zinc-50 via-muted to-violet-50/40 dark:from-zinc-900 dark:via-zinc-800/60 dark:to-violet-950/20 ring-1 ring-inset ring-black/[0.07] dark:ring-white/[0.05] cursor-zoom-in select-none"
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
@@ -88,6 +88,9 @@ export function ProductImageZoom({
             )}
           </motion.div>
         </AnimatePresence>
+
+        {/* vignette frame: kedalaman di semua sisi, pointer-events none */}
+        <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_24px_rgba(0,0,0,0.07)] dark:shadow-[inset_0_0_24px_rgba(0,0,0,0.22)] z-[1]" />
 
         {discount && (
           <span className="absolute top-3 left-3 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full z-10 pointer-events-none">

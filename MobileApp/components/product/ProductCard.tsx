@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { Heart, ImageOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { formatPrice } from "@/lib/utils";
 import { useWishlistStore } from "@/store/wishlistStore";
@@ -39,21 +39,35 @@ export function ProductCard({ product, priority = false, index = 0 }: ProductCar
     >
       <Link href={`/products/${product.slug}`}>
         {/* object-contain supaya foto produk full visible (tidak ke-crop
-            kepala/kaki). Gradient soft sebagai padding alami kalau aspect
-            ratio foto tidak persis 3:4. */}
-        <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-muted to-primary/5">
+            kepala/kaki). Ring inset + vignette memberi kedalaman pada frame. */}
+        <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-zinc-50 via-muted to-violet-50/40 dark:from-zinc-900 dark:via-zinc-800/60 dark:to-violet-950/20 ring-1 ring-inset ring-black/[0.07] dark:ring-white/[0.05]">
           {coverImage ? (
-            <Image
-              src={coverImage}
-              alt={product.name}
-              fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-contain group-hover:scale-105 transition-transform duration-500"
-              priority={priority}
-            />
+            <>
+              <Image
+                src={coverImage}
+                alt={product.name}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-contain group-hover:scale-105 transition-transform duration-500"
+                priority={priority}
+              />
+              {/* vignette frame: soft shadow ke dalam di semua sisi */}
+              <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_20px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_0_20px_rgba(0,0,0,0.18)]" />
+            </>
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center">
-              <span className="text-4xl opacity-30">🧕</span>
+            <div className="relative w-full h-full flex flex-col items-center justify-center gap-2">
+              {/* dot grid pattern */}
+              <div
+                className="absolute inset-0 opacity-[0.12] dark:opacity-[0.07]"
+                style={{
+                  backgroundImage: "radial-gradient(circle, #7C3AED 1px, transparent 1px)",
+                  backgroundSize: "18px 18px",
+                }}
+              />
+              <div className="w-12 h-12 rounded-2xl bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center ring-1 ring-violet-200/60 dark:ring-violet-700/30">
+                <ImageOff size={20} className="text-violet-400 dark:text-violet-500" />
+              </div>
+              <span className="text-[10px] text-violet-400/70 dark:text-violet-600 font-medium tracking-wide">Belum ada foto</span>
             </div>
           )}
           {discount && (

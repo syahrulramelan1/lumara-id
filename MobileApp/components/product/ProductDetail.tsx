@@ -125,8 +125,8 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 <button
                   key={`${img}-${i}`}
                   onClick={() => setActiveImage(i)}
-                  className={`relative w-16 h-20 rounded-[10px] overflow-hidden shrink-0 border-2 transition-colors bg-muted ${
-                    i === activeImage ? "border-primary" : "border-transparent"
+                  className={`relative w-16 h-20 rounded-[10px] overflow-hidden shrink-0 border-2 transition-all bg-gradient-to-br from-zinc-50 to-violet-50/30 dark:from-zinc-900 dark:to-violet-950/20 ring-1 ring-inset ring-black/[0.06] dark:ring-white/[0.04] ${
+                    i === activeImage ? "border-primary shadow-[0_0_0_3px_rgba(124,58,237,0.15)]" : "border-transparent hover:border-primary/40"
                   }`}
                   aria-label={`Lihat foto ${i + 1}`}
                 >
