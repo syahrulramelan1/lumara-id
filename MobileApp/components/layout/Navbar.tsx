@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Search, ShoppingBag, Heart, Menu, X, Globe, Sun, Moon,
@@ -100,13 +99,12 @@ export function Navbar() {
 
           {/* Logo — link ke /home (storefront), bukan / (splash linktree) */}
           <Link href="/home" className="flex items-center shrink-0">
-            <Image
-              src={safeTheme === "dark" ? "/logo-white.jpeg" : "/logo-dark.jpeg"}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={safeTheme === "dark" ? "/api/logo/white" : "/api/logo/dark"}
               alt="Lumara.id"
-              width={130}
-              height={45}
               className="h-9 w-auto object-contain"
-              priority
+              style={{ maxWidth: 140 }}
             />
           </Link>
 
@@ -257,12 +255,12 @@ export function Navbar() {
       >
         {/* Close button */}
         <div className="flex items-center justify-between px-5 h-14 shrink-0">
-          <Image
-            src={safeTheme === "dark" ? "/logo-white.jpeg" : "/logo-dark.jpeg"}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={safeTheme === "dark" ? "/api/logo/white" : "/api/logo/dark"}
             alt="Lumara.id"
-            width={100}
-            height={35}
             className="h-7 w-auto object-contain"
+            style={{ maxWidth: 110 }}
           />
           <button onClick={() => setDrawerOpen(false)}
             className="p-2 hover:bg-muted rounded-full transition-colors">

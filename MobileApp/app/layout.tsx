@@ -57,9 +57,9 @@ export const metadata: Metadata = {
     description: "Tampil Anggun, Tetap Syar'i",
   },
   icons: {
-    icon: "/mawar-icon.jpeg",
-    shortcut: "/mawar-icon.jpeg",
-    apple: "/mawar-icon.jpeg",
+    icon: "/api/logo/icon",
+    shortcut: "/api/logo/icon",
+    apple: "/api/logo/icon",
   },
 };
 

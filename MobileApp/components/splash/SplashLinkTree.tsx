@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import { ArrowUpRight, Sun, Moon, Sparkles } from "lucide-react";
@@ -124,10 +123,22 @@ export function SplashLinkTree() {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={isDark ? "/logo-white.jpeg" : "/logo-dark.jpeg"}
+                src={isDark ? "/api/logo/white" : "/api/logo/dark"}
                 alt="Lumara.id"
                 className="h-14 w-auto object-contain"
                 style={{ maxWidth: 220 }}
+                onError={(e) => {
+                  // Fallback ultimate: tampilkan brand text kalau API juga error
+                  const target = e.currentTarget;
+                  target.style.display = "none";
+                  const parent = target.parentElement;
+                  if (parent && !parent.querySelector(".logo-fallback")) {
+                    const fallback = document.createElement("span");
+                    fallback.className = "logo-fallback text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-600";
+                    fallback.textContent = "Lumara.id";
+                    parent.appendChild(fallback);
+                  }
+                }}
               />
             </motion.div>
 
@@ -199,13 +210,13 @@ export function SplashLinkTree() {
               >
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms] ease-in-out bg-gradient-to-r from-transparent via-violet-100/40 dark:via-white/5 to-transparent pointer-events-none" />
 
-                <div className="relative w-11 h-11 rounded-xl flex items-center justify-center overflow-hidden shrink-0 transition-transform duration-300 group-hover:scale-105">
-                  <Image
-                    src="/mawar-icon.jpeg"
+                <div className="relative w-11 h-11 rounded-xl flex items-center justify-center overflow-hidden shrink-0 transition-transform duration-300 group-hover:scale-105 bg-gradient-to-br from-violet-500 to-fuchsia-500">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/api/logo/icon"
                     alt="Lumara.id"
-                    width={44}
-                    height={44}
                     className="w-full h-full object-cover"
+                    onError={(e) => { e.currentTarget.style.display = "none"; }}
                   />
                 </div>
                 <div className="relative flex-1 min-w-0 text-left">
