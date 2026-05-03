@@ -1,30 +1,32 @@
 import { NextResponse } from "next/server";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
+import sharp from "sharp";
 
 /**
- * Serve logo via API route — lebih reliabel daripada static file di public/
- * untuk Next.js standalone mode di Render.
+ * Serve logo via API route + optimasi sharp (resize + WebP).
  *
  * Endpoint:
- *   GET /api/logo/dark   → logo-dark.jpeg   (untuk light mode + footer light)
- *   GET /api/logo/white  → logo-white.jpeg  (untuk dark mode + footer dark)
- *   GET /api/logo/icon   → mawar-icon.jpeg  (favicon/icon kotak)
+ *   GET /api/logo/dark   → logo-dark.jpeg   → WebP 600px
+ *   GET /api/logo/white  → logo-white.jpeg  → WebP 600px
+ *   GET /api/logo/icon   → mawar-icon.jpeg  → WebP 200px
  *
- * Kenapa pakai API route, bukan langsung /logo-xxx.jpeg dari public/?
- *   - Di Render production (Next.js standalone), static serving dari public/
- *     kadang tidak konsisten setelah cp -r public .next/standalone/public.
- *   - readFileSync bisa baca file dari filesystem manapun yang accessible
- *     ke Node process — pattern ini sama dengan /api/app-icon yang sudah
- *     terbukti jalan.
- *   - Cache 1 tahun + immutable → browser cache aggresif, no perf penalty.
+ * Original JPEG ~1.6-2 MB. Setelah resize+WebP: ~20-50 KB (40x lebih kecil).
+ *
+ * Cache strategy:
+ *   - `force-static`: Next.js render & cache hasilnya saat build → zero
+ *     runtime cost setelah build
+ *   - In-memory Map: fallback runtime cache kalau dynamic
+ *   - Browser Cache-Control: 1 tahun + immutable
  */
 
-const VARIANTS: Record<string, { file: string; mime: string }> = {
-  dark:  { file: "logo-dark.jpeg",  mime: "image/jpeg" },
-  white: { file: "logo-white.jpeg", mime: "image/jpeg" },
-  icon:  { file: "mawar-icon.jpeg", mime: "image/jpeg" },
+const VARIANTS: Record<string, { file: string; maxWidth: number }> = {
+  dark:  { file: "logo-dark.jpeg",  maxWidth: 600 },
+  white: { file: "logo-white.jpeg", maxWidth: 600 },
+  icon:  { file: "mawar-icon.jpeg", maxWidth: 200 },
 };
+
+const CACHE = new Map<string, Buffer>();
 
 export const dynamic = "force-static";
 
@@ -42,42 +44,73 @@ export async function GET(
     );
   }
 
-  // Coba beberapa path — production standalone kadang punya cwd berbeda
+  // Cache hit → langsung return
+  const cached = CACHE.get(variant);
+  if (cached) {
+    return new NextResponse(new Uint8Array(cached), {
+      headers: {
+        "Content-Type": "image/webp",
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "X-Logo-Cache": "hit",
+      },
+    });
+  }
+
   const candidatePaths = [
-    join(process.cwd(), "public", config.file),               // standalone: .next/standalone/public/
-    join(process.cwd(), "MobileApp", "public", config.file),  // monorepo dev
-    join(process.cwd(), "..", "public", config.file),         // edge case
+    join(process.cwd(), "public", config.file),
+    join(process.cwd(), "MobileApp", "public", config.file),
+    join(process.cwd(), "..", "public", config.file),
   ];
 
   for (const path of candidatePaths) {
-    if (existsSync(path)) {
+    if (!existsSync(path)) continue;
+    try {
+      const raw = readFileSync(path);
+      const optimized = await sharp(raw)
+        .resize({ width: config.maxWidth, withoutEnlargement: true })
+        .webp({ quality: 85 })
+        .toBuffer();
+
+      CACHE.set(variant, optimized);
+
+      return new NextResponse(new Uint8Array(optimized), {
+        headers: {
+          "Content-Type": "image/webp",
+          "Cache-Control": "public, max-age=31536000, immutable",
+          "X-Logo-Cache": "miss",
+          "X-Logo-Source": path,
+          "X-Logo-Size": String(optimized.length),
+        },
+      });
+    } catch (err) {
+      console.error(`[/api/logo/${variant}] sharp gagal di ${path}:`, err);
+      // Fallback: serve raw JPEG kalau sharp gagal
       try {
-        const buffer = readFileSync(path);
-        return new NextResponse(buffer, {
+        const raw = readFileSync(path);
+        return new NextResponse(new Uint8Array(raw), {
           headers: {
-            "Content-Type": config.mime,
+            "Content-Type": "image/jpeg",
             "Cache-Control": "public, max-age=31536000, immutable",
-            "X-Logo-Source": path,
+            "X-Logo-Cache": "raw-fallback",
           },
         });
       } catch {
-        // Lanjut ke kandidat berikutnya
+        // lanjut path berikutnya
       }
     }
   }
 
-  // Semua path gagal — log untuk debug & return placeholder transparent 1x1 PNG
   console.error(
     `[/api/logo/${variant}] File '${config.file}' tidak ditemukan di:`,
     candidatePaths
   );
 
-  // Fallback: 1x1 transparent PNG agar UI tidak broken
+  // Ultimate fallback: 1x1 transparent PNG
   const fallback = Buffer.from(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
     "base64"
   );
-  return new NextResponse(fallback, {
+  return new NextResponse(new Uint8Array(fallback), {
     status: 200,
     headers: {
       "Content-Type": "image/png",

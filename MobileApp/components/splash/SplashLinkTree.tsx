@@ -55,31 +55,28 @@ export function SplashLinkTree() {
   return (
     <div className="relative min-h-screen bg-white dark:bg-[#0F0A1E]">
 
-      {/* ── Blobs: fixed layer, overflow-hidden agar tidak meluber ── */}
+      {/* ── Blobs: 3 saja, blur-2xl (40px) bukan 3xl (96px), promote ke layer GPU ── */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none" aria-hidden>
         <motion.div
-          className="absolute -top-40 -left-32 w-[500px] h-[500px] rounded-full blur-3xl
+          style={{ willChange: "transform" }}
+          className="absolute -top-32 -left-24 w-[380px] h-[380px] rounded-full blur-2xl
                      bg-violet-200/40 dark:bg-primary/20"
-          animate={{ x: [0, 60, 0], y: [0, 50, 0], scale: [1, 1.08, 1] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute top-1/4 -right-32 w-[420px] h-[420px] rounded-full blur-3xl
-                     bg-pink-200/40 dark:bg-pink-600/15"
-          animate={{ x: [0, -40, 0], y: [0, 60, 0], scale: [1, 1.12, 1] }}
+          animate={{ x: [0, 50, 0], y: [0, 40, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute -bottom-32 left-1/3 w-[480px] h-[480px] rounded-full blur-3xl
-                     bg-amber-100/50 dark:bg-amber-500/10"
-          animate={{ x: [0, 50, -30, 0], y: [0, -40, 30, 0] }}
+          style={{ willChange: "transform" }}
+          className="absolute top-1/4 -right-24 w-[340px] h-[340px] rounded-full blur-2xl
+                     bg-pink-200/40 dark:bg-pink-600/15"
+          animate={{ x: [0, -40, 0], y: [0, 50, 0] }}
           transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full blur-3xl
-                     bg-sky-100/40 dark:bg-sky-600/10"
-          animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.6, 0.4] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+          style={{ willChange: "transform" }}
+          className="absolute -bottom-24 left-1/4 w-[360px] h-[360px] rounded-full blur-2xl
+                     bg-amber-100/50 dark:bg-amber-500/10"
+          animate={{ x: [0, 40, 0], y: [0, -30, 0] }}
+          transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
         />
       </div>
 
@@ -92,7 +89,7 @@ export function SplashLinkTree() {
         aria-label={isDark ? "Mode terang" : "Mode gelap"}
         style={{ touchAction: "manipulation" }}
         className="fixed top-5 right-5 sm:top-7 sm:right-7 z-30 p-3 rounded-full
-                   bg-white/70 dark:bg-white/5 backdrop-blur-xl
+                   bg-white/90 dark:bg-zinc-900/90
                    border border-violet-100/80 dark:border-white/10
                    shadow-[0_4px_20px_-8px_rgba(124,58,237,0.15)]
                    hover:shadow-[0_8px_30px_-8px_rgba(124,58,237,0.25)] transition-shadow"
@@ -137,24 +134,18 @@ export function SplashLinkTree() {
               Modest Fashion Premium
             </motion.div>
 
-            {/* Logo wordmark — pakai <img> biasa, lebih reliabel untuk static files */}
-            <motion.div
-              animate={{
-                filter: [
-                  "drop-shadow(0 6px 20px rgba(124,58,237,0.15))",
-                  "drop-shadow(0 12px 36px rgba(124,58,237,0.38))",
-                  "drop-shadow(0 6px 20px rgba(124,58,237,0.15))",
-                ],
-              }}
-              transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-              className="flex justify-center mb-4"
-            >
-              {/* frame container: ring inset + soft bg agar logo tidak floating mentah */}
-              <div className="px-5 py-3 rounded-2xl bg-white/65 dark:bg-zinc-900/65 backdrop-blur-sm ring-1 ring-inset ring-black/[0.07] dark:ring-white/[0.07] shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)]">
+            {/* Logo wordmark — frame statis (no infinite filter), shadow violet halus */}
+            <div className="flex justify-center mb-4">
+              {/* solid bg + ring inset (no backdrop-blur — terlalu mahal di mobile) */}
+              <div className="px-5 py-3 rounded-2xl bg-white dark:bg-zinc-900/85 ring-1 ring-inset ring-black/[0.07] dark:ring-white/[0.07] shadow-[0_8px_24px_-8px_rgba(124,58,237,0.28)]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={isDark ? "/api/logo/white" : "/api/logo/dark"}
                   alt="Lumara.id"
+                  width={200}
+                  height={48}
+                  loading="eager"
+                  decoding="async"
                   className="h-12 w-auto object-contain"
                   style={{ maxWidth: 200 }}
                   onError={(e) => {
@@ -170,7 +161,7 @@ export function SplashLinkTree() {
                   }}
                 />
               </div>
-            </motion.div>
+            </div>
 
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
               Pilih channel paling nyaman buat kamu
@@ -193,11 +184,12 @@ export function SplashLinkTree() {
                 // pan-y: izinkan scroll vertikal, jangan block touch event
                 style={{ touchAction: "pan-y" }}
                 className="relative flex items-center gap-4 w-full px-5 py-4 rounded-2xl
-                           bg-white dark:bg-zinc-900/60
-                           border border-zinc-100 dark:border-zinc-800
+                           bg-gradient-to-br from-white via-white to-violet-50/40
+                           dark:from-zinc-900/60 dark:via-zinc-900/60 dark:to-violet-950/20
+                           ring-1 ring-inset ring-black/[0.05] dark:ring-white/[0.05]
                            shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)]
                            hover:shadow-[0_8px_30px_-8px_rgba(124,58,237,0.25)]
-                           hover:border-violet-200 dark:hover:border-violet-700/50
+                           hover:ring-violet-200 dark:hover:ring-violet-700/50
                            transition-all duration-300 group overflow-hidden"
               >
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms] ease-in-out bg-gradient-to-r from-transparent via-violet-100/40 dark:via-white/5 to-transparent pointer-events-none" />
@@ -232,26 +224,27 @@ export function SplashLinkTree() {
                 onClick={triggerExit}
                 type="button"
                 className="relative flex items-center gap-4 w-full px-5 py-4 rounded-2xl text-left
-                           bg-white dark:bg-zinc-900/60
-                           border border-zinc-100 dark:border-zinc-800
+                           bg-gradient-to-br from-white via-white to-violet-50/40
+                           dark:from-zinc-900/60 dark:via-zinc-900/60 dark:to-violet-950/20
+                           ring-1 ring-inset ring-black/[0.05] dark:ring-white/[0.05]
                            shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)]
                            hover:shadow-[0_8px_30px_-8px_rgba(124,58,237,0.25)]
-                           hover:border-violet-200 dark:hover:border-violet-700/50
+                           hover:ring-violet-200 dark:hover:ring-violet-700/50
                            transition-all duration-300 group overflow-hidden"
               >
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms] ease-in-out bg-gradient-to-r from-transparent via-violet-100/40 dark:via-white/5 to-transparent pointer-events-none" />
 
-                {/* dark mode: logo-dark di atas bg putih; light mode: mawar icon di atas gradient violet */}
-                <div className={`relative w-11 h-11 rounded-xl flex items-center justify-center overflow-hidden shrink-0 transition-transform duration-300 group-hover:scale-105 ring-1 ring-inset ring-black/[0.07] dark:ring-white/[0.08] ${
-                  isDark
-                    ? "bg-white/90"
-                    : "bg-gradient-to-br from-violet-500 to-fuchsia-500"
-                }`}>
+                {/* Selalu pakai dark-logo (wordmark) di atas bg putih — konsisten light & dark */}
+                <div className="relative w-11 h-11 rounded-xl flex items-center justify-center overflow-hidden shrink-0 transition-transform duration-300 group-hover:scale-105 ring-1 ring-inset ring-black/[0.07] bg-white">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={isDark ? "/api/logo/dark" : "/api/logo/icon"}
+                    src="/api/logo/dark"
                     alt="Lumara.id"
-                    className={isDark ? "w-4/5 h-4/5 object-contain" : "w-full h-full object-cover"}
+                    width={36}
+                    height={36}
+                    loading="eager"
+                    decoding="async"
+                    className="w-4/5 h-4/5 object-contain"
                     onError={(e) => { e.currentTarget.style.display = "none"; }}
                   />
                 </div>
@@ -325,6 +318,10 @@ export function SplashLinkTree() {
               <img
                 src="/api/logo/white"
                 alt="Lumara.id"
+                width={220}
+                height={56}
+                loading="eager"
+                decoding="async"
                 className="h-14 w-auto object-contain drop-shadow-[0_4px_20px_rgba(0,0,0,0.25)]"
                 style={{ maxWidth: 220 }}
               />
