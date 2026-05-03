@@ -1,36 +1,16 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useTheme } from "next-themes";
 import { getT } from "@/lib/i18n";
 import { useUIStore } from "@/store/uiStore";
 import { SocialLinks } from "@/components/shared/SocialLinks";
 
 export function Footer() {
   const language = useUIStore((s) => s.language);
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  const isDark = mounted && resolvedTheme === "dark";
   const t = getT(language);
   return (
     <footer className="bg-dark text-white mt-16 pb-20 md:pb-0">
       <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
-          {/* Logo hanya tampil saat dark theme — light theme tidak pakai image */}
-          {isDark && (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src="/api/logo/white"
-              alt="Lumara.id"
-              width={160}
-              height={40}
-              loading="lazy"
-              decoding="async"
-              className="h-10 w-auto object-contain mb-3"
-              style={{ maxWidth: 160 }}
-            />
-          )}
           <p className="text-sm text-white/60 leading-relaxed mb-4">{t.footer.tagline}</p>
           <SocialLinks variant="footer" />
         </div>

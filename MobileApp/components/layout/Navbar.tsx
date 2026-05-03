@@ -97,9 +97,13 @@ export function Navbar() {
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
 
-          {/* Logo — link ke /home. Image hanya di light theme; dark theme tanpa image */}
-          <Link href="/home" className="flex items-center shrink-0 min-w-[40px] h-9">
-            {mounted && safeTheme !== "dark" && (
+          {/* Logo — link ke /home. Light: image dark-logo. Dark: text gradient lumara.id */}
+          <Link href="/home" className="flex items-center shrink-0 h-9">
+            {mounted && safeTheme === "dark" ? (
+              <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-violet-300">
+                lumara.id
+              </span>
+            ) : mounted ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src="/api/logo/dark"
@@ -111,6 +115,8 @@ export function Navbar() {
                 className="h-9 w-auto object-contain"
                 style={{ maxWidth: 140 }}
               />
+            ) : (
+              <div className="h-9 w-[100px]" />
             )}
           </Link>
 
@@ -261,9 +267,13 @@ export function Navbar() {
       >
         {/* Close button */}
         <div className="flex items-center justify-between px-5 h-14 shrink-0">
-          {/* Drawer logo — sama: image hanya di light theme, dark tanpa image */}
-          <div className="min-w-[40px] h-7">
-            {mounted && safeTheme !== "dark" && (
+          {/* Drawer logo — sama pola dengan header: image (light) / text gradient (dark) */}
+          <div className="h-7 flex items-center">
+            {mounted && safeTheme === "dark" ? (
+              <span className="text-base font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-violet-300">
+                lumara.id
+              </span>
+            ) : mounted ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src="/api/logo/dark"
@@ -275,6 +285,8 @@ export function Navbar() {
                 className="h-7 w-auto object-contain"
                 style={{ maxWidth: 110 }}
               />
+            ) : (
+              <div className="h-7 w-[80px]" />
             )}
           </div>
           <button onClick={() => setDrawerOpen(false)}
