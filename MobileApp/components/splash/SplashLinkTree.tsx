@@ -37,12 +37,11 @@ export function SplashLinkTree() {
 
   const isDark = mounted && resolvedTheme === "dark";
 
-  // ── Cinematic transition ke /home ────────────────────────────
+  // ── Cinematic transition ke /home — transparent blur, langsung masuk ──
   const triggerExit = () => {
     if (isExiting) return;
     setIsExiting(true);
-    // beri waktu curtain naik penuh sebelum navigate
-    setTimeout(() => router.push("/home"), 850);
+    setTimeout(() => router.push("/home"), 450);
   };
 
   // Threshold swipe: offset 80px ATAU velocity > 400px/s ke atas
@@ -234,17 +233,17 @@ export function SplashLinkTree() {
               >
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms] ease-in-out bg-gradient-to-r from-transparent via-violet-100/40 dark:via-white/5 to-transparent pointer-events-none" />
 
-                {/* Selalu pakai dark-logo (wordmark) di atas bg putih — konsisten light & dark */}
+                {/* Mawar icon — sama untuk light & dark theme */}
                 <div className="relative w-11 h-11 rounded-xl flex items-center justify-center overflow-hidden shrink-0 transition-transform duration-300 group-hover:scale-105 ring-1 ring-inset ring-black/[0.07] bg-white">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/api/logo/dark"
+                    src="/api/logo/icon"
                     alt="Lumara.id"
-                    width={36}
-                    height={36}
+                    width={44}
+                    height={44}
                     loading="eager"
                     decoding="async"
-                    className="w-4/5 h-4/5 object-contain"
+                    className="w-full h-full object-cover"
                     onError={(e) => { e.currentTarget.style.display = "none"; }}
                   />
                 </div>
@@ -299,42 +298,15 @@ export function SplashLinkTree() {
         </div>
       </motion.div>
 
-      {/* ── Curtain reveal: gradient violet/fuchsia naik dari bawah saat exit ── */}
+      {/* ── Transition overlay: transparent backdrop-blur, no color ── */}
       <AnimatePresence>
         {isExiting && (
           <motion.div
-            initial={{ y: "100%" }}
-            animate={{ y: "0%" }}
-            transition={{ duration: 0.7, ease: [0.65, 0, 0.35, 1] }}
-            className="fixed inset-0 z-[200] bg-gradient-to-br from-violet-600 via-fuchsia-500 to-violet-700 flex items-center justify-center"
-          >
-            <motion.div
-              initial={{ scale: 0.6, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-col items-center gap-3 px-6"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/api/logo/white"
-                alt="Lumara.id"
-                width={220}
-                height={56}
-                loading="eager"
-                decoding="async"
-                className="h-14 w-auto object-contain drop-shadow-[0_4px_20px_rgba(0,0,0,0.25)]"
-                style={{ maxWidth: 220 }}
-              />
-              <motion.span
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.55, duration: 0.4 }}
-                className="text-white/95 text-sm font-medium tracking-wide"
-              >
-                Selamat datang di koleksi kami
-              </motion.span>
-            </motion.div>
-          </motion.div>
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
+            className="fixed inset-0 z-[200] backdrop-blur-md bg-white/25 dark:bg-zinc-950/40 pointer-events-none"
+          />
         )}
       </AnimatePresence>
     </div>

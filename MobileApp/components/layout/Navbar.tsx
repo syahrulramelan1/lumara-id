@@ -97,15 +97,21 @@ export function Navbar() {
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
 
-          {/* Logo — link ke /home (storefront), bukan / (splash linktree) */}
-          <Link href="/home" className="flex items-center shrink-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={safeTheme === "dark" ? "/api/logo/white" : "/api/logo/dark"}
-              alt="Lumara.id"
-              className="h-9 w-auto object-contain"
-              style={{ maxWidth: 140 }}
-            />
+          {/* Logo — link ke /home. Image hanya di light theme; dark theme tanpa image */}
+          <Link href="/home" className="flex items-center shrink-0 min-w-[40px] h-9">
+            {mounted && safeTheme !== "dark" && (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src="/api/logo/dark"
+                alt="Lumara.id"
+                width={140}
+                height={36}
+                loading="eager"
+                decoding="async"
+                className="h-9 w-auto object-contain"
+                style={{ maxWidth: 140 }}
+              />
+            )}
           </Link>
 
           {/* Desktop nav links */}
@@ -255,13 +261,22 @@ export function Navbar() {
       >
         {/* Close button */}
         <div className="flex items-center justify-between px-5 h-14 shrink-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={safeTheme === "dark" ? "/api/logo/white" : "/api/logo/dark"}
-            alt="Lumara.id"
-            className="h-7 w-auto object-contain"
-            style={{ maxWidth: 110 }}
-          />
+          {/* Drawer logo — sama: image hanya di light theme, dark tanpa image */}
+          <div className="min-w-[40px] h-7">
+            {mounted && safeTheme !== "dark" && (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src="/api/logo/dark"
+                alt="Lumara.id"
+                width={110}
+                height={28}
+                loading="eager"
+                decoding="async"
+                className="h-7 w-auto object-contain"
+                style={{ maxWidth: 110 }}
+              />
+            )}
+          </div>
           <button onClick={() => setDrawerOpen(false)}
             className="p-2 hover:bg-muted rounded-full transition-colors">
             <X size={18} />
