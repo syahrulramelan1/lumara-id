@@ -60,7 +60,7 @@ export const SOCIAL_CHANNELS: SocialChannel[] = [
   {
     id:       "whatsapp",
     label:    "WhatsApp",
-    handle:   "+62 852-8573-3391",
+    handle:   "Chat Sekarang",
     url:      buildWhatsAppUrl(),
     desc:     "Live chat 24 jam — paling cepat dibalas. Tanya produk, order, atau resi.",
     brandHex: "#25D366",
