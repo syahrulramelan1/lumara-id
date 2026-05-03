@@ -1,17 +1,24 @@
 "use client";
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { useTheme } from "next-themes";
-import { ArrowUpRight, Sun, Moon, Sparkles } from "lucide-react";
+import { ArrowUpRight, Sun, Moon, Sparkles, ChevronUp } from "lucide-react";
 import { FaWhatsapp, FaInstagram, FaTiktok } from "react-icons/fa";
 import { SiShopee } from "react-icons/si";
 import { SOCIAL_CHANNELS, withUtm } from "@/lib/social";
 
 export function SplashLinkTree() {
+  const router = useRouter();
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  // Prefetch /home agar transisi instan saat curtain naik
+  useEffect(() => {
+    router.prefetch("/home");
+  }, [router]);
 
   const channels = SOCIAL_CHANNELS.map((c) => ({
     ...c,
@@ -29,6 +36,21 @@ export function SplashLinkTree() {
   };
 
   const isDark = mounted && resolvedTheme === "dark";
+
+  // ── Cinematic transition ke /home ────────────────────────────
+  const triggerExit = () => {
+    if (isExiting) return;
+    setIsExiting(true);
+    // beri waktu curtain naik penuh sebelum navigate
+    setTimeout(() => router.push("/home"), 850);
+  };
+
+  // Threshold swipe: offset 80px ATAU velocity > 400px/s ke atas
+  const handleSwipeEnd = (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    if (info.offset.y < -80 || info.velocity.y < -400) {
+      triggerExit();
+    }
+  };
 
   return (
     <div className="relative min-h-screen bg-white dark:bg-[#0F0A1E]">
@@ -84,8 +106,14 @@ export function SplashLinkTree() {
         )}
       </motion.button>
 
-      {/* ── Konten: scrollable, centered ── */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-16 sm:py-20">
+      {/* ── Konten: scrollable, centered. Exit anim: slide-up + fade ── */}
+      <motion.div
+        animate={isExiting ? { y: -60, opacity: 0, filter: "blur(2px)" } : {}}
+        transition={{ duration: 0.6, ease: [0.7, 0, 0.3, 1] }}
+        className={`relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-16 sm:py-20 ${
+          isExiting ? "pointer-events-none" : ""
+        }`}
+      >
         <div className="w-full max-w-md">
 
           {/* Header */}
@@ -200,9 +228,10 @@ export function SplashLinkTree() {
               whileHover={{ y: -2 }}
               style={{ touchAction: "pan-y" }}
             >
-              <Link
-                href="/home"
-                className="relative flex items-center gap-4 w-full px-5 py-4 rounded-2xl
+              <button
+                onClick={triggerExit}
+                type="button"
+                className="relative flex items-center gap-4 w-full px-5 py-4 rounded-2xl text-left
                            bg-white dark:bg-zinc-900/60
                            border border-zinc-100 dark:border-zinc-800
                            shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)]
@@ -234,21 +263,83 @@ export function SplashLinkTree() {
                   size={18}
                   className="relative text-zinc-300 dark:text-zinc-600 group-hover:text-violet-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all shrink-0"
                 />
-              </Link>
+              </button>
             </motion.div>
           </div>
+
+          {/* ── Swipe-up handle: drag ke atas → cinematic transition ke /home ── */}
+          <motion.div
+            drag="y"
+            dragConstraints={{ top: -120, bottom: 0 }}
+            dragElastic={{ top: 0.4, bottom: 0 }}
+            onDragEnd={handleSwipeEnd}
+            onClick={triggerExit}
+            whileTap={{ scale: 0.96 }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 + (channels.length + 1) * 0.08, ease: [0.22, 1, 0.36, 1] }}
+            style={{ touchAction: "none" }}
+            className="mt-8 mx-auto cursor-pointer flex flex-col items-center gap-2 select-none"
+            aria-label="Geser ke atas untuk masuk toko"
+          >
+            <motion.div
+              animate={{ y: [0, -6, 0] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+              className="w-11 h-11 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-[0_8px_24px_-6px_rgba(124,58,237,0.5)] ring-1 ring-inset ring-white/20"
+            >
+              <ChevronUp size={20} className="text-white" strokeWidth={2.5} />
+            </motion.div>
+            <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium tracking-wide">
+              Geser ke atas untuk belanja
+            </span>
+          </motion.div>
 
           {/* Footer kecil */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.9 }}
-            className="text-center text-xs text-zinc-400 dark:text-zinc-600 mt-10"
+            className="text-center text-xs text-zinc-400 dark:text-zinc-600 mt-8"
           >
             © {new Date().getFullYear()} Lumara.id — Modest Fashion Indonesia
           </motion.p>
         </div>
-      </div>
+      </motion.div>
+
+      {/* ── Curtain reveal: gradient violet/fuchsia naik dari bawah saat exit ── */}
+      <AnimatePresence>
+        {isExiting && (
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: "0%" }}
+            transition={{ duration: 0.7, ease: [0.65, 0, 0.35, 1] }}
+            className="fixed inset-0 z-[200] bg-gradient-to-br from-violet-600 via-fuchsia-500 to-violet-700 flex items-center justify-center"
+          >
+            <motion.div
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-col items-center gap-3 px-6"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/api/logo/white"
+                alt="Lumara.id"
+                className="h-14 w-auto object-contain drop-shadow-[0_4px_20px_rgba(0,0,0,0.25)]"
+                style={{ maxWidth: 220 }}
+              />
+              <motion.span
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.55, duration: 0.4 }}
+                className="text-white/95 text-sm font-medium tracking-wide"
+              >
+                Selamat datang di koleksi kami
+              </motion.span>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
