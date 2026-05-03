@@ -64,10 +64,10 @@ export function ProductCard({ product, priority = false, index = 0 }: ProductCar
                   backgroundSize: "18px 18px",
                 }}
               />
-              <div className="w-12 h-12 rounded-2xl bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center ring-1 ring-violet-200/60 dark:ring-violet-700/30">
+              <div className="relative z-10 w-12 h-12 rounded-2xl bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center ring-1 ring-violet-200/60 dark:ring-violet-700/30">
                 <ImageOff size={20} className="text-violet-400 dark:text-violet-500" />
               </div>
-              <span className="text-[10px] text-violet-400/70 dark:text-violet-600 font-medium tracking-wide">Belum ada foto</span>
+              <span className="relative z-10 text-[10px] text-violet-400/70 dark:text-violet-600 font-medium tracking-wide">Belum ada foto</span>
             </div>
           )}
           {discount && (

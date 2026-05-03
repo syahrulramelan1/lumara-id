@@ -90,7 +90,7 @@ export function ProductImageZoom({
         </AnimatePresence>
 
         {/* vignette frame: kedalaman di semua sisi, pointer-events none */}
-        <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_24px_rgba(0,0,0,0.07)] dark:shadow-[inset_0_0_24px_rgba(0,0,0,0.22)] z-[1]" />
+        <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_24px_rgba(0,0,0,0.07)] dark:shadow-[inset_0_0_24px_rgba(0,0,0,0.22)]" />
 
         {discount && (
           <span className="absolute top-3 left-3 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full z-10 pointer-events-none">
@@ -100,7 +100,7 @@ export function ProductImageZoom({
 
         {/* Hint icon — fade out saat hover zoom aktif */}
         <div
-          className={`absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-white p-2 rounded-full pointer-events-none transition-opacity ${
+          className={`absolute bottom-3 right-3 z-10 bg-black/60 backdrop-blur-sm text-white p-2 rounded-full pointer-events-none transition-opacity ${
             hoverZoom ? "opacity-0" : "opacity-100"
           }`}
         >
