@@ -113,33 +113,35 @@ export function SplashLinkTree() {
             <motion.div
               animate={{
                 filter: [
-                  "drop-shadow(0 6px 20px rgba(124,58,237,0.18))",
-                  "drop-shadow(0 12px 36px rgba(124,58,237,0.44))",
-                  "drop-shadow(0 6px 20px rgba(124,58,237,0.18))",
+                  "drop-shadow(0 6px 20px rgba(124,58,237,0.15))",
+                  "drop-shadow(0 12px 36px rgba(124,58,237,0.38))",
+                  "drop-shadow(0 6px 20px rgba(124,58,237,0.15))",
                 ],
               }}
               transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
               className="flex justify-center mb-4"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={isDark ? "/api/logo/white" : "/api/logo/dark"}
-                alt="Lumara.id"
-                className="h-14 w-auto object-contain"
-                style={{ maxWidth: 220 }}
-                onError={(e) => {
-                  // Fallback ultimate: tampilkan brand text kalau API juga error
-                  const target = e.currentTarget;
-                  target.style.display = "none";
-                  const parent = target.parentElement;
-                  if (parent && !parent.querySelector(".logo-fallback")) {
-                    const fallback = document.createElement("span");
-                    fallback.className = "logo-fallback text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-600";
-                    fallback.textContent = "Lumara.id";
-                    parent.appendChild(fallback);
-                  }
-                }}
-              />
+              {/* frame container: ring inset + soft bg agar logo tidak floating mentah */}
+              <div className="px-5 py-3 rounded-2xl bg-white/65 dark:bg-zinc-900/65 backdrop-blur-sm ring-1 ring-inset ring-black/[0.07] dark:ring-white/[0.07] shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={isDark ? "/api/logo/white" : "/api/logo/dark"}
+                  alt="Lumara.id"
+                  className="h-12 w-auto object-contain"
+                  style={{ maxWidth: 200 }}
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    target.style.display = "none";
+                    const parent = target.parentElement;
+                    if (parent && !parent.querySelector(".logo-fallback")) {
+                      const fallback = document.createElement("span");
+                      fallback.className = "logo-fallback text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-600";
+                      fallback.textContent = "Lumara.id";
+                      parent.appendChild(fallback);
+                    }
+                  }}
+                />
+              </div>
             </motion.div>
 
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -173,7 +175,7 @@ export function SplashLinkTree() {
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms] ease-in-out bg-gradient-to-r from-transparent via-violet-100/40 dark:via-white/5 to-transparent pointer-events-none" />
 
                 <div
-                  className="relative w-11 h-11 rounded-xl flex items-center justify-center text-white shrink-0 transition-transform duration-300 group-hover:scale-105"
+                  className="relative w-11 h-11 rounded-xl flex items-center justify-center text-white shrink-0 transition-transform duration-300 group-hover:scale-105 ring-1 ring-inset ring-white/20"
                   style={{ backgroundColor: c.brandHex }}
                 >
                   {iconFor(c.id)}
@@ -210,12 +212,17 @@ export function SplashLinkTree() {
               >
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms] ease-in-out bg-gradient-to-r from-transparent via-violet-100/40 dark:via-white/5 to-transparent pointer-events-none" />
 
-                <div className="relative w-11 h-11 rounded-xl flex items-center justify-center overflow-hidden shrink-0 transition-transform duration-300 group-hover:scale-105 bg-gradient-to-br from-violet-500 to-fuchsia-500">
+                {/* dark mode: logo-dark di atas bg putih; light mode: mawar icon di atas gradient violet */}
+                <div className={`relative w-11 h-11 rounded-xl flex items-center justify-center overflow-hidden shrink-0 transition-transform duration-300 group-hover:scale-105 ring-1 ring-inset ring-black/[0.07] dark:ring-white/[0.08] ${
+                  isDark
+                    ? "bg-white/90"
+                    : "bg-gradient-to-br from-violet-500 to-fuchsia-500"
+                }`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/api/logo/icon"
+                    src={isDark ? "/api/logo/dark" : "/api/logo/icon"}
                     alt="Lumara.id"
-                    className="w-full h-full object-cover"
+                    className={isDark ? "w-4/5 h-4/5 object-contain" : "w-full h-full object-cover"}
                     onError={(e) => { e.currentTarget.style.display = "none"; }}
                   />
                 </div>
