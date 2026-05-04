@@ -13,64 +13,81 @@ export default function OGImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #faf5ff 0%, #f5f3ff 40%, #ede9fe 100%)",
+          background: "linear-gradient(135deg, #faf5ff 0%, #ede9fe 60%, #ddd6fe 100%)",
           fontFamily: "sans-serif",
           position: "relative",
+          overflow: "hidden",
         }}
       >
-        {/* Blob dekorasi kiri atas */}
+        {/* Blob kiri atas */}
         <div
           style={{
             position: "absolute",
-            top: -80,
-            left: -80,
-            width: 400,
-            height: 400,
+            top: -100,
+            left: -100,
+            width: 500,
+            height: 500,
             borderRadius: "50%",
-            background: "rgba(167,139,250,0.25)",
-            filter: "blur(60px)",
+            background: "rgba(167,139,250,0.3)",
           }}
         />
-        {/* Blob dekorasi kanan bawah */}
+        {/* Blob kanan bawah */}
         <div
           style={{
             position: "absolute",
-            bottom: -60,
-            right: -60,
-            width: 360,
-            height: 360,
+            bottom: -80,
+            right: -80,
+            width: 420,
+            height: 420,
             borderRadius: "50%",
-            background: "rgba(232,121,249,0.18)",
-            filter: "blur(60px)",
+            background: "rgba(232,121,249,0.2)",
           }}
         />
 
-        {/* Card putih tengah */}
+        {/* Card putih */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            background: "rgba(255,255,255,0.92)",
-            borderRadius: 32,
-            padding: "56px 80px",
-            boxShadow: "0 20px 60px -16px rgba(124,58,237,0.25)",
-            border: "1px solid rgba(124,58,237,0.12)",
+            background: "rgba(255,255,255,0.93)",
+            borderRadius: 36,
+            padding: "60px 96px",
+            boxShadow: "0 24px 80px -16px rgba(124,58,237,0.3)",
+            border: "1.5px solid rgba(124,58,237,0.15)",
             gap: 0,
+            position: "relative",
           }}
         >
-          {/* Logo image */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://lumara-id.onrender.com/logo-dark.jpeg"
-            alt="Lumara.id"
-            width={280}
-            height={68}
-            style={{ objectFit: "contain", marginBottom: 20 }}
+          {/* Brand name */}
+          <div
+            style={{
+              fontSize: 72,
+              fontWeight: 800,
+              letterSpacing: -2,
+              background: "linear-gradient(90deg, #7C3AED, #9333EA, #7C3AED)",
+              backgroundClip: "text",
+              color: "transparent",
+              marginBottom: 8,
+              lineHeight: 1,
+            }}
+          >
+            lumara.id
+          </div>
+
+          {/* Garis pemisah */}
+          <div
+            style={{
+              width: 60,
+              height: 3,
+              background: "linear-gradient(90deg, #7C3AED, #9333EA)",
+              borderRadius: 9999,
+              marginBottom: 20,
+              marginTop: 12,
+            }}
           />
 
           {/* Tagline pill */}
@@ -78,44 +95,42 @@ export default function OGImage() {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 8,
               background: "linear-gradient(90deg, #7C3AED, #9333EA)",
               borderRadius: 9999,
-              padding: "8px 20px",
+              padding: "10px 28px",
               marginBottom: 24,
             }}
           >
-            <span style={{ color: "white", fontSize: 16, fontWeight: 600, letterSpacing: 1 }}>
+            <span style={{ color: "white", fontSize: 22, fontWeight: 600, letterSpacing: 0.5 }}>
               ✦ Modest Fashion Premium
             </span>
           </div>
 
-          {/* Description */}
-          <p
+          {/* Deskripsi */}
+          <div
             style={{
               color: "#52525b",
-              fontSize: 22,
+              fontSize: 24,
               textAlign: "center",
-              margin: 0,
               maxWidth: 560,
               lineHeight: 1.5,
+              marginBottom: 20,
             }}
           >
             Tampil Anggun, Tetap Syar&apos;i
-          </p>
+          </div>
 
           {/* Domain */}
-          <p
+          <div
             style={{
               color: "#a78bfa",
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: 600,
-              margin: "16px 0 0",
               letterSpacing: 0.5,
             }}
           >
             lumara-id.onrender.com
-          </p>
+          </div>
         </div>
       </div>
     ),
