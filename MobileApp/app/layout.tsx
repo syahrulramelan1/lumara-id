@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     description: "Tampil Anggun, Tetap Syar'i — Koleksi modest fashion eksklusif untuk muslimah Indonesia",
     images: [
       {
-        url: "https://lumara-id.onrender.com/opengraph-image",
+        url: "https://lumara-id.onrender.com/og-image.png",
         width: 1200,
         height: 630,
         alt: "lumara.id — Modest Fashion Premium Indonesia",
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "lumara.id — Modest Fashion Premium",
     description: "Tampil Anggun, Tetap Syar'i",
-    images: ["https://lumara-id.onrender.com/opengraph-image"],
+    images: ["https://lumara-id.onrender.com/og-image.png"],
   },
   icons: {
     icon: "/api/logo/icon",
