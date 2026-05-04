@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { orderService } from "@/lib/services/OrderService";
+import { prisma } from "@/lib/prisma";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 export async function GET(req: NextRequest) {
   try {
@@ -24,6 +27,40 @@ export async function POST(req: NextRequest) {
     if (!userId || !items?.length || !shippingAddress || !paymentMethod) {
       return NextResponse.json({ success: false, error: "Data pesanan tidak lengkap" }, { status: 400 });
     }
+
+    // ── 1) Verify Bearer token — cegah forge userId orang lain ──
+    const token = req.headers.get("authorization")?.replace("Bearer ", "");
+    if (!token) {
+      return NextResponse.json({ success: false, error: "Sesi tidak valid, silakan login ulang" }, { status: 401 });
+    }
+
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } }
+    );
+    const { data: { user: authUser }, error: authErr } = await supabase.auth.getUser(token);
+    if (authErr || !authUser?.email) {
+      return NextResponse.json({ success: false, error: "Sesi tidak valid, silakan login ulang" }, { status: 401 });
+    }
+
+    // ── 2) Validate userId masih exist + email match ──
+    //     Cegah session lama dari akun yang sudah dihapus admin.
+    const dbUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true },
+    });
+    if (!dbUser) {
+      return NextResponse.json(
+        { success: false, error: "Akun Anda tidak ditemukan atau telah dihapus. Silakan hubungi admin." },
+        { status: 403 }
+      );
+    }
+    if (dbUser.email.toLowerCase() !== authUser.email.toLowerCase()) {
+      return NextResponse.json({ success: false, error: "Sesi tidak cocok dengan akun" }, { status: 403 });
+    }
+
     const order = await orderService.createOrder(userId, items, shippingAddress, paymentMethod);
     return NextResponse.json({ success: true, data: order }, { status: 201 });
   } catch (error) {

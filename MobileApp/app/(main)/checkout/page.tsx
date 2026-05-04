@@ -6,6 +6,7 @@ import { ArrowLeft, MapPin, CreditCard, ShoppingBag, CheckCircle, LogIn } from "
 import { toast } from "sonner";
 import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
+import { createClientComponent } from "@/lib/supabase-browser";
 import type { ShippingAddress } from "@/types";
 
 const PAYMENT_METHODS = [
@@ -45,9 +46,22 @@ export default function CheckoutPage() {
 
     setSubmitting(true);
     try {
+      // Ambil token Supabase untuk verifikasi server-side
+      const supabase = createClientComponent();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) {
+        toast.error("Sesi habis, silakan login ulang");
+        setSubmitting(false);
+        return;
+      }
+
       const res = await fetch("/api/orders", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
         body: JSON.stringify({
           userId: dbUser.id,
           items: items.map((i) => ({

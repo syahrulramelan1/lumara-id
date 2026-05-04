@@ -17,9 +17,17 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
         });
+        // Token tidak valid (akun dihapus / sesi expired di backend) → force sign out
+        if (res.status === 401 || res.status === 403) {
+          await supabase.auth.signOut();
+          clear();
+          syncFromServer([]);
+          setLoading(false);
+          return;
+        }
         const data = await res.json() as { success: boolean; user?: import("@/store/authStore").DbUser };
         if (data.success && data.user) setDbUser(data.user);
-      } catch { /* ignore */ }
+      } catch { /* network error — biarin user tetap login dengan state lama */ }
       setLoading(false);
     };
 
