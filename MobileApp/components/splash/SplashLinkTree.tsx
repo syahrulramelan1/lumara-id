@@ -136,7 +136,7 @@ export function SplashLinkTree() {
             {/* Logo wordmark — frame statis (no infinite filter), shadow violet halus */}
             <div className="flex justify-center mb-4">
               {/* solid bg + ring inset (no backdrop-blur — terlalu mahal di mobile) */}
-              <div className="px-5 py-3 rounded-2xl bg-white dark:bg-zinc-900/85 ring-1 ring-inset ring-black/[0.07] dark:ring-white/[0.07] shadow-[0_8px_24px_-8px_rgba(124,58,237,0.28)]">
+              <div className="rounded-2xl overflow-hidden bg-white dark:bg-zinc-900/85 ring-1 ring-inset ring-black/[0.07] dark:ring-white/[0.07] shadow-[0_8px_24px_-8px_rgba(124,58,237,0.28)]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={isDark ? "/api/logo/white" : "/api/logo/dark"}
@@ -145,7 +145,7 @@ export function SplashLinkTree() {
                   height={48}
                   loading="eager"
                   decoding="async"
-                  className="h-12 w-auto object-contain"
+                  className="h-12 w-auto block"
                   style={{ maxWidth: 200 }}
                   onError={(e) => {
                     const target = e.currentTarget;
