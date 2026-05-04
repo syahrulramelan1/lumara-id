@@ -34,7 +34,7 @@ export function SocialLinks({ variant = "footer" }: { variant?: "footer" | "comp
             rel="noopener noreferrer"
             aria-label={c.label}
             title={`${c.label} — ${c.handle}`}
-            className="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition-all hover:scale-110"
+            className="w-9 h-9 flex items-center justify-center shrink-0 bg-white/10 hover:bg-white/20 rounded-full transition-all hover:scale-110"
             style={{ color: "white" }}
           >
             {iconFor(c.id, 16)}

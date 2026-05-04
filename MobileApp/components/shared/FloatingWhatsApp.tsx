@@ -28,9 +28,10 @@ export function FloatingWhatsApp({ message, hidden }: FloatingWhatsAppProps) {
       {/* Pulse ring — efek perhatian ringan */}
       <span className="absolute inset-0 rounded-full bg-green-500/40 animate-ping" />
 
-      <div className="relative flex items-center gap-2 bg-[#25D366] hover:bg-[#1EBE5A] text-white rounded-full shadow-lg shadow-green-500/30 transition-all hover:scale-105 active:scale-95 pl-3 pr-4 py-3">
+      {/* Mobile: w-12 h-12 perfect circle (icon only). Desktop: pill dengan label */}
+      <div className="relative flex items-center justify-center md:justify-start md:gap-2 bg-[#25D366] hover:bg-[#1EBE5A] text-white rounded-full shadow-lg shadow-green-500/30 transition-all hover:scale-105 active:scale-95 w-12 h-12 md:w-auto md:h-auto md:pl-3 md:pr-4 md:py-3">
         <FaWhatsapp size={22} className="shrink-0" />
-        {/* Label muncul di desktop, hidden di mobile (cuma icon) */}
+        {/* Label muncul di desktop, hidden di mobile */}
         <span className="hidden md:inline text-sm font-semibold whitespace-nowrap">
           Chat Sekarang
         </span>
