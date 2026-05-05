@@ -16,16 +16,17 @@ export default function ForgotPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email) return;
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
+      const redirectTo = `${window.location.origin}/reset-password`;
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
       if (error) throw error;
       setSent(true);
       toast.success(t.auth.forgot_sent);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t.auth.error);
+      const msg = err instanceof Error ? err.message : t.auth.error;
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
