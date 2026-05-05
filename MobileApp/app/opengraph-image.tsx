@@ -129,7 +129,7 @@ export default function OGImage() {
               letterSpacing: 0.5,
             }}
           >
-            lumara-id.onrender.com
+            lumara-id.vercel.app
           </div>
         </div>
       </div>

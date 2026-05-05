@@ -249,7 +249,7 @@ export function SplashLinkTree() {
                 </div>
                 <div className="relative flex-1 min-w-0 text-left">
                   <p className="font-semibold text-[15px] text-zinc-900 dark:text-zinc-100">Lihat Koleksi Web</p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">lumara-id.onrender.com</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">lumara-id.vercel.app</p>
                 </div>
                 <ArrowUpRight
                   size={18}

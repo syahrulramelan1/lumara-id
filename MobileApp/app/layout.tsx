@@ -46,13 +46,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "id_ID",
-    url: "https://lumara-id.onrender.com",
+    url: "https://lumara-id.vercel.app",
     siteName: "lumara.id",
     title: "lumara.id — Modest Fashion Premium",
     description: "Tampil Anggun, Tetap Syar'i — Koleksi modest fashion eksklusif untuk muslimah Indonesia",
     images: [
       {
-        url: "https://lumara-id.onrender.com/og-image.png",
+        url: "https://lumara-id.vercel.app/og-image.png",
         width: 1200,
         height: 630,
         alt: "lumara.id — Modest Fashion Premium Indonesia",
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "lumara.id — Modest Fashion Premium",
     description: "Tampil Anggun, Tetap Syar'i",
-    images: ["https://lumara-id.onrender.com/og-image.png"],
+    images: ["https://lumara-id.vercel.app/og-image.png"],
   },
   icons: {
     icon: "/api/logo/icon",
