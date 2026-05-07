@@ -24,14 +24,14 @@ export default async function MainLayout({ children }: { children: React.ReactNo
   if (maintenance) redirect("/maintenance");
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className="pb-20 md:pb-0">
+      <main className="flex-1 pb-20 md:pb-0">
         <PageTransition>{children}</PageTransition>
       </main>
       <Footer />
       <BottomNav />
       <FloatingWhatsApp />
-    </>
+    </div>
   );
 }
