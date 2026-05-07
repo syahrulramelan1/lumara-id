@@ -50,6 +50,30 @@ function formatIDR(n: number) {
   }).format(n);
 }
 
+function formatEtd(etd: string): string {
+  if (!etd || etd === "-") return "—";
+  // Komerce return "2 day", "1-3 day". Translate ke Indonesia.
+  return etd.replace(/\s*days?\s*$/i, " hari").trim() || etd;
+}
+
+const COURIER_BADGE_COLORS: Record<string, string> = {
+  jne: "bg-red-600",
+  tiki: "bg-blue-600",
+  pos: "bg-orange-500",
+};
+
+function CourierBadge({ code }: { code: string }) {
+  const bg = COURIER_BADGE_COLORS[code.toLowerCase()] ?? "bg-gray-500";
+  return (
+    <div
+      className={`w-12 h-12 rounded-[10px] flex items-center justify-center text-white text-[11px] font-bold tracking-wide shrink-0 ${bg}`}
+      aria-hidden
+    >
+      {code.toUpperCase()}
+    </div>
+  );
+}
+
 const EMPTY_ADDR: ShippingAddress = {
   name: "",
   phone: "",
@@ -502,7 +526,7 @@ export default function CheckoutPage() {
           </div>
 
           {shipOptions.length > 0 && (
-            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
               {shipOptions.map((o) => {
                 const active =
                   selectedShip?.courier === o.courier &&
@@ -513,17 +537,31 @@ export default function CheckoutPage() {
                     key={`${o.courier}-${o.service}-${o.cost}`}
                     type="button"
                     onClick={() => setSelectedShip(o)}
-                    className={`w-full text-left px-3 py-2.5 rounded-[12px] border text-sm transition-colors ${
+                    className={`w-full text-left px-3 py-2.5 rounded-[12px] border transition-colors ${
                       active
                         ? "border-primary bg-primary/5"
                         : "border-border hover:border-primary/40"
                     }`}
                   >
-                    <span className="font-medium">
-                      {o.courierName} — {o.service}
-                    </span>
-                    <span className="text-muted-foreground"> · ETD {o.etd}</span>
-                    <div className="text-primary font-semibold mt-0.5">{formatIDR(o.cost)}</div>
+                    <div className="flex items-center gap-3">
+                      <CourierBadge code={o.courier} />
+                      <div className="flex-1 min-w-0">
+                        <div className={`text-sm font-medium truncate ${active ? "text-primary" : ""}`}>
+                          {o.courierName} · {o.description || o.service}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-0.5">
+                          Estimasi {formatEtd(o.etd)} · Layanan {o.service}
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1.5 shrink-0">
+                        <span className={`text-sm font-semibold ${active ? "text-primary" : ""}`}>
+                          {formatIDR(o.cost)}
+                        </span>
+                        <div className={`w-4 h-4 rounded-full border-2 transition-all ${
+                          active ? "border-primary bg-primary" : "border-muted-foreground"
+                        }`} />
+                      </div>
+                    </div>
                   </button>
                 );
               })}
