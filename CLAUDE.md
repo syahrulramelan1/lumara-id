@@ -356,27 +356,33 @@ Abstract class dengan static helper `findById<T>` dan `count`.
 
 **Race condition risk**: Step 5a-5e tidak transactional. Kalau decrement gagal di tengah, stok inkonsisten. **Acceptable** untuk skala UMKM saat ini.
 
-### 1.b RajaOngkir Shipping Cost
+### 1.b RajaOngkir (Komerce) Shipping Cost
 
-**Files**: `app/api/shipping/{provinces,cities,cost}/route.ts`
+**⚠️ Endpoint Starter lama (`api.rajaongkir.com/starter`) DEAD** — RajaOngkir migrasi total ke Komerce per ~2024. Pakai `https://rajaongkir.komerce.id/api/v1/`. API key tetap sama, response shape & city IDs **berubah total**.
+
+**Files**: `app/api/shipping/{provinces,cities,cost}/route.ts` + helper `lib/shipping/rajaongkir.ts`
 
 **Strategi**:
 
 ```
-- API key di env `RAJAONGKIR_API_KEY` (Starter tier — 100 hits/hari, gratis)
-- Origin gudang di env `RAJAONGKIR_ORIGIN_CITY_ID` (default 152 = Jakarta Pusat)
+- API key di env `RAJAONGKIR_API_KEY` (akun Komerce — gratis tier)
+- Origin gudang di env `RAJAONGKIR_ORIGIN_CITY_ID` (ID Komerce, BUKAN Starter lama!)
+  Referensi DKI Jakarta: 135=Jakbar, 136=Jaksel, 137=Jakpus, 138=Jakut, 139=Jaktim, 141=Kep.Seribu
   → DISIMPAN DI SERVER, alamat gudang fisik tidak ditampilkan di UI publik
-- Provinces & cities: GET dengan `next: { revalidate: 86400 }` (cache 24 jam)
-  → 1 request/hari saja per resource, hemat kuota
+- Provinces: GET `/destination/province` (cache 24 jam)
+- Cities:    GET `/destination/city/{province_id}` (PATH param, cache 24 jam)
+- Cost:      POST `/calculate/domestic-cost` form-encoded (origin, destination, weight, courier)
+- Response shape Komerce: `{meta: {code, status, message}, data: [...]}`
+- Server route map output Komerce ke shape lama (province_id, city_id, city_name) supaya frontend tetap kompat
+- Komerce TIDAK return `type` (Kota/Kabupaten) atau `postal_code` di city response — postal_code user input manual
 - Cost: POST paralel ke 3 kurir (JNE/TIKI/POS) via Promise.allSettled
   → Flatten + sort ascending by cost, return array {courier, courierName, service, description, cost, etd}
-- Frontend cuma render hasilnya, tidak transform
 ```
 
-**Kenapa Starter (bukan Pro/Basic)**:
+**Catatan**:
 
-- Cukup untuk skala UMKM (100 hit ongkir + 1 hit cities/hari)
-- Pro/Basic butuh subdistrict/kecamatan-level detail — kita tidak butuh, user input kecamatan manual
+- City IDs Komerce ≠ Starter lama. Jakarta Pusat: 152→137, Jakarta Timur: 154→139, dst.
+- Cukup untuk skala UMKM. Kalau perlu kecamatan-level → upgrade ke Komerce paid plan
 
 **Geolocation di checkout** (UX ala Shopee):
 
