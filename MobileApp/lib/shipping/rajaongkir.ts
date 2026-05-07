@@ -1,9 +1,13 @@
 /**
- * Raja Ongkir Starter — zona & ongkir (server-only).
- * Titik asal penjual: RAJAONGKIR_ORIGIN_CITY_ID (env), tidak ditampilkan di UI.
+ * Raja Ongkir (Komerce) — endpoint baru sejak migrasi.
+ * Lama: api.rajaongkir.com/starter (DEAD)
+ * Baru: rajaongkir.komerce.id/api/v1/
+ *
+ * Titik asal penjual: RAJAONGKIR_ORIGIN_CITY_ID (env, ID Komerce, BUKAN ID Starter lama).
+ *   Jakarta Pusat = 137, Jakarta Selatan = 136, Jakarta Timur = 139, dll.
  */
 
-const RAJAONGKIR_URL = "https://api.rajaongkir.com/starter";
+const KOMERCE_URL = "https://rajaongkir.komerce.id/api/v1";
 
 const COURIERS = ["jne", "tiki", "pos"] as const;
 
@@ -23,7 +27,7 @@ export interface RajaOngkirShippingOption {
 }
 
 export function getOriginCityId(): string {
-  return process.env.RAJAONGKIR_ORIGIN_CITY_ID?.trim() || "152";
+  return process.env.RAJAONGKIR_ORIGIN_CITY_ID?.trim() || "137";
 }
 
 function requireApiKey(): string {
@@ -32,19 +36,25 @@ function requireApiKey(): string {
   return key;
 }
 
-/** Ambil semua opsi ongkir (Starter) untuk tujuan kota + berat (gram). */
+interface KomerceCostRow {
+  name?: string;
+  code?: string;
+  service?: string;
+  description?: string;
+  cost?: number;
+  etd?: string;
+}
+
+interface KomerceEnvelope<T> {
+  meta?: { code?: number; status?: string; message?: string };
+  data?: T;
+}
+
+/** Ambil semua opsi ongkir untuk tujuan kota + berat (gram). */
 export async function fetchShippingOptions(
   destinationCityId: string,
   weightGrams: number
 ): Promise<RajaOngkirShippingOption[]> {
-  type RoCostRow = {
-    costs?: Array<{
-      service: string;
-      description: string;
-      cost: Array<{ value: number; etd: string }>;
-    }>;
-  };
-
   const API_KEY = requireApiKey();
   const origin = getOriginCityId();
 
@@ -61,39 +71,36 @@ export async function fetchShippingOptions(
         weight: String(Math.round(weightGrams)),
         courier,
       });
-      const res = await fetch(`${RAJAONGKIR_URL}/cost`, {
+      const res = await fetch(`${KOMERCE_URL}/calculate/domestic-cost`, {
         method: "POST",
         headers: { key: API_KEY, "content-type": "application/x-www-form-urlencoded" },
         body: body.toString(),
       });
-      const json: unknown = await res.json();
-      const ro = json as { rajaongkir?: { status?: boolean; results?: unknown[]; message?: string } };
-      if (ro?.rajaongkir?.status === false) {
-        throw new Error(ro.rajaongkir.message ?? "Gagal hitung ongkir (Raja Ongkir).");
+      const json = (await res.json()) as KomerceEnvelope<KomerceCostRow[]>;
+      if (json?.meta?.code !== 200) {
+        throw new Error(json?.meta?.message ?? `Komerce HTTP ${res.status} (${courier})`);
       }
-      const resultsArr = ro?.rajaongkir?.results ?? [];
-      return { courier, data: resultsArr };
+      return { courier, data: json.data ?? [] };
     })
   );
 
   const options: RajaOngkirShippingOption[] = [];
 
   for (const result of results) {
-    if (result.status !== "fulfilled") continue;
+    if (result.status !== "fulfilled") {
+      console.error("[komerce/cost] courier failed:", result.reason);
+      continue;
+    }
     const { courier, data } = result.value;
-    for (const item of data as RoCostRow[]) {
-      for (const svc of item.costs ?? []) {
-        const cost = svc.cost?.[0]?.value ?? 0;
-        const etd = svc.cost?.[0]?.etd ?? "-";
-        options.push({
-          courier,
-          courierName: COURIER_NAMES[courier] ?? courier.toUpperCase(),
-          service: svc.service,
-          description: svc.description,
-          cost,
-          etd,
-        });
-      }
+    for (const row of data) {
+      options.push({
+        courier,
+        courierName: COURIER_NAMES[courier] ?? courier.toUpperCase(),
+        service: String(row.service ?? "-"),
+        description: String(row.description ?? ""),
+        cost: Number(row.cost ?? 0),
+        etd: String(row.etd ?? "-"),
+      });
     }
   }
 
@@ -109,9 +116,6 @@ export function findMatchingShippingOption(
   cost: number
 ): RajaOngkirShippingOption | undefined {
   return options.find(
-    (o) =>
-      o.courier === courier &&
-      o.service === service &&
-      o.cost === cost
+    (o) => o.courier === courier && o.service === service && o.cost === cost
   );
 }

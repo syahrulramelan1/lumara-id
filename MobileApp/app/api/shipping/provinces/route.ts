@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
-const RAJAONGKIR_URL = "https://api.rajaongkir.com/starter";
+const KOMERCE_URL = "https://rajaongkir.komerce.id/api/v1";
+
+interface KomerceProvinceRow { id: number | string; name: string }
 
 export async function GET() {
   try {
@@ -12,43 +14,40 @@ export async function GET() {
       );
     }
 
-    const res = await fetch(`${RAJAONGKIR_URL}/province`, {
+    const res = await fetch(`${KOMERCE_URL}/destination/province`, {
       headers: { key: API_KEY },
       next: { revalidate: 86400 },
     });
 
     const rawText = await res.text();
-    let json: unknown = null;
+    let json: { meta?: { code?: number; message?: string }; data?: KomerceProvinceRow[] } | null = null;
     try { json = JSON.parse(rawText); } catch { /* keep null */ }
 
-    const ro = (json as { rajaongkir?: { status?: { code?: number; description?: string }; results?: unknown[] } } | null)?.rajaongkir;
-
-    // Log lengkap di Vercel runtime logs (Functions tab)
     console.log("[shipping/provinces]", {
       httpStatus: res.status,
-      roStatusCode: ro?.status?.code,
-      roStatusDesc: ro?.status?.description,
-      resultsCount: Array.isArray(ro?.results) ? ro.results.length : 0,
+      metaCode: json?.meta?.code,
+      metaMessage: json?.meta?.message,
+      dataCount: Array.isArray(json?.data) ? json.data.length : 0,
       bodyPreview: rawText.slice(0, 400),
     });
 
-    if (!res.ok || ro?.status?.code !== 200) {
+    if (!res.ok || json?.meta?.code !== 200) {
       return NextResponse.json(
         {
           success: false,
-          error: ro?.status?.description ?? `RajaOngkir HTTP ${res.status}`,
-          details: {
-            httpStatus: res.status,
-            roStatusCode: ro?.status?.code,
-            roStatusDesc: ro?.status?.description,
-            bodyPreview: rawText.slice(0, 400),
-          },
+          error: json?.meta?.message ?? `Komerce HTTP ${res.status}`,
+          details: { httpStatus: res.status, metaCode: json?.meta?.code, bodyPreview: rawText.slice(0, 400) },
         },
         { status: 502 }
       );
     }
 
-    const provinces = ro?.results ?? [];
+    // Map ke shape yang sama dengan API lama supaya frontend tidak perlu ubah
+    const provinces = (json.data ?? []).map((p) => ({
+      province_id: String(p.id),
+      province: p.name,
+    }));
+
     return NextResponse.json({ success: true, data: provinces });
   } catch (err) {
     console.error("[shipping/provinces] exception:", err);
