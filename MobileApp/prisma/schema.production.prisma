@@ -94,12 +94,15 @@ model Order {
   userId           String
   status           String    @default("PENDING")
   total            Int
+  shippingCost     Int       @default(0) @map("shipping_cost")
   shippingAddress  Json      @default("{}")
   paymentMethod    String?
 
-  // ── Pengiriman manual ──────────────────────
+  // ── Kurir dipilih buyer saat checkout ─────
   courier          String?
   courierService   String?   @map("courier_service")
+
+  // ── Pengiriman manual (diisi admin) ───────
   trackingNumber   String?   @db.Text @map("tracking_number")
   shippedAt        DateTime? @map("shipped_at")
   estimatedArrival DateTime? @map("estimated_arrival")

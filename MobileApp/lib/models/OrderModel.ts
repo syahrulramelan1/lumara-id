@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { Order } from "@prisma/client";
+import type { Order, Prisma } from "@prisma/client";
 import type { OrderWithItems, OrderTracking, ShippingAddress, CartItem } from "@/types";
 
 // List-mode: tidak include array trackings (hemat memory di Render free tier).
@@ -64,17 +64,24 @@ export class OrderModel {
     userId: string,
     items: CartItem[],
     shippingAddress: ShippingAddress,
-    paymentMethod: string
+    paymentMethod: string,
+    shippingCost = 0,
+    courier?: string,
+    courierService?: string
   ): Promise<Order> {
-    const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const itemsTotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const total = itemsTotal + shippingCost;
 
     const order = await prisma.order.create({
       data: {
         userId,
         total,
-        shippingAddress: JSON.stringify(shippingAddress),
+        shippingCost,
+        shippingAddress: shippingAddress as unknown as Prisma.InputJsonValue,
         paymentMethod,
         status: "PENDING",
+        courier: courier ?? null,
+        courierService: courierService ?? null,
         items: {
           create: items.map((i) => ({
             productId: i.productId,

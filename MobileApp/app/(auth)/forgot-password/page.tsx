@@ -23,13 +23,11 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     try {
       const redirectTo = `${window.location.origin}/reset-password`;
-      const { data, error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo });
-      console.log("reset result:", { data, error });
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo });
       if (error) throw error;
       setSent(true);
       toast.success(t.auth.forgot_sent);
     } catch (err) {
-      console.error("reset error:", err);
       const msg = err instanceof Error ? err.message : t.auth.error;
       toast.error(msg);
     } finally {

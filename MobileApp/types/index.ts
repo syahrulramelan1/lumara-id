@@ -124,4 +124,11 @@ export interface ShippingAddress {
   postalCode: string;
   address: string;
   notes?: string;
+  /** Raja Ongkir — province_id (master provinsi) */
+  provinceId?: string;
+  /** Raja Ongkir — city_id (master kota, untuk hitung ongkir) */
+  cityId?: string;
+  /** Opsional: koordinat dari tombol geolocation (bantu patokan antar). */
+  geoLat?: number;
+  geoLng?: number;
 }

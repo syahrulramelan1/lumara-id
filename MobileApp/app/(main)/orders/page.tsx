@@ -5,6 +5,7 @@ import { Package, ChevronRight, LogIn, ShoppingBag } from "lucide-react";
 import { useUIStore } from "@/store/uiStore";
 import { useAuthStore } from "@/store/authStore";
 import { getT } from "@/lib/i18n";
+import { createClientComponent } from "@/lib/supabase-browser";
 import type { OrderWithItems } from "@/types";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -43,13 +44,26 @@ export default function OrdersPage() {
 
   useEffect(() => {
     if (!dbUser?.id) return;
+    let cancelled = false;
     setLoading(true);
-    fetch(`/api/orders?userId=${dbUser.id}`)
-      .then((r) => r.json())
-      .then((d: { success: boolean; data?: OrderWithItems[] }) => {
-        if (d.success) setOrders(d.data ?? []);
-      })
-      .finally(() => setLoading(false));
+    (async () => {
+      try {
+        const supabase = createClientComponent();
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+        if (!token) return;
+        const r = await fetch("/api/orders?page=1", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const d = (await r.json()) as { success: boolean; data?: OrderWithItems[] };
+        if (!cancelled && d.success) setOrders(d.data ?? []);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [dbUser?.id]);
 
   if (authLoading) {

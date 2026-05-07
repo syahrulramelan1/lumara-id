@@ -1,5 +1,6 @@
 import { orderModel } from "@/lib/models/OrderModel";
 import { productModel } from "@/lib/models/ProductModel";
+import { fetchShippingOptions, findMatchingShippingOption } from "@/lib/shipping/rajaongkir";
 import type { CartItem, ShippingAddress, OrderWithItems } from "@/types";
 
 export class OrderService {
@@ -13,15 +14,36 @@ export class OrderService {
     userId: string,
     items: CartItem[],
     shippingAddress: ShippingAddress,
-    paymentMethod: string
+    paymentMethod: string,
+    shippingCost = 0,
+    courier?: string,
+    courierService?: string,
+    weightGrams = 1000
   ) {
+    if (!shippingAddress.cityId?.trim()) {
+      throw new Error("Pilih kota tujuan (Raja Ongkir) untuk menghitung ongkir.");
+    }
+    if (!courier?.trim() || !courierService?.trim()) {
+      throw new Error("Pilih kurir dan layanan pengiriman.");
+    }
+    const w = Math.round(Number(weightGrams));
+    if (!Number.isFinite(w) || w < 100) {
+      throw new Error("Berat paket tidak valid (minimal 100 gram).");
+    }
+
+    const options = await fetchShippingOptions(shippingAddress.cityId.trim(), w);
+    const ok = findMatchingShippingOption(options, courier.trim(), courierService.trim(), shippingCost);
+    if (!ok) {
+      throw new Error("Ongkir tidak valid atau sudah berubah. Silakan hitung ulang ongkir.");
+    }
+
     for (const item of items) {
       const product = await productModel.findById(item.productId);
       if (!product) throw new Error(`Produk ${item.name} tidak ditemukan`);
       if (product.stock < item.quantity) throw new Error(`Stok ${item.name} tidak cukup`);
     }
 
-    const order = await orderModel.create(userId, items, shippingAddress, paymentMethod);
+    const order = await orderModel.create(userId, items, shippingAddress, paymentMethod, shippingCost, courier, courierService);
 
     await Promise.all(
       items.map((item) => productModel.decrementStock(item.productId, item.quantity))
