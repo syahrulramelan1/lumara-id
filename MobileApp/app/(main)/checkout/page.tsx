@@ -60,16 +60,26 @@ const COURIER_BADGE_COLORS: Record<string, string> = {
   jne: "bg-red-600",
   tiki: "bg-blue-600",
   pos: "bg-orange-500",
+  jnt: "bg-rose-500",
+};
+
+const COURIER_BADGE_LABELS: Record<string, string> = {
+  jne: "JNE",
+  tiki: "TIKI",
+  pos: "POS",
+  jnt: "J&T",
 };
 
 function CourierBadge({ code }: { code: string }) {
-  const bg = COURIER_BADGE_COLORS[code.toLowerCase()] ?? "bg-gray-500";
+  const key = code.toLowerCase();
+  const bg = COURIER_BADGE_COLORS[key] ?? "bg-gray-500";
+  const label = COURIER_BADGE_LABELS[key] ?? code.toUpperCase();
   return (
     <div
       className={`w-12 h-12 rounded-[10px] flex items-center justify-center text-white text-[11px] font-bold tracking-wide shrink-0 ${bg}`}
       aria-hidden
     >
-      {code.toUpperCase()}
+      {label}
     </div>
   );
 }

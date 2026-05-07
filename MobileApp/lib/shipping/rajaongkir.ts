@@ -9,12 +9,13 @@
 
 const KOMERCE_URL = "https://rajaongkir.komerce.id/api/v1";
 
-const COURIERS = ["jne", "tiki", "pos"] as const;
+const COURIERS = ["jne", "tiki", "pos", "jnt"] as const;
 
 const COURIER_NAMES: Record<string, string> = {
   jne: "JNE",
   tiki: "TIKI",
   pos: "POS Indonesia",
+  jnt: "J&T Express",
 };
 
 export interface RajaOngkirShippingOption {
