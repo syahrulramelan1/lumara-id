@@ -18,12 +18,48 @@ export async function GET(req: NextRequest) {
 
     const res = await fetch(`${RAJAONGKIR_URL}/city?province=${provinceId}`, {
       headers: { key: API_KEY },
-      next: { revalidate: 86400 }, // cache 24 jam
+      next: { revalidate: 86400 },
     });
-    const json = await res.json();
-    const cities = json?.rajaongkir?.results ?? [];
+
+    const rawText = await res.text();
+    let json: unknown = null;
+    try { json = JSON.parse(rawText); } catch { /* keep null */ }
+
+    const ro = (json as { rajaongkir?: { status?: { code?: number; description?: string }; results?: unknown[] } } | null)?.rajaongkir;
+
+    console.log("[shipping/cities]", {
+      provinceId,
+      httpStatus: res.status,
+      roStatusCode: ro?.status?.code,
+      roStatusDesc: ro?.status?.description,
+      resultsCount: Array.isArray(ro?.results) ? ro.results.length : 0,
+      bodyPreview: rawText.slice(0, 400),
+    });
+
+    if (!res.ok || ro?.status?.code !== 200) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: ro?.status?.description ?? `RajaOngkir HTTP ${res.status}`,
+          details: {
+            httpStatus: res.status,
+            roStatusCode: ro?.status?.code,
+            roStatusDesc: ro?.status?.description,
+            bodyPreview: rawText.slice(0, 400),
+          },
+        },
+        { status: 502 }
+      );
+    }
+
+    const cities = ro?.results ?? [];
     return NextResponse.json({ success: true, data: cities });
-  } catch {
-    return NextResponse.json({ success: false, error: "Gagal mengambil data kota" }, { status: 500 });
+  } catch (err) {
+    console.error("[shipping/cities] exception:", err);
+    const msg = err instanceof Error ? err.message : "Gagal mengambil data kota";
+    return NextResponse.json(
+      { success: false, error: msg, details: { exception: String(err) } },
+      { status: 500 }
+    );
   }
 }

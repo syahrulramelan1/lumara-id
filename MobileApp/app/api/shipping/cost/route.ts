@@ -17,9 +17,18 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await fetchShippingOptions(String(destination), weightNum);
+    console.log("[shipping/cost]", {
+      destination: String(destination),
+      weight: weightNum,
+      optionsCount: data.length,
+    });
     return NextResponse.json({ success: true, data });
   } catch (err) {
+    console.error("[shipping/cost] exception:", err);
     const msg = err instanceof Error ? err.message : "Gagal menghitung ongkir";
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: msg, details: { exception: String(err) } },
+      { status: 500 }
+    );
   }
 }

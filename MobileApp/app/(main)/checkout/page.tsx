@@ -93,10 +93,12 @@ export default function CheckoutPage() {
     (async () => {
       try {
         const r = await fetch("/api/shipping/provinces");
-        const j = (await r.json()) as { success?: boolean; data?: RoProvince[]; error?: string };
+        const j = (await r.json()) as { success?: boolean; data?: RoProvince[]; error?: string; details?: unknown };
+        console.log("[provinces] status:", r.status, "body:", j);
         if (!r.ok || !j.success) throw new Error(j.error ?? "Gagal memuat provinsi");
         if (!cancelled) setProvinces(j.data ?? []);
       } catch (e) {
+        console.error("[provinces] error:", e);
         if (!cancelled) toast.error(e instanceof Error ? e.message : "Gagal memuat provinsi");
       } finally {
         if (!cancelled) setLoadingProvinces(false);
@@ -114,10 +116,12 @@ export default function CheckoutPage() {
     setSelectedShip(null);
     try {
       const r = await fetch(`/api/shipping/cities?province_id=${encodeURIComponent(provinceId)}`);
-      const j = (await r.json()) as { success?: boolean; data?: RoCity[]; error?: string };
+      const j = (await r.json()) as { success?: boolean; data?: RoCity[]; error?: string; details?: unknown };
+      console.log("[cities] status:", r.status, "body:", j);
       if (!r.ok || !j.success) throw new Error(j.error ?? "Gagal memuat kota");
       setCities(j.data ?? []);
     } catch (e) {
+      console.error("[cities] error:", e);
       toast.error(e instanceof Error ? e.message : "Gagal memuat kota");
     } finally {
       setLoadingCities(false);
@@ -163,7 +167,8 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ destination: addr.cityId, weight: wGrams }),
       });
-      const j = (await r.json()) as { success?: boolean; data?: ShipOption[]; error?: string };
+      const j = (await r.json()) as { success?: boolean; data?: ShipOption[]; error?: string; details?: unknown };
+      console.log("[cost] status:", r.status, "body:", j);
       if (!r.ok || !j.success) throw new Error(j.error ?? "Gagal hitung ongkir");
       const opts = j.data ?? [];
       if (opts.length === 0) {
@@ -171,6 +176,7 @@ export default function CheckoutPage() {
       }
       setShipOptions(opts);
     } catch (e) {
+      console.error("[cost] error:", e);
       toast.error(e instanceof Error ? e.message : "Gagal hitung ongkir");
     } finally {
       setLoadingCost(false);
