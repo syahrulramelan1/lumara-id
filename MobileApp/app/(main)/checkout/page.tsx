@@ -50,10 +50,14 @@ function formatIDR(n: number) {
   }).format(n);
 }
 
+/** "2 day" → "2 hari", "1-3 day" → "1 - 3 hari", "" → "" (no estimate) */
 function formatEtd(etd: string): string {
-  if (!etd || etd === "-") return "—";
-  // Komerce return "2 day", "1-3 day". Translate ke Indonesia.
-  return etd.replace(/\s*days?\s*$/i, " hari").trim() || etd;
+  if (!etd || etd === "-") return "";
+  const cleaned = etd.replace(/\s*days?\s*$/i, "").trim();
+  if (!cleaned) return "";
+  // Spasi di sekitar dash supaya rapi: "1-3" → "1 - 3"
+  const spaced = cleaned.replace(/\s*-\s*/g, " - ");
+  return `${spaced} hari`;
 }
 
 const COURIER_BADGE_COLORS: Record<string, string> = {
@@ -566,12 +570,17 @@ export default function CheckoutPage() {
                   selectedShip?.courier === o.courier &&
                   selectedShip?.service === o.service &&
                   selectedShip?.cost === o.cost;
+                const etdLabel = formatEtd(o.etd);
+                const serviceName = o.description || o.service;
+                const title = etdLabel
+                  ? `${o.courierName} · ${serviceName} (${etdLabel})`
+                  : `${o.courierName} · ${serviceName}`;
                 return (
                   <button
                     key={`${o.courier}-${o.service}-${o.cost}`}
                     type="button"
                     onClick={() => setSelectedShip(o)}
-                    className={`w-full text-left px-3 py-2.5 rounded-[12px] border transition-colors ${
+                    className={`w-full text-left px-3 py-3 rounded-[12px] border transition-colors ${
                       active
                         ? "border-primary bg-primary/5"
                         : "border-border hover:border-primary/40"
@@ -579,15 +588,10 @@ export default function CheckoutPage() {
                   >
                     <div className="flex items-center gap-3">
                       <CourierBadge code={o.courier} />
-                      <div className="flex-1 min-w-0">
-                        <div className={`text-sm font-medium truncate ${active ? "text-primary" : ""}`}>
-                          {o.courierName} · {o.description || o.service}
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-0.5">
-                          Estimasi {formatEtd(o.etd)} · Layanan {o.service}
-                        </div>
+                      <div className={`flex-1 min-w-0 text-sm font-medium truncate ${active ? "text-primary" : ""}`}>
+                        {title}
                       </div>
-                      <div className="flex flex-col items-end gap-1.5 shrink-0">
+                      <div className="flex items-center gap-3 shrink-0">
                         <span className={`text-sm font-semibold ${active ? "text-primary" : ""}`}>
                           {formatIDR(o.cost)}
                         </span>
