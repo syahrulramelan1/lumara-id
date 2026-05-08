@@ -70,10 +70,34 @@ const COURIER_BADGE_LABELS: Record<string, string> = {
   jnt: "J&T",
 };
 
+const COURIER_LOGOS: Record<string, string> = {
+  jne: "/kurir/jne.webp",
+  tiki: "/kurir/tiki.webp",
+  pos: "/kurir/posindonesia.png",
+  jnt: "/kurir/jdant.jpg",
+};
+
 function CourierBadge({ code }: { code: string }) {
   const key = code.toLowerCase();
+  const logo = COURIER_LOGOS[key];
   const bg = COURIER_BADGE_COLORS[key] ?? "bg-gray-500";
   const label = COURIER_BADGE_LABELS[key] ?? code.toUpperCase();
+  const [errored, setErrored] = useState(false);
+
+  if (logo && !errored) {
+    return (
+      <div className="w-12 h-12 rounded-[10px] bg-white border border-card-border flex items-center justify-center shrink-0 overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={logo}
+          alt={label}
+          className="w-full h-full object-contain p-1"
+          onError={() => setErrored(true)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div
       className={`w-12 h-12 rounded-[10px] flex items-center justify-center text-white text-[11px] font-bold tracking-wide shrink-0 ${bg}`}
