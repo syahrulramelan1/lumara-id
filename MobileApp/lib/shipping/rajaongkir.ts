@@ -33,7 +33,7 @@ export function getOriginCityId(): string {
 
 function requireApiKey(): string {
   const key = process.env.RAJAONGKIR_API_KEY?.trim();
-  if (!key) throw new Error("Konfigurasi Raja Ongkir belum diset (RAJAONGKIR_API_KEY).");
+  if (!key) throw new Error("Sistem ongkir belum dikonfigurasi. Hubungi admin.");
   return key;
 }
 

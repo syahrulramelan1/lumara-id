@@ -9,7 +9,7 @@ export async function GET() {
     const API_KEY = process.env.RAJAONGKIR_API_KEY?.trim();
     if (!API_KEY) {
       return NextResponse.json(
-        { success: false, error: "Raja Ongkir belum dikonfigurasi (RAJAONGKIR_API_KEY)." },
+        { success: false, error: "Sistem ongkir belum dikonfigurasi. Hubungi admin." },
         { status: 503 }
       );
     }

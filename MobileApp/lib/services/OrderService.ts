@@ -21,7 +21,7 @@ export class OrderService {
     weightGrams = 1000
   ) {
     if (!shippingAddress.cityId?.trim()) {
-      throw new Error("Pilih kota tujuan (Raja Ongkir) untuk menghitung ongkir.");
+      throw new Error("Pilih kota tujuan untuk menghitung ongkir.");
     }
     if (!courier?.trim() || !courierService?.trim()) {
       throw new Error("Pilih kurir dan layanan pengiriman.");
