@@ -105,8 +105,37 @@ export async function fetchShippingOptions(
     }
   }
 
-  options.sort((a, b) => a.cost - b.cost);
-  return options;
+  // Filter ala e-commerce fashion (Shopee/Tokopedia style):
+  // drop trucking/cargo & ETA > 7 hari (irrelevant buat barang ringan).
+  const filtered = options.filter(isFashionFriendly);
+
+  filtered.sort((a, b) => a.cost - b.cost);
+  return filtered;
+}
+
+/**
+ * Filter layanan yang masuk akal buat fashion store:
+ * - Drop layanan kontainer/truk (JNE Trucking, dll) — buat barang berat
+ * - Drop ETA > 7 hari — buyer fashion gak nungguin sebulan
+ * - Keep layanan tanpa ETD (mis. J&T return etd kosong)
+ */
+function isFashionFriendly(o: RajaOngkirShippingOption): boolean {
+  const haystack = `${o.description} ${o.service} ${o.courier}`.toLowerCase();
+  const blocked = ["trucking", "cargo", "truk", "kargo", "container", "freight", "city courier"];
+  if (blocked.some((kw) => haystack.includes(kw))) return false;
+
+  const maxDays = parseMaxEtdDays(o.etd);
+  if (maxDays !== null && maxDays > 7) return false;
+
+  return true;
+}
+
+/** "1-3 day" → 3, "2 day" → 2, "7-14 day" → 14, "" → null */
+function parseMaxEtdDays(etd: string): number | null {
+  if (!etd) return null;
+  const matches = etd.match(/\d+/g);
+  if (!matches || matches.length === 0) return null;
+  return Math.max(...matches.map(Number));
 }
 
 /** Cocokkan pilihan buyer dengan hasil resmi RO (hindari manipulasi ongkir). */
