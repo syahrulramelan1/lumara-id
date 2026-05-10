@@ -31,8 +31,8 @@ export class OrderService {
       throw new Error("Berat paket tidak valid (minimal 100 gram).");
     }
 
-    const options = await fetchShippingOptions(shippingAddress.cityId.trim(), w);
-    const ok = findMatchingShippingOption(options, courier.trim(), courierService.trim(), shippingCost);
+    const result = await fetchShippingOptions(shippingAddress.cityId.trim(), w);
+    const ok = findMatchingShippingOption(result.options, courier.trim(), courierService.trim(), shippingCost);
     if (!ok) {
       throw new Error("Ongkir tidak valid atau sudah berubah. Silakan hitung ulang ongkir.");
     }

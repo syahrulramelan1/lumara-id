@@ -27,6 +27,22 @@ export interface RajaOngkirShippingOption {
   etd: string;
 }
 
+export interface CourierDiagnostic {
+  courier: string;
+  status: "ok" | "empty" | "error";
+  rawCount: number;
+  httpStatus?: number;
+  metaCode?: number;
+  message?: string;
+}
+
+export interface ShippingFetchResult {
+  options: RajaOngkirShippingOption[];
+  diagnostics: CourierDiagnostic[];
+  rawCount: number;        // total option dari Komerce sebelum filter
+  filteredCount: number;   // berapa yang kena filter (trucking/cargo/ETA>14)
+}
+
 export function getOriginCityId(): string {
   return process.env.RAJAONGKIR_ORIGIN_CITY_ID?.trim() || "137";
 }
@@ -51,11 +67,11 @@ interface KomerceEnvelope<T> {
   data?: T;
 }
 
-/** Ambil semua opsi ongkir untuk tujuan kota + berat (gram). */
+/** Ambil semua opsi ongkir + diagnostic per kurir. */
 export async function fetchShippingOptions(
   destinationCityId: string,
   weightGrams: number
-): Promise<RajaOngkirShippingOption[]> {
+): Promise<ShippingFetchResult> {
   const API_KEY = requireApiKey();
   const origin = getOriginCityId();
 
@@ -64,8 +80,8 @@ export async function fetchShippingOptions(
     throw new Error("Berat paket minimal 100 gram.");
   }
 
-  const results = await Promise.allSettled(
-    COURIERS.map(async (courier) => {
+  const settled = await Promise.allSettled(
+    COURIERS.map(async (courier): Promise<{ courier: string; rows: KomerceCostRow[]; httpStatus: number; metaCode?: number; message?: string }> => {
       const body = new URLSearchParams({
         origin,
         destination: String(destinationCityId).trim(),
@@ -77,23 +93,58 @@ export async function fetchShippingOptions(
         headers: { key: API_KEY, "content-type": "application/x-www-form-urlencoded" },
         body: body.toString(),
       });
-      const json = (await res.json()) as KomerceEnvelope<KomerceCostRow[]>;
-      if (json?.meta?.code !== 200) {
-        throw new Error(json?.meta?.message ?? `Komerce HTTP ${res.status} (${courier})`);
+      const json = (await res.json().catch(() => null)) as KomerceEnvelope<KomerceCostRow[]> | null;
+      const metaCode = json?.meta?.code;
+      const message = json?.meta?.message;
+
+      if (metaCode !== 200) {
+        // Throw dengan info — diagnostic ditangkap di catch
+        const err = new Error(message ?? `Komerce HTTP ${res.status} (${courier})`) as Error & {
+          httpStatus: number;
+          metaCode?: number;
+          courierCode: string;
+        };
+        err.httpStatus = res.status;
+        err.metaCode = metaCode;
+        err.courierCode = courier;
+        throw err;
       }
-      return { courier, data: json.data ?? [] };
+      return { courier, rows: json?.data ?? [], httpStatus: res.status, metaCode, message };
     })
   );
 
   const options: RajaOngkirShippingOption[] = [];
+  const diagnostics: CourierDiagnostic[] = [];
 
-  for (const result of results) {
-    if (result.status !== "fulfilled") {
-      console.error("[komerce/cost] courier failed:", result.reason);
+  for (let i = 0; i < settled.length; i++) {
+    const result = settled[i];
+    const courier = COURIERS[i];
+
+    if (result.status === "rejected") {
+      const reason = result.reason as Error & { httpStatus?: number; metaCode?: number };
+      console.error(`[komerce/cost] ${courier} failed:`, reason.message);
+      diagnostics.push({
+        courier,
+        status: "error",
+        rawCount: 0,
+        httpStatus: reason.httpStatus,
+        metaCode: reason.metaCode,
+        message: reason.message,
+      });
       continue;
     }
-    const { courier, data } = result.value;
-    for (const row of data) {
+
+    const { rows, httpStatus, metaCode, message } = result.value;
+    diagnostics.push({
+      courier,
+      status: rows.length > 0 ? "ok" : "empty",
+      rawCount: rows.length,
+      httpStatus,
+      metaCode,
+      message: rows.length === 0 ? (message ?? "Komerce balas kosong") : undefined,
+    });
+
+    for (const row of rows) {
       options.push({
         courier,
         courierName: COURIER_NAMES[courier] ?? courier.toUpperCase(),
@@ -105,12 +156,16 @@ export async function fetchShippingOptions(
     }
   }
 
-  // Filter ala e-commerce fashion (Shopee/Tokopedia style):
-  // drop trucking/cargo & ETA > 7 hari (irrelevant buat barang ringan).
+  const rawCount = options.length;
   const filtered = options.filter(isFashionFriendly);
-
   filtered.sort((a, b) => a.cost - b.cost);
-  return filtered;
+
+  return {
+    options: filtered,
+    diagnostics,
+    rawCount,
+    filteredCount: rawCount - filtered.length,
+  };
 }
 
 /**

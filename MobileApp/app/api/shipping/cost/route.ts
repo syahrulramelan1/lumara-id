@@ -16,13 +16,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const data = await fetchShippingOptions(String(destination), weightNum);
+    const result = await fetchShippingOptions(String(destination), weightNum);
     console.log("[shipping/cost]", {
       destination: String(destination),
       weight: weightNum,
-      optionsCount: data.length,
+      filteredOptions: result.options.length,
+      rawCount: result.rawCount,
+      filteredCount: result.filteredCount,
+      diagnostics: result.diagnostics,
     });
-    return NextResponse.json({ success: true, data });
+
+    // Always include diagnostics so client bisa debug kenapa array kosong
+    return NextResponse.json({
+      success: true,
+      data: result.options,
+      debug: {
+        rawCount: result.rawCount,
+        filteredCount: result.filteredCount,
+        perCourier: result.diagnostics,
+      },
+    });
   } catch (err) {
     console.error("[shipping/cost] exception:", err);
     const msg = err instanceof Error ? err.message : "Gagal menghitung ongkir";
