@@ -279,7 +279,9 @@ export default function CheckoutPage() {
       const normalize = (s: string) =>
         s
           .toLowerCase()
-          .replace(/^(daerah\s+khusus\s+ibukota\s+|provinsi\s+|kota\s+|kabupaten\s+|kab\.\s+)/i, "")
+          .replace(/^(daerah\s+khusus\s+ibukota\s+|provinsi\s+|kota\s+|kabupaten\s+|kab\.\s+|dki\s+|di\s+)/i, "")
+          .replace(/\s+(special\s+region|special\s+capital\s+region)\s*$/i, "")
+          .replace(/[()]/g, "")
           .replace(/\s+/g, " ")
           .trim();
 
@@ -549,7 +551,7 @@ export default function CheckoutPage() {
                 </option>
                 {cities.map((c) => (
                   <option key={c.city_id} value={c.city_id}>
-                    {c.type} {c.city_name}
+                    {`${c.type ?? ""} ${c.city_name}`.trim()}
                   </option>
                 ))}
               </select>

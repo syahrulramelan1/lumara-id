@@ -13,16 +13,54 @@ export default function ResetPasswordPage() {
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { language } = useUIStore();
   const t = getT(language);
-  const supabase = createClientComponent();
 
   useEffect(() => {
-    // Supabase inserts session from URL hash automatically on client
-    supabase.auth.onAuthStateChange((event) => {
+    const supabase = createClientComponent();
+    let mounted = true;
+
+    // 1) Cek error eksplisit di URL hash (token expired/invalid).
+    if (typeof window !== "undefined" && window.location.hash) {
+      const hashParams = new URLSearchParams(window.location.hash.slice(1));
+      const hashError = hashParams.get("error_description") ?? hashParams.get("error");
+      if (hashError) {
+        setError(decodeURIComponent(hashError.replace(/\+/g, " ")));
+        return;
+      }
+    }
+
+    // 2) Cek session — Supabase auto-parse URL hash saat browser client init.
+    //    Kalau hash valid recovery, session udah ada di sini.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      if (session) {
+        setReady(true);
+        return;
+      }
+      // Belum siap — coba lagi sekali setelah 1.5s (parse URL kadang async).
+      setTimeout(() => {
+        if (!mounted) return;
+        supabase.auth.getSession().then(({ data: { session: s2 } }) => {
+          if (!mounted) return;
+          if (s2) setReady(true);
+          else setError("Tautan reset password tidak valid atau sudah kadaluarsa.");
+        });
+      }, 1500);
+    });
+
+    // 3) Listener PASSWORD_RECOVERY sebagai fallback.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (!mounted) return;
       if (event === "PASSWORD_RECOVERY") setReady(true);
     });
-  }, [supabase]);
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,8 +74,11 @@ export default function ResetPasswordPage() {
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) throw error;
+      const supabase = createClientComponent();
+      const { error: updateErr } = await supabase.auth.updateUser({ password });
+      if (updateErr) throw updateErr;
+      // Logout recovery session — paksa user login fresh dengan password baru.
+      await supabase.auth.signOut();
       toast.success(t.auth.reset_success);
       router.push("/login");
     } catch (err) {
@@ -59,7 +100,29 @@ export default function ResetPasswordPage() {
       </div>
 
       <div className="bg-card border border-card-border rounded-2xl p-6 shadow-card">
-        {!ready ? (
+        {error ? (
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto">
+              <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <p className="text-sm font-medium">{error}</p>
+            <p className="text-xs text-muted-foreground">Silakan minta tautan reset password baru.</p>
+            <Link
+              href="/forgot-password"
+              className="block w-full py-3 bg-primary text-white font-semibold rounded-[12px] hover:bg-primary/90 transition-colors text-sm text-center"
+            >
+              Minta Tautan Baru
+            </Link>
+            <Link
+              href="/login"
+              className="block text-xs text-muted-foreground hover:text-primary"
+            >
+              {t.auth.back_login}
+            </Link>
+          </div>
+        ) : !ready ? (
           <div className="text-center py-4">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
             <p className="text-sm text-muted-foreground">{t.auth.reset_verifying}</p>

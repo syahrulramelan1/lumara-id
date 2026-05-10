@@ -116,7 +116,8 @@ export async function fetchShippingOptions(
 /**
  * Filter layanan yang masuk akal buat fashion store:
  * - Drop layanan kontainer/truk (JNE Trucking, dll) — buat barang berat
- * - Drop ETA > 7 hari — buyer fashion gak nungguin sebulan
+ * - Drop ETA > 14 hari — biar Indonesia Timur (Papua/Maluku/NTT) tetap bisa
+ *   pakai layanan reguler yang ETD 7-14 hari, tapi trucking 15-30 hari out.
  * - Keep layanan tanpa ETD (mis. J&T return etd kosong)
  */
 function isFashionFriendly(o: RajaOngkirShippingOption): boolean {
@@ -125,7 +126,7 @@ function isFashionFriendly(o: RajaOngkirShippingOption): boolean {
   if (blocked.some((kw) => haystack.includes(kw))) return false;
 
   const maxDays = parseMaxEtdDays(o.etd);
-  if (maxDays !== null && maxDays > 7) return false;
+  if (maxDays !== null && maxDays > 14) return false;
 
   return true;
 }
