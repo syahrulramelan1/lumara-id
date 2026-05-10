@@ -5,7 +5,11 @@
  *
  * Titik asal penjual: RAJAONGKIR_ORIGIN_CITY_ID (env, ID Komerce, BUKAN ID Starter lama).
  *   Jakarta Pusat = 137, Jakarta Selatan = 136, Jakarta Timur = 139, dll.
+ *
+ * Quota: Komerce free tier ≈ 100 hits/hari TOTAL (cost+province+cities).
+ * Pakai in-memory cache supaya 1 quota call serve banyak buyer.
  */
+import { cacheGet, cacheSet, TTL } from "@/lib/shipping/cache";
 
 const KOMERCE_URL = "https://rajaongkir.komerce.id/api/v1";
 
@@ -80,18 +84,29 @@ export async function fetchShippingOptions(
     throw new Error("Berat paket minimal 100 gram.");
   }
 
+  const dest = String(destinationCityId).trim();
+  const w = Math.round(weightGrams);
+
+  // Cache per kombinasi (origin, dest, weight) — harga jarang berubah,
+  // 24 jam cukup. Hemat quota Komerce drastis kalau banyak buyer
+  // ke kota yang sama.
+  const cacheKey = `komerce:cost:v1:${origin}:${dest}:${w}`;
+  const cached = cacheGet<ShippingFetchResult>(cacheKey);
+  if (cached) return cached;
+
   const settled = await Promise.allSettled(
     COURIERS.map(async (courier): Promise<{ courier: string; rows: KomerceCostRow[]; httpStatus: number; metaCode?: number; message?: string }> => {
       const body = new URLSearchParams({
         origin,
-        destination: String(destinationCityId).trim(),
-        weight: String(Math.round(weightGrams)),
+        destination: dest,
+        weight: String(w),
         courier,
       });
       const res = await fetch(`${KOMERCE_URL}/calculate/domestic-cost`, {
         method: "POST",
         headers: { key: API_KEY, "content-type": "application/x-www-form-urlencoded" },
         body: body.toString(),
+        cache: "no-store",
       });
       const json = (await res.json().catch(() => null)) as KomerceEnvelope<KomerceCostRow[]> | null;
       const metaCode = json?.meta?.code;
@@ -160,12 +175,20 @@ export async function fetchShippingOptions(
   const filtered = options.filter(isFashionFriendly);
   filtered.sort((a, b) => a.cost - b.cost);
 
-  return {
+  const result: ShippingFetchResult = {
     options: filtered,
     diagnostics,
     rawCount,
     filteredCount: rawCount - filtered.length,
   };
+
+  // Cache HANYA kalau ada hasil sukses (raw > 0). Kalau semua kurir error
+  // (mis. daily limit 429), jangan cache — biar request berikutnya retry.
+  if (rawCount > 0) {
+    cacheSet(cacheKey, result, TTL.ONE_DAY);
+  }
+
+  return result;
 }
 
 /**

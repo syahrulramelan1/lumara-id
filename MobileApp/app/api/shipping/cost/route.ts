@@ -23,10 +23,21 @@ export async function POST(req: NextRequest) {
       filteredOptions: result.options.length,
       rawCount: result.rawCount,
       filteredCount: result.filteredCount,
-      diagnostics: result.diagnostics,
     });
 
-    // Always include diagnostics so client bisa debug kenapa array kosong
+    // Kalau SEMUA kurir kena 429 (daily limit), surface error yg jelas
+    const allRateLimited = result.diagnostics.every((d) => d.metaCode === 429);
+    if (result.options.length === 0 && allRateLimited && result.diagnostics.length > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Sistem ongkir sedang sibuk (kuota harian penuh). Silakan coba beberapa jam lagi.",
+          debug: { perCourier: result.diagnostics, rawCount: 0 },
+        },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       data: result.options,
