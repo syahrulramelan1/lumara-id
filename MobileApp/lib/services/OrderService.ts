@@ -1,7 +1,7 @@
 import { orderModel } from "@/lib/models/OrderModel";
 import { productModel } from "@/lib/models/ProductModel";
 import { fetchShippingOptions, findMatchingShippingOption } from "@/lib/shipping/rajaongkir";
-import { getStaticShippingOptions } from "@/lib/shipping/static";
+import { getStaticShippingOptions, findMatchingStaticOption } from "@/lib/shipping/static";
 import type { CartItem, ShippingAddress, OrderWithItems } from "@/types";
 
 export class OrderService {
@@ -29,31 +29,28 @@ export class OrderService {
       throw new Error("Berat paket tidak valid (minimal 100 gram).");
     }
 
-    // Validasi anti-tamper: cocokin cost yang dikirim client dengan
-    // hasil dari Komerce / fallback. Courier "internal" = static fallback.
+    // Validasi anti-tamper: cocokin {courier, service, cost} yang dikirim
+    // client dengan opsi valid. Sumber opsi: Komerce (kalau cityId ada &
+    // API jalan) ATAU static fallback (pakai provinceId). Client bisa pick
+    // dari kedua source — server validate keduanya.
     let validated = false;
-    if (courier === "internal") {
-      // Fallback flat rate — butuh provinceId
-      if (!shippingAddress.provinceId?.trim()) {
-        throw new Error("Pilih provinsi tujuan untuk menghitung ongkir.");
-      }
-      const opts = getStaticShippingOptions(shippingAddress.provinceId.trim(), w);
-      validated = !!findMatchingShippingOption(opts, courier, courierService.trim(), shippingCost);
-    } else {
-      // Komerce mode — butuh cityId
-      if (!shippingAddress.cityId?.trim()) {
-        throw new Error("Pilih kota tujuan untuk menghitung ongkir.");
-      }
+    const courierClean = courier.trim();
+    const serviceClean = courierService.trim();
+
+    // 1) Try Komerce kalau cityId ada
+    if (shippingAddress.cityId?.trim()) {
       try {
         const result = await fetchShippingOptions(shippingAddress.cityId.trim(), w);
-        validated = !!findMatchingShippingOption(result.options, courier.trim(), courierService.trim(), shippingCost);
+        validated = !!findMatchingShippingOption(result.options, courierClean, serviceClean, shippingCost);
       } catch {
-        // Komerce error saat validasi → fallback ke static cocokin pakai provinceId
-        if (shippingAddress.provinceId?.trim()) {
-          const opts = getStaticShippingOptions(shippingAddress.provinceId.trim(), w);
-          validated = !!findMatchingShippingOption(opts, courier.trim(), courierService.trim(), shippingCost);
-        }
+        // Komerce error — biarin, akan coba static di bawah
       }
+    }
+
+    // 2) Try static fallback kalau Komerce gak match (atau gak ada cityId)
+    if (!validated && shippingAddress.provinceId?.trim()) {
+      const opts = getStaticShippingOptions(shippingAddress.provinceId.trim(), w);
+      validated = !!findMatchingStaticOption(opts, courierClean, serviceClean, shippingCost);
     }
 
     if (!validated) {

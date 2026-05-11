@@ -1,12 +1,20 @@
 /**
- * Static fallback data — dipakai saat Komerce API gak available
- * (daily quota habis, network error, dll).
+ * Static shipping system — flat rate per zona × kurir (JNE/TIKI/J&T).
+ * Tidak butuh API eksternal, tidak ada quota, predictable.
  *
- * 34 provinsi Komerce mapped ke 8 zona pengiriman flat rate.
- * Buyer dijamin bisa checkout walaupun Komerce down.
+ * 34 provinsi dipetakan ke 8 zona pengiriman. Setiap zona punya base rate
+ * per kg. Setiap kurir punya offset (JNE referensi, TIKI sedikit mahal,
+ * J&T paling murah — pola pasar UMKM Indonesia).
  */
 
-import type { RajaOngkirShippingOption } from "@/lib/shipping/rajaongkir";
+export interface RajaOngkirShippingOption {
+  courier: string;
+  courierName: string;
+  service: string;
+  description: string;
+  cost: number;
+  etd: string;
+}
 
 type ZoneKey =
   | "jabodetabek"
@@ -26,16 +34,35 @@ interface StaticProvince {
 
 const ZONE_INFO: Record<ZoneKey, { ratePerKg: number; etd: string; label: string }> = {
   jabodetabek: { ratePerKg: 12000, etd: "1-2", label: "Jabodetabek" },
-  jawa: { ratePerKg: 20000, etd: "2-4", label: "Pulau Jawa" },
-  "bali-ntb": { ratePerKg: 30000, etd: "3-5", label: "Bali & NTB" },
-  sumatra: { ratePerKg: 35000, etd: "3-6", label: "Sumatra" },
-  kalimantan: { ratePerKg: 40000, etd: "4-7", label: "Kalimantan" },
-  sulawesi: { ratePerKg: 45000, etd: "4-7", label: "Sulawesi" },
-  "maluku-ntt": { ratePerKg: 70000, etd: "7-14", label: "Maluku & NTT" },
-  papua: { ratePerKg: 80000, etd: "7-14", label: "Papua" },
+  jawa:        { ratePerKg: 20000, etd: "2-4", label: "Pulau Jawa" },
+  "bali-ntb":  { ratePerKg: 30000, etd: "3-5", label: "Bali & NTB" },
+  sumatra:     { ratePerKg: 35000, etd: "3-6", label: "Sumatra" },
+  kalimantan:  { ratePerKg: 40000, etd: "4-7", label: "Kalimantan" },
+  sulawesi:    { ratePerKg: 45000, etd: "4-7", label: "Sulawesi" },
+  "maluku-ntt":{ ratePerKg: 70000, etd: "7-14", label: "Maluku & NTT" },
+  papua:       { ratePerKg: 80000, etd: "7-14", label: "Papua" },
 };
 
-// Province IDs match Komerce IDs jadi consistent saat API live atau fallback.
+interface CourierConfig {
+  courier: string;
+  courierName: string;
+  service: string;
+  description: string;
+  /** Selisih rupiah dari zone base rate. Diaplikasikan SEBELUM dikali berat. */
+  costOffset: number;
+}
+
+// Realistic pricing pattern Indonesian fashion UMKM:
+// - JNE: tarif referensi (paling kompetitif & familiar)
+// - TIKI: sedikit lebih mahal (~Rp 2k/kg)
+// - J&T: paling murah (~Rp 1k/kg lebih rendah dari JNE)
+const COURIER_CONFIGS: CourierConfig[] = [
+  { courier: "jne",  courierName: "JNE",           service: "REG", description: "Layanan Reguler", costOffset: 0 },
+  { courier: "tiki", courierName: "TIKI",          service: "REG", description: "Reguler",         costOffset: 2000 },
+  { courier: "pos",  courierName: "POS Indonesia", service: "REG", description: "Pos Reguler",     costOffset: -3000 },
+  { courier: "jnt",  courierName: "J&T Express",   service: "EZ",  description: "Reguler",         costOffset: -1000 },
+];
+
 export const STATIC_PROVINCES: StaticProvince[] = [
   { province_id: "10", province: "DKI JAKARTA", zone: "jabodetabek" },
   { province_id: "11", province: "BANTEN", zone: "jabodetabek" },
@@ -73,7 +100,6 @@ export const STATIC_PROVINCES: StaticProvince[] = [
   { province_id: "29", province: "PAPUA BARAT", zone: "papua" },
 ];
 
-/** Untuk API provinces fallback. */
 export function getStaticProvinces() {
   return STATIC_PROVINCES.map((p) => ({ province_id: p.province_id, province: p.province }));
 }
@@ -83,8 +109,8 @@ function getZoneFromProvinceId(provinceId: string): ZoneKey | null {
 }
 
 /**
- * Generate flat rate options dari province + berat.
- * Format kompatibel dengan RajaOngkirShippingOption supaya UI seragam.
+ * Hitung opsi pengiriman flat rate untuk 3 kurir (JNE/TIKI/J&T).
+ * Sort ascending by cost.
  */
 export function getStaticShippingOptions(
   provinceId: string,
@@ -95,31 +121,28 @@ export function getStaticShippingOptions(
 
   const info = ZONE_INFO[zone];
   const weightKg = Math.max(1, Math.ceil(weightGrams / 1000));
-  const baseCost = info.ratePerKg * weightKg;
 
-  // Kasih 2 opsi: Reguler (base) & Express (1.5x lebih cepat)
-  return [
-    {
-      courier: "internal",
-      courierName: "Reguler",
-      service: "REG",
-      description: `Pengiriman ke ${info.label}`,
-      cost: baseCost,
-      etd: `${info.etd} day`,
-    },
-    {
-      courier: "internal",
-      courierName: "Express",
-      service: "EXP",
-      description: `Pengiriman cepat ke ${info.label}`,
-      cost: Math.round(baseCost * 1.5),
-      etd: `${etdHalf(info.etd)} day`,
-    },
-  ];
+  const options = COURIER_CONFIGS.map((c) => ({
+    courier: c.courier,
+    courierName: c.courierName,
+    service: c.service,
+    description: c.description,
+    cost: Math.max(0, (info.ratePerKg + c.costOffset) * weightKg),
+    etd: `${info.etd} day`,
+  }));
+
+  options.sort((a, b) => a.cost - b.cost);
+  return options;
 }
 
-function etdHalf(etd: string): string {
-  // "3-5" → "1-2", "1-2" → "1", "7-14" → "3-7"
-  const parts = etd.split("-").map((n) => Math.max(1, Math.ceil(Number(n) / 2)));
-  return parts.join("-");
+/** Anti-tamper: cocokin pilihan buyer dengan opsi yang valid. */
+export function findMatchingStaticOption(
+  options: RajaOngkirShippingOption[],
+  courier: string,
+  service: string,
+  cost: number
+): RajaOngkirShippingOption | undefined {
+  return options.find(
+    (o) => o.courier === courier && o.service === service && o.cost === cost
+  );
 }

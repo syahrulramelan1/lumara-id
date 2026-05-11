@@ -64,7 +64,6 @@ const COURIER_BADGE_COLORS: Record<string, string> = {
   tiki: "bg-blue-600",
   pos: "bg-orange-500",
   jnt: "bg-rose-500",
-  internal: "bg-primary",
 };
 
 const COURIER_BADGE_LABELS: Record<string, string> = {
@@ -72,7 +71,6 @@ const COURIER_BADGE_LABELS: Record<string, string> = {
   tiki: "TIKI",
   pos: "POS",
   jnt: "J&T",
-  internal: "LMR",
 };
 
 const COURIER_LOGOS: Record<string, string> = {
