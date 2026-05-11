@@ -6,6 +6,8 @@ import { User, Package, Heart, LogIn, LogOut, Edit2, Check, X } from "lucide-rea
 import { toast } from "sonner";
 import { useUIStore } from "@/store/uiStore";
 import { useAuthStore } from "@/store/authStore";
+import { useCartStore } from "@/store/cartStore";
+import { useWishlistStore } from "@/store/wishlistStore";
 import { getT } from "@/lib/i18n";
 import { createClientComponent } from "@/lib/supabase-browser";
 
@@ -56,10 +58,14 @@ export default function AccountPage() {
   };
 
   const handleLogout = async () => {
+    // Clear local state dulu sebelum signOut — UI langsung reflect logout
+    useCartStore.getState().clearCart();
+    useWishlistStore.getState().syncFromServer([]);
+    useAuthStore.getState().clear();
     const supabase = createClientComponent();
     await supabase.auth.signOut();
-    router.push("/home");
     toast.success("Berhasil keluar");
+    router.push("/home");
   };
 
   if (loading) {

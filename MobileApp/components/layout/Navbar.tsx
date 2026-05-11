@@ -62,6 +62,12 @@ export function Navbar() {
   const handleLogout = async () => {
     setProfileOpen(false);
     setDrawerOpen(false);
+    // Order penting: clear local state DULU sebelum signOut, supaya UI
+    // langsung reflect logout. UIProvider listener (SIGNED_OUT) juga
+    // akan re-clear, tapi clear ganda aman (no-op).
+    useCartStore.getState().clearCart();
+    useWishlistStore.getState().syncFromServer([]);
+    useAuthStore.getState().clear();
     const supabase = createClientComponent();
     await supabase.auth.signOut();
     toast.success("Berhasil keluar");

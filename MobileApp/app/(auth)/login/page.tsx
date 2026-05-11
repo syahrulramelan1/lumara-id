@@ -25,8 +25,19 @@ function LoginForm() {
     setLoading(true);
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+
+        // Sync ke DB Prisma SEBELUM redirect — cegah race condition di mana
+        // page tujuan butuh dbUser tapi UIProvider listener belum selesai
+        // sync. Sync endpoint idempotent jadi aman dipanggil sini + listener.
+        if (data.session?.access_token) {
+          await fetch("/api/auth/sync-user", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${data.session.access_token}` },
+          });
+        }
+
         toast.success(t.auth.success_login);
         router.push(redirectTo);
       } else {

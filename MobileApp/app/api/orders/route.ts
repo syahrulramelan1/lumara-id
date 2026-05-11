@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { orderService } from "@/lib/services/OrderService";
 import { prisma } from "@/lib/prisma";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createServerComponent } from "@/lib/supabase";
 import type { CartItem, ShippingAddress } from "@/types";
 
 export async function GET(req: NextRequest) {
@@ -12,12 +11,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } }
-    );
+    const supabase = await createServerComponent();
     const { data: { user: authUser }, error: authErr } = await supabase.auth.getUser(token);
     if (authErr || !authUser?.email) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
@@ -71,12 +65,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Sesi tidak valid, silakan login ulang" }, { status: 401 });
     }
 
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } }
-    );
+    const supabase = await createServerComponent();
     const { data: { user: authUser }, error: authErr } = await supabase.auth.getUser(token);
     if (authErr || !authUser?.email) {
       return NextResponse.json({ success: false, error: "Sesi tidak valid, silakan login ulang" }, { status: 401 });

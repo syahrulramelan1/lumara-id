@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createServerComponent } from "@/lib/supabase";
 import { prisma } from "@/lib/prisma";
 
 export async function PATCH(req: NextRequest) {
@@ -8,12 +7,7 @@ export async function PATCH(req: NextRequest) {
     const token = req.headers.get("authorization")?.replace("Bearer ", "");
     if (!token) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
 
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } }
-    );
+    const supabase = await createServerComponent();
 
     const { data: { user }, error } = await supabase.auth.getUser(token);
     if (error || !user?.email) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
