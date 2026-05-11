@@ -89,12 +89,12 @@ function CourierBadge({ code }: { code: string }) {
 
   if (logo && !errored) {
     return (
-      <div className="w-12 h-12 rounded-[10px] bg-white border border-card-border flex items-center justify-center shrink-0 overflow-hidden">
+      <div className="w-12 h-12 rounded-[10px] bg-white border border-zinc-200 dark:border-zinc-500 flex items-center justify-center shrink-0 overflow-hidden shadow-sm ring-1 ring-black/5">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={logo}
           alt={label}
-          className="w-full h-full object-contain p-1"
+          className="w-full h-full object-contain p-1.5"
           onError={() => setErrored(true)}
         />
       </div>
