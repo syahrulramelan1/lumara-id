@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchShippingOptions } from "@/lib/shipping/rajaongkir";
+import { getStaticShippingOptions } from "@/lib/shipping/static";
 
 export async function POST(req: NextRequest) {
   try {
-    const { destination, weight } = await req.json();
-    if (!destination || weight == null) {
-      return NextResponse.json({ success: false, error: "destination dan weight wajib diisi" }, { status: 400 });
-    }
+    const { destination, provinceId, weight } = await req.json();
 
     const weightNum = Number(weight);
     if (!Number.isFinite(weightNum) || weightNum < 100) {
@@ -16,37 +14,73 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result = await fetchShippingOptions(String(destination), weightNum);
-    console.log("[shipping/cost]", {
-      destination: String(destination),
-      weight: weightNum,
-      filteredOptions: result.options.length,
-      rawCount: result.rawCount,
-      filteredCount: result.filteredCount,
-    });
+    // Helper: fallback ke static flat rate berdasarkan provinceId
+    const fallbackResponse = (reason: string) => {
+      if (!provinceId) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Sistem ongkir tidak tersedia. Coba beberapa saat lagi.",
+            details: { reason },
+          },
+          { status: 503 }
+        );
+      }
+      const opts = getStaticShippingOptions(String(provinceId), weightNum);
+      if (opts.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Tujuan pengiriman tidak dikenal", details: { reason, provinceId } },
+          { status: 400 }
+        );
+      }
+      return NextResponse.json({
+        success: true,
+        data: opts,
+        fallback: true,
+        reason,
+        debug: { mode: "static-flat-rate" },
+      });
+    };
 
-    // Kalau SEMUA kurir kena 429 (daily limit), surface error yg jelas
-    const allRateLimited = result.diagnostics.every((d) => d.metaCode === 429);
-    if (result.options.length === 0 && allRateLimited && result.diagnostics.length > 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Sistem ongkir sedang sibuk (kuota harian penuh). Silakan coba beberapa jam lagi.",
-          debug: { perCourier: result.diagnostics, rawCount: 0 },
-        },
-        { status: 503 }
-      );
+    // Kalau destination kosong → langsung fallback static (mode no city)
+    if (!destination) {
+      return fallbackResponse("no-destination");
     }
 
-    return NextResponse.json({
-      success: true,
-      data: result.options,
-      debug: {
+    try {
+      const result = await fetchShippingOptions(String(destination), weightNum);
+      console.log("[shipping/cost]", {
+        destination: String(destination),
+        weight: weightNum,
+        filteredOptions: result.options.length,
         rawCount: result.rawCount,
-        filteredCount: result.filteredCount,
-        perCourier: result.diagnostics,
-      },
-    });
+      });
+
+      // Kalau semua kurir kena 429 → fallback
+      const allRateLimited = result.diagnostics.length > 0 && result.diagnostics.every((d) => d.metaCode === 429);
+      if (allRateLimited) {
+        return fallbackResponse("quota-exceeded");
+      }
+
+      // Kalau Komerce return 0 hasil → fallback supaya buyer tetep bisa checkout
+      if (result.options.length === 0) {
+        return fallbackResponse("no-coverage");
+      }
+
+      return NextResponse.json({
+        success: true,
+        data: result.options,
+        fallback: false,
+        debug: {
+          rawCount: result.rawCount,
+          filteredCount: result.filteredCount,
+          perCourier: result.diagnostics,
+        },
+      });
+    } catch (err) {
+      console.error("[shipping/cost] Komerce exception:", err);
+      return fallbackResponse("komerce-exception");
+    }
   } catch (err) {
     console.error("[shipping/cost] exception:", err);
     const msg = err instanceof Error ? err.message : "Gagal menghitung ongkir";

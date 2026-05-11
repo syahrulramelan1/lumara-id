@@ -64,6 +64,7 @@ const COURIER_BADGE_COLORS: Record<string, string> = {
   tiki: "bg-blue-600",
   pos: "bg-orange-500",
   jnt: "bg-rose-500",
+  internal: "bg-primary",
 };
 
 const COURIER_BADGE_LABELS: Record<string, string> = {
@@ -71,6 +72,7 @@ const COURIER_BADGE_LABELS: Record<string, string> = {
   tiki: "TIKI",
   pos: "POS",
   jnt: "J&T",
+  internal: "LMR",
 };
 
 const COURIER_LOGOS: Record<string, string> = {
@@ -137,6 +139,11 @@ export default function CheckoutPage() {
   const [loadingCities, setLoadingCities] = useState(false);
   const [loadingCost, setLoadingCost] = useState(false);
 
+  // Fallback mode: aktif kalau Komerce gak available (quota habis / network err).
+  // Saat aktif: city pakai text input bukan dropdown, ongkir pakai flat rate
+  // per zona berdasarkan provinsi.
+  const [fallbackMode, setFallbackMode] = useState(false);
+
   const [weightKg, setWeightKg] = useState(1);
   const [shipOptions, setShipOptions] = useState<ShipOption[]>([]);
   const [selectedShip, setSelectedShip] = useState<ShipOption | null>(null);
@@ -146,16 +153,25 @@ export default function CheckoutPage() {
 
   const subtotal = total();
 
-  // Master provinsi (cache 24h di server)
+  // Master provinsi — auto-fallback ke static kalau Komerce down
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         const r = await fetch("/api/shipping/provinces");
-        const j = (await r.json()) as { success?: boolean; data?: RoProvince[]; error?: string; details?: unknown };
-        console.log("[provinces] status:", r.status, "body:", j);
+        const j = (await r.json()) as {
+          success?: boolean;
+          data?: RoProvince[];
+          fallback?: boolean;
+          reason?: string;
+          error?: string;
+        };
+        console.log("[provinces] status:", r.status, "fallback:", j.fallback, "body:", j);
         if (!r.ok || !j.success) throw new Error(j.error ?? "Gagal memuat provinsi");
-        if (!cancelled) setProvinces(j.data ?? []);
+        if (!cancelled) {
+          setProvinces(j.data ?? []);
+          setFallbackMode(Boolean(j.fallback));
+        }
       } catch (e) {
         console.error("[provinces] error:", e);
         if (!cancelled) toast.error(e instanceof Error ? e.message : "Gagal memuat provinsi");
@@ -175,15 +191,23 @@ export default function CheckoutPage() {
     setSelectedShip(null);
     try {
       const r = await fetch(`/api/shipping/cities?province_id=${encodeURIComponent(provinceId)}`);
-      const j = (await r.json()) as { success?: boolean; data?: RoCity[]; error?: string; details?: unknown };
-      console.log("[cities] status:", r.status, "body:", j);
+      const j = (await r.json()) as {
+        success?: boolean;
+        data?: RoCity[];
+        fallback?: boolean;
+        error?: string;
+      };
+      console.log("[cities] status:", r.status, "fallback:", j.fallback, "count:", j.data?.length);
       if (!r.ok || !j.success) throw new Error(j.error ?? "Gagal memuat kota");
       const data = j.data ?? [];
       setCities(data);
+      // Cities fallback → auto-switch ke fallback mode (city pakai text input)
+      if (j.fallback) setFallbackMode(true);
       return data;
     } catch (e) {
       console.error("[cities] error:", e);
-      toast.error(e instanceof Error ? e.message : "Gagal memuat kota");
+      // Network/server error → fallback mode supaya UX gak stuck
+      setFallbackMode(true);
       return [];
     } finally {
       setLoadingCities(false);
@@ -202,21 +226,33 @@ export default function CheckoutPage() {
       district: "",
       postalCode: "",
     }));
-    void loadCities(p.province_id);
+    setShipOptions([]);
+    setSelectedShip(null);
+    // Di fallback mode skip cities API call (gak akan dapat data)
+    if (!fallbackMode) {
+      void loadCities(p.province_id);
+    }
   };
 
   const handleCityChange = (cityId: string) => {
     const c = cities.find((x) => x.city_id === cityId);
     if (!c) return;
-    const label = `${c.type} ${c.city_name}`.trim();
+    const label = `${c.type ?? ""} ${c.city_name}`.trim();
     setAddr((a) => ({ ...a, city: label, cityId: c.city_id }));
     setShipOptions([]);
     setSelectedShip(null);
   };
 
   const hitungOngkir = async () => {
-    if (!addr.cityId) {
+    // Validasi tergantung mode:
+    // - Komerce mode butuh cityId (cek tarif persis dari Komerce)
+    // - Fallback mode butuh provinceId aja (flat rate per zona)
+    if (!fallbackMode && !addr.cityId) {
       toast.error("Pilih kota tujuan dulu");
+      return;
+    }
+    if (fallbackMode && !addr.provinceId) {
+      toast.error("Pilih provinsi tujuan dulu");
       return;
     }
     const wGrams = Math.max(100, Math.round(weightKg * 1000));
@@ -227,15 +263,26 @@ export default function CheckoutPage() {
       const r = await fetch("/api/shipping/cost", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ destination: addr.cityId, weight: wGrams }),
+        body: JSON.stringify({
+          destination: addr.cityId, // bisa undefined di fallback mode
+          provinceId: addr.provinceId, // dipakai server kalau fallback
+          weight: wGrams,
+        }),
       });
-      const j = (await r.json()) as { success?: boolean; data?: ShipOption[]; error?: string; details?: unknown };
-      console.log("[cost] status:", r.status, "body:", j);
+      const j = (await r.json()) as {
+        success?: boolean;
+        data?: ShipOption[];
+        fallback?: boolean;
+        error?: string;
+      };
+      console.log("[cost] status:", r.status, "fallback:", j.fallback, "count:", j.data?.length);
       if (!r.ok || !j.success) throw new Error(j.error ?? "Gagal hitung ongkir");
       const opts = j.data ?? [];
       if (opts.length === 0) {
         toast.message("Tidak ada layanan ongkir untuk rute ini — coba berat atau kota lain.");
       }
+      // Kalau cost endpoint return fallback flag, lock fallback mode di UI
+      if (j.fallback) setFallbackMode(true);
       setShipOptions(opts);
     } catch (e) {
       console.error("[cost] error:", e);
@@ -426,22 +473,32 @@ export default function CheckoutPage() {
 
             <div className="col-span-2">
               <label className="text-xs font-medium text-muted-foreground mb-1 block">Kota / Kabupaten</label>
-              <select
-                value={addr.cityId ?? ""}
-                onChange={(e) => handleCityChange(e.target.value)}
-                required
-                disabled={!addr.provinceId || loadingCities}
-                className="w-full px-3 py-2.5 text-sm border border-border rounded-[10px] bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-              >
-                <option value="">
-                  {!addr.provinceId ? "Pilih provinsi dulu" : loadingCities ? "Memuat kota…" : "Pilih kota"}
-                </option>
-                {cities.map((c) => (
-                  <option key={c.city_id} value={c.city_id}>
-                    {`${c.type ?? ""} ${c.city_name}`.trim()}
+              {fallbackMode ? (
+                <input
+                  value={addr.city}
+                  onChange={(e) => setField("city", e.target.value)}
+                  placeholder="Contoh: Jakarta Selatan"
+                  required
+                  className="w-full px-3 py-2.5 text-sm border border-border rounded-[10px] bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                />
+              ) : (
+                <select
+                  value={addr.cityId ?? ""}
+                  onChange={(e) => handleCityChange(e.target.value)}
+                  required
+                  disabled={!addr.provinceId || loadingCities}
+                  className="w-full px-3 py-2.5 text-sm border border-border rounded-[10px] bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                >
+                  <option value="">
+                    {!addr.provinceId ? "Pilih provinsi dulu" : loadingCities ? "Memuat kota…" : "Pilih kota"}
                   </option>
-                ))}
-              </select>
+                  {cities.map((c) => (
+                    <option key={c.city_id} value={c.city_id}>
+                      {`${c.type ?? ""} ${c.city_name}`.trim()}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             <div>
@@ -512,13 +569,19 @@ export default function CheckoutPage() {
             <button
               type="button"
               onClick={hitungOngkir}
-              disabled={loadingCost || !addr.cityId}
+              disabled={loadingCost || (!addr.cityId && !addr.provinceId)}
               className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm font-semibold rounded-[12px] disabled:opacity-50"
             >
               {loadingCost ? <Loader2 size={16} className="animate-spin" /> : null}
               Hitung ongkir
             </button>
           </div>
+
+          {fallbackMode && (
+            <div className="text-xs px-3 py-2 rounded-[10px] bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 text-amber-900 dark:text-amber-200">
+              ℹ️ Estimasi ongkir flat per zona. Harga akhir bisa berubah saat barang diserahkan ke kurir.
+            </div>
+          )}
 
           {shipOptions.length > 0 && (
             <div className="space-y-2 max-h-80 overflow-y-auto pr-1">

@@ -14,26 +14,24 @@ interface CityItem {
 }
 
 export async function GET(req: NextRequest) {
+  const provinceId = req.nextUrl.searchParams.get("province_id");
+  if (!provinceId) {
+    return NextResponse.json({ success: false, error: "province_id wajib diisi" }, { status: 400 });
+  }
+
+  const cacheKey = `komerce:cities:v1:${provinceId}`;
+  const cached = cacheGet<CityItem[]>(cacheKey);
+  if (cached) {
+    return NextResponse.json({ success: true, data: cached, cached: true, fallback: false });
+  }
+
+  const API_KEY = process.env.RAJAONGKIR_API_KEY?.trim();
+  if (!API_KEY) {
+    // No API key → fallback mode (frontend tau city pakai text input)
+    return NextResponse.json({ success: true, data: [], fallback: true, reason: "no-api-key" });
+  }
+
   try {
-    const provinceId = req.nextUrl.searchParams.get("province_id");
-    if (!provinceId) {
-      return NextResponse.json({ success: false, error: "province_id wajib diisi" }, { status: 400 });
-    }
-
-    const cacheKey = `komerce:cities:v1:${provinceId}`;
-    const cached = cacheGet<CityItem[]>(cacheKey);
-    if (cached) {
-      return NextResponse.json({ success: true, data: cached, cached: true });
-    }
-
-    const API_KEY = process.env.RAJAONGKIR_API_KEY?.trim();
-    if (!API_KEY) {
-      return NextResponse.json(
-        { success: false, error: "Sistem ongkir belum dikonfigurasi. Hubungi admin." },
-        { status: 503 }
-      );
-    }
-
     const res = await fetch(`${KOMERCE_URL}/destination/city/${encodeURIComponent(provinceId)}`, {
       headers: { key: API_KEY },
       cache: "no-store",
@@ -51,26 +49,14 @@ export async function GET(req: NextRequest) {
       dataCount: Array.isArray(json?.data) ? json.data.length : 0,
     });
 
-    if (json?.meta?.code === 429) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Sistem ongkir sedang sibuk (kuota harian penuh). Silakan coba beberapa jam lagi.",
-          details: { metaCode: 429, metaMessage: json.meta.message },
-        },
-        { status: 503 }
-      );
-    }
-
     if (!res.ok || json?.meta?.code !== 200) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: json?.meta?.message ?? `Komerce HTTP ${res.status}`,
-          details: { httpStatus: res.status, metaCode: json?.meta?.code, bodyPreview: rawText.slice(0, 300) },
-        },
-        { status: 502 }
-      );
+      // Fallback: return empty cities + fallback flag
+      return NextResponse.json({
+        success: true,
+        data: [],
+        fallback: true,
+        reason: json?.meta?.code === 429 ? "quota-exceeded" : "komerce-error",
+      });
     }
 
     const cities: CityItem[] = (json.data ?? []).map((c) => ({
@@ -85,13 +71,9 @@ export async function GET(req: NextRequest) {
       cacheSet(cacheKey, cities, TTL.ONE_WEEK);
     }
 
-    return NextResponse.json({ success: true, data: cities });
+    return NextResponse.json({ success: true, data: cities, fallback: false });
   } catch (err) {
     console.error("[shipping/cities] exception:", err);
-    const msg = err instanceof Error ? err.message : "Gagal mengambil data kota";
-    return NextResponse.json(
-      { success: false, error: msg, details: { exception: String(err) } },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: true, data: [], fallback: true, reason: "network-error" });
   }
 }

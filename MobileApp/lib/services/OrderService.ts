@@ -1,6 +1,7 @@
 import { orderModel } from "@/lib/models/OrderModel";
 import { productModel } from "@/lib/models/ProductModel";
 import { fetchShippingOptions, findMatchingShippingOption } from "@/lib/shipping/rajaongkir";
+import { getStaticShippingOptions } from "@/lib/shipping/static";
 import type { CartItem, ShippingAddress, OrderWithItems } from "@/types";
 
 export class OrderService {
@@ -20,9 +21,6 @@ export class OrderService {
     courierService?: string,
     weightGrams = 1000
   ) {
-    if (!shippingAddress.cityId?.trim()) {
-      throw new Error("Pilih kota tujuan untuk menghitung ongkir.");
-    }
     if (!courier?.trim() || !courierService?.trim()) {
       throw new Error("Pilih kurir dan layanan pengiriman.");
     }
@@ -31,9 +29,34 @@ export class OrderService {
       throw new Error("Berat paket tidak valid (minimal 100 gram).");
     }
 
-    const result = await fetchShippingOptions(shippingAddress.cityId.trim(), w);
-    const ok = findMatchingShippingOption(result.options, courier.trim(), courierService.trim(), shippingCost);
-    if (!ok) {
+    // Validasi anti-tamper: cocokin cost yang dikirim client dengan
+    // hasil dari Komerce / fallback. Courier "internal" = static fallback.
+    let validated = false;
+    if (courier === "internal") {
+      // Fallback flat rate — butuh provinceId
+      if (!shippingAddress.provinceId?.trim()) {
+        throw new Error("Pilih provinsi tujuan untuk menghitung ongkir.");
+      }
+      const opts = getStaticShippingOptions(shippingAddress.provinceId.trim(), w);
+      validated = !!findMatchingShippingOption(opts, courier, courierService.trim(), shippingCost);
+    } else {
+      // Komerce mode — butuh cityId
+      if (!shippingAddress.cityId?.trim()) {
+        throw new Error("Pilih kota tujuan untuk menghitung ongkir.");
+      }
+      try {
+        const result = await fetchShippingOptions(shippingAddress.cityId.trim(), w);
+        validated = !!findMatchingShippingOption(result.options, courier.trim(), courierService.trim(), shippingCost);
+      } catch {
+        // Komerce error saat validasi → fallback ke static cocokin pakai provinceId
+        if (shippingAddress.provinceId?.trim()) {
+          const opts = getStaticShippingOptions(shippingAddress.provinceId.trim(), w);
+          validated = !!findMatchingShippingOption(opts, courier.trim(), courierService.trim(), shippingCost);
+        }
+      }
+    }
+
+    if (!validated) {
       throw new Error("Ongkir tidak valid atau sudah berubah. Silakan hitung ulang ongkir.");
     }
 
