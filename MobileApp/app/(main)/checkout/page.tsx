@@ -10,7 +10,6 @@ import {
   CheckCircle,
   LogIn,
   Loader2,
-  LocateFixed,
   Truck,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -142,8 +141,6 @@ export default function CheckoutPage() {
   const [shipOptions, setShipOptions] = useState<ShipOption[]>([]);
   const [selectedShip, setSelectedShip] = useState<ShipOption | null>(null);
 
-  const [geoLoading, setGeoLoading] = useState(false);
-
   const setField = (k: keyof ShippingAddress, v: string) =>
     setAddr((prev) => ({ ...prev, [k]: v }));
 
@@ -245,116 +242,6 @@ export default function CheckoutPage() {
       toast.error(e instanceof Error ? e.message : "Gagal hitung ongkir");
     } finally {
       setLoadingCost(false);
-    }
-  };
-
-  const useMyLocation = async () => {
-    if (typeof window === "undefined" || !navigator.geolocation) {
-      toast.error("Browser tidak mendukung GPS");
-      return;
-    }
-    if (provinces.length === 0) {
-      toast.error("Daftar provinsi belum siap, coba lagi sebentar");
-      return;
-    }
-    setGeoLoading(true);
-    try {
-      // 1) Ambil koordinat
-      const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          timeout: 12_000,
-        });
-      });
-      const { latitude, longitude } = pos.coords;
-
-      // 2) Reverse geocode via Nominatim (gratis, no key)
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=id&zoom=18&addressdetails=1`
-      );
-      const geo = await res.json();
-      const a = geo?.address ?? {};
-
-      // 3) Normalize untuk fuzzy match
-      const normalize = (s: string) =>
-        s
-          .toLowerCase()
-          .replace(/^(daerah\s+khusus\s+ibukota\s+|provinsi\s+|kota\s+|kabupaten\s+|kab\.\s+|dki\s+|di\s+)/i, "")
-          .replace(/\s+(special\s+region|special\s+capital\s+region)\s*$/i, "")
-          .replace(/[()]/g, "")
-          .replace(/\s+/g, " ")
-          .trim();
-
-      const findMatch = <T extends { id: string; name: string }>(
-        target: string,
-        list: T[]
-      ): T | undefined => {
-        if (!target) return undefined;
-        const nt = normalize(target);
-        const exact = list.find((x) => normalize(x.name) === nt);
-        if (exact) return exact;
-        return list.find((x) => {
-          const nx = normalize(x.name);
-          return nt.includes(nx) || nx.includes(nt);
-        });
-      };
-
-      // 4) Match provinsi
-      const stateRaw = a.state || a.region || "";
-      const provMatch = findMatch(
-        stateRaw,
-        provinces.map((p) => ({ id: p.province_id, name: p.province }))
-      );
-
-      // 5) Isi field text yang bisa langsung
-      const district = a.suburb || a.neighbourhood || a.village || a.town || "";
-      const postcode = a.postcode || "";
-      const road = [a.road, a.house_number].filter(Boolean).join(" ");
-
-      setAddr((prev) => ({
-        ...prev,
-        district: district || prev.district,
-        postalCode: postcode || prev.postalCode,
-        address: road || prev.address,
-        geoLat: latitude,
-        geoLng: longitude,
-      }));
-
-      // 6) Kalau provinsi ketemu → load kota & match
-      if (provMatch) {
-        const matchedProv = provinces.find((p) => p.province_id === provMatch.id)!;
-        setAddr((prev) => ({
-          ...prev,
-          province: matchedProv.province,
-          provinceId: matchedProv.province_id,
-          city: "",
-          cityId: undefined,
-        }));
-
-        const cityList = await loadCities(matchedProv.province_id);
-
-        const cityRaw = a.city || a.regency || a.county || a.town || "";
-        const cityMatch = findMatch(
-          cityRaw,
-          cityList.map((c) => ({ id: c.city_id, name: c.city_name }))
-        );
-
-        if (cityMatch) {
-          const matchedCity = cityList.find((c) => c.city_id === cityMatch.id)!;
-          const label = `${matchedCity.type} ${matchedCity.city_name}`.trim();
-          setAddr((prev) => ({ ...prev, city: label, cityId: matchedCity.city_id }));
-          toast.success("Alamat berhasil diisi otomatis. Cek lagi sebelum lanjut.");
-        } else {
-          toast.message("Provinsi terisi otomatis. Pilih kota manual ya.");
-        }
-      } else {
-        toast.message("Lokasi terdeteksi tapi provinsi belum cocok. Pilih manual ya.");
-      }
-    } catch (err) {
-      console.error("[geolocate]", err);
-      toast.error("Gagal deteksi lokasi. Pastikan izin GPS aktif.");
-    } finally {
-      setGeoLoading(false);
     }
   };
 
@@ -597,22 +484,6 @@ export default function CheckoutPage() {
               />
             </div>
 
-            <div className="col-span-2 flex flex-wrap gap-2 items-center">
-              <button
-                type="button"
-                onClick={useMyLocation}
-                disabled={geoLoading}
-                className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-[10px] border border-border bg-background hover:bg-muted/40 transition-colors disabled:opacity-50"
-              >
-                {geoLoading ? <Loader2 size={14} className="animate-spin" /> : <LocateFixed size={14} />}
-                {geoLoading ? "Mendeteksi..." : "Isi otomatis dari lokasi saya"}
-              </button>
-              {addr.geoLat != null && addr.geoLng != null && (
-                <span className="text-xs text-muted-foreground">
-                  Koordinat: {addr.geoLat.toFixed(5)}, {addr.geoLng.toFixed(5)}
-                </span>
-              )}
-            </div>
           </div>
         </div>
 
