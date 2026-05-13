@@ -67,15 +67,21 @@ const ProductTable = ({ products }: { products: ApiProduct[] }) => {
                     <Link to={`/products/${item.id}`} className="btn-icon" title="Edit">
                       <HiOutlinePencil />
                     </Link>
-                    <a
-                      href={`${import.meta.env.VITE_STORE_URL || ""}/products/${item.slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-icon hidden sm:flex"
-                      title="Lihat"
-                    >
-                      <HiOutlineEye />
-                    </a>
+                    {(() => {
+                      const storeUrl = import.meta.env.VITE_STORE_URL?.replace(/\/$/, "");
+                      if (!storeUrl || !item.slug) return null; // jangan render kalau env belum di-set / slug kosong
+                      return (
+                        <a
+                          href={`${storeUrl}/products/${item.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn-icon hidden sm:flex"
+                          title="Lihat di toko"
+                        >
+                          <HiOutlineEye />
+                        </a>
+                      );
+                    })()}
                     <button
                       onClick={() => { if (window.confirm(`Hapus produk "${item.name}"?`)) deleteMutation.mutate(item.id); }}
                       disabled={deleteMutation.isPending}
