@@ -15,7 +15,7 @@ export function HeroSection() {
   const t = getT(language);
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#F9F9FF] via-[#EDE9FE] to-[#F0E6FF] dark:from-[#0F0A1E] dark:via-[#1a0f2e] dark:to-[#0F0A1E] min-h-[480px] flex flex-col">
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#F9F9FF] via-[#EDE9FE] to-[#F0E6FF] dark:from-[#0F0A1E] dark:via-[#1a0f2e] dark:to-[#0F0A1E] min-h-[480px] flex items-center">
       {/* Floating blobs */}
       <motion.div
         animate={{ y: [-12, 12, -12], scale: [1, 1.06, 1] }}
@@ -33,8 +33,7 @@ export function HeroSection() {
         className="absolute top-1/2 right-1/4 w-32 h-32 bg-primary/8 rounded-full blur-2xl pointer-events-none"
       />
 
-      {/* Flex-1 agar konten tumbuh mengisi ruang, marquee tetap di bawah */}
-      <div className="relative flex-1 flex items-center max-w-7xl mx-auto px-4 py-16 md:py-24 w-full">
+      <div className="relative max-w-7xl mx-auto px-4 py-16 md:py-24 w-full">
         <div className="max-w-2xl">
           {/* Badge */}
           <motion.div
@@ -109,23 +108,16 @@ export function HeroSection() {
             <SearchBar className="max-w-md" placeholder={t.hero.search_placeholder} />
           </motion.div>
 
-          {/* Trust badges */}
+          {/* Marquee trust-badge di bawah search — lebar mengikuti max-w-md search */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: STAGGER_DELAY * 5 }}
-            className="flex items-center gap-4 mt-6 text-sm text-muted-foreground flex-wrap"
+            className="mt-5 max-w-md overflow-hidden rounded-xl border border-border/40 bg-muted/40 backdrop-blur-sm"
           >
-            <span className="flex items-center gap-1.5 bg-muted/60 px-3 py-1.5 rounded-full text-xs font-medium">🚚 {t.hero.badge_shipping}</span>
-            <span className="flex items-center gap-1.5 bg-muted/60 px-3 py-1.5 rounded-full text-xs font-medium">💎 {t.hero.badge_premium}</span>
-            <span className="flex items-center gap-1.5 bg-muted/60 px-3 py-1.5 rounded-full text-xs font-medium">🔄 {t.hero.badge_return}</span>
+            <InfiniteMarquee className="py-2" speed={28} />
           </motion.div>
         </div>
-      </div>
-
-      {/* Marquee strip di bawah konten hero — posisi fix di bottom karena flex-col */}
-      <div className="border-t border-border/30 bg-background/60 backdrop-blur-sm w-full">
-        <InfiniteMarquee className="py-2.5" />
       </div>
     </section>
   );
