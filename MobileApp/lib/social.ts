@@ -68,8 +68,8 @@ export const SOCIAL_CHANNELS: SocialChannel[] = [
   {
     id:       "instagram",
     label:    "Instagram",
-    handle:   "@lumara.id",
-    url:      "https://instagram.com/lumara.id",
+    handle:   "@lumara.ind",
+    url:      "https://www.instagram.com/lumara.ind",
     desc:     "Foto produk terbaru, behind the scene, dan promo eksklusif.",
     brandHex: "#E4405F",
   },
