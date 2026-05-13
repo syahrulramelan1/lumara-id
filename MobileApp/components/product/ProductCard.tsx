@@ -1,8 +1,9 @@
 "use client";
+import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Heart, ImageOff } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { formatPrice } from "@/lib/utils";
 import { useWishlistStore } from "@/store/wishlistStore";
 import type { ProductWithCategory } from "@/types";
@@ -14,6 +15,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, priority = false, index = 0 }: ProductCardProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-30px" });
   const { toggle, isWishlisted } = useWishlistStore();
   const images: string[] = Array.isArray(product.images)
     ? (product.images as string[])
@@ -28,9 +31,9 @@ export function ProductCard({ product, priority = false, index = 0 }: ProductCar
 
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0, y: 60, scale: 0.9 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-30px" }}
+      animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 60, scale: 0.9 }}
       transition={{ type: "spring", stiffness: 80, damping: 14, delay }}
       whileHover={{ y: -5, transition: { type: "spring", stiffness: 400, damping: 22 } }}
       className="group relative bg-card rounded-card overflow-hidden border border-card-border shadow-card hover:shadow-card-hover transition-shadow duration-300"
@@ -65,12 +68,10 @@ export function ProductCard({ product, priority = false, index = 0 }: ProductCar
             </div>
           )}
 
-          {/* Badge diskon — pop masuk dengan spring bounce */}
           {discount && (
             <motion.span
               initial={{ scale: 0, rotate: -15 }}
-              whileInView={{ scale: 1, rotate: 0 }}
-              viewport={{ once: true }}
+              animate={isInView ? { scale: 1, rotate: 0 } : { scale: 0, rotate: -15 }}
               transition={{ type: "spring", stiffness: 350, damping: 14, delay: delay + 0.15 }}
               className="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full"
             >
@@ -80,8 +81,7 @@ export function ProductCard({ product, priority = false, index = 0 }: ProductCar
           {product.isNew && !discount && (
             <motion.span
               initial={{ scale: 0, rotate: -15 }}
-              whileInView={{ scale: 1, rotate: 0 }}
-              viewport={{ once: true }}
+              animate={isInView ? { scale: 1, rotate: 0 } : { scale: 0, rotate: -15 }}
               transition={{ type: "spring", stiffness: 350, damping: 14, delay: delay + 0.15 }}
               className="absolute top-2 left-2 bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded-full"
             >
@@ -91,7 +91,6 @@ export function ProductCard({ product, priority = false, index = 0 }: ProductCar
         </div>
       </Link>
 
-      {/* Wishlist heart */}
       <motion.button
         onClick={() => toggle(product.id)}
         whileTap={{ scale: 0.75 }}

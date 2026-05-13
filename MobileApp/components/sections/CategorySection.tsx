@@ -1,11 +1,53 @@
 "use client";
+import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import type { CategoryWithCount } from "@/types";
 import { useUIStore } from "@/store/uiStore";
 import { getT } from "@/lib/i18n";
 import { FadeInView } from "@/components/motion/FadeInView";
+
+function CategoryCard({ cat, delay, productsLabel }: { cat: CategoryWithCount; delay: number; productsLabel: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-30px" });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 50, scale: 0.88 }}
+      animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 50, scale: 0.88 }}
+      transition={{ type: "spring", stiffness: 80, damping: 14, delay }}
+    >
+      <Link href={`/categories/${cat.slug}`} className="group flex flex-col items-center gap-2">
+        <motion.div
+          whileHover={{ scale: 1.08, y: -3 }}
+          whileTap={{ scale: 0.94 }}
+          transition={{ type: "spring", stiffness: 400, damping: 22 }}
+          className="relative w-full aspect-square rounded-[14px] overflow-hidden bg-primary/5 border border-card-border group-hover:border-primary/40 transition-colors duration-200"
+        >
+          {cat.image ? (
+            <Image
+              src={cat.image}
+              alt={cat.name}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-400"
+              sizes="(max-width: 640px) 30vw, 20vw"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-3xl">🧕</div>
+          )}
+        </motion.div>
+        <div className="text-center">
+          <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{cat.name}</p>
+          <p className="text-xs text-muted-foreground">
+            {cat._count.products} {productsLabel}
+          </p>
+        </div>
+      </Link>
+    </motion.div>
+  );
+}
 
 interface CategorySectionProps {
   categories: CategoryWithCount[];
@@ -29,40 +71,12 @@ export function CategorySection({ categories }: CategorySectionProps) {
 
       <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
         {categories.map((cat, i) => (
-          <motion.div
+          <CategoryCard
             key={cat.id}
-            initial={{ opacity: 0, y: 50, scale: 0.88 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true, margin: "-30px" }}
-            transition={{ type: "spring", stiffness: 80, damping: 14, delay: i * 0.07 }}
-          >
-            <Link href={`/categories/${cat.slug}`} className="group flex flex-col items-center gap-2">
-              <motion.div
-                whileHover={{ scale: 1.08, y: -3 }}
-                whileTap={{ scale: 0.94 }}
-                transition={{ type: "spring", stiffness: 400, damping: 22 }}
-                className="relative w-full aspect-square rounded-[14px] overflow-hidden bg-primary/5 border border-card-border group-hover:border-primary/40 transition-colors duration-200"
-              >
-                {cat.image ? (
-                  <Image
-                    src={cat.image}
-                    alt={cat.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-400"
-                    sizes="(max-width: 640px) 30vw, 20vw"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-3xl">🧕</div>
-                )}
-              </motion.div>
-              <div className="text-center">
-                <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{cat.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {cat._count.products} {t.sections.products_count}
-                </p>
-              </div>
-            </Link>
-          </motion.div>
+            cat={cat}
+            delay={i * 0.07}
+            productsLabel={t.sections.products_count}
+          />
         ))}
       </div>
     </section>

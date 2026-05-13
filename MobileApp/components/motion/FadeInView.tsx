@@ -1,5 +1,6 @@
 "use client";
-import { motion, useReducedMotion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { EASE_OUT_EXPO } from "./variants";
 
 interface FadeInViewProps {
@@ -11,13 +12,15 @@ interface FadeInViewProps {
 }
 
 export function FadeInView({ children, className, delay = 0, y = 40, duration = 0.6 }: FadeInViewProps) {
+  const ref = useRef<HTMLDivElement>(null);
   const prefersReduced = useReducedMotion();
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
 
   return (
     <motion.div
-      initial={prefersReduced ? false : { opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
+      ref={ref}
+      initial={{ opacity: 0, y: prefersReduced ? 0 : y }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: prefersReduced ? 0 : y }}
       transition={{ duration, ease: EASE_OUT_EXPO, delay }}
       className={className}
     >

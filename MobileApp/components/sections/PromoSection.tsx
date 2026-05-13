@@ -1,6 +1,7 @@
 "use client";
+import { useRef } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useUIStore } from "@/store/uiStore";
 import { getT } from "@/lib/i18n";
 import { EASE_OUT_EXPO } from "@/components/motion/variants";
@@ -8,15 +9,19 @@ import { EASE_OUT_EXPO } from "@/components/motion/variants";
 export function PromoSection() {
   const { language } = useUIStore();
   const t = getT(language);
+  const ref1 = useRef<HTMLDivElement>(null);
+  const ref2 = useRef<HTMLDivElement>(null);
+  const isInView1 = useInView(ref1, { once: true, margin: "-40px" });
+  const isInView2 = useInView(ref2, { once: true, margin: "-40px" });
 
   return (
     <section className="max-w-7xl mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Card 1 — slide dari kiri */}
         <motion.div
+          ref={ref1}
           initial={{ opacity: 0, x: -60 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-40px" }}
+          animate={isInView1 ? { opacity: 1, x: 0 } : { opacity: 0, x: -60 }}
           transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
         >
           <motion.div
@@ -25,7 +30,6 @@ export function PromoSection() {
             transition={{ type: "spring", stiffness: 300, damping: 22 }}
             className="relative bg-gradient-to-br from-primary to-secondary rounded-2xl p-6 overflow-hidden text-white cursor-pointer"
           >
-            {/* Decorative circles */}
             <motion.div
               animate={{ scale: [1, 1.1, 1], rotate: [0, 10, 0] }}
               transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
@@ -47,9 +51,9 @@ export function PromoSection() {
 
         {/* Card 2 — slide dari kanan */}
         <motion.div
+          ref={ref2}
           initial={{ opacity: 0, x: 60 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-40px" }}
+          animate={isInView2 ? { opacity: 1, x: 0 } : { opacity: 0, x: 60 }}
           transition={{ duration: 0.6, ease: EASE_OUT_EXPO, delay: 0.1 }}
         >
           <motion.div
