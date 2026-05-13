@@ -17,7 +17,7 @@ export function FeaturedSection({ products }: FeaturedSectionProps) {
 
   return (
     <section className="relative max-w-7xl mx-auto px-4 py-12 overflow-hidden">
-      {/* Background blob dekoratif */}
+      {/* Blob dekoratif */}
       <motion.div
         animate={{ y: [-10, 10, -10], scale: [1, 1.05, 1] }}
         transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
@@ -29,14 +29,14 @@ export function FeaturedSection({ products }: FeaturedSectionProps) {
         className="absolute bottom-0 -left-20 w-56 h-56 bg-secondary/5 rounded-full blur-3xl pointer-events-none -z-10"
       />
 
-      <FadeInView className="flex items-center justify-between mb-6">
+      <FadeInView className="flex items-center justify-between mb-6" y={50}>
         <div>
           <h2 className="text-2xl font-bold text-foreground">{t.sections.featured_title}</h2>
           <p className="text-sm text-muted-foreground mt-0.5">{t.sections.featured_subtitle}</p>
         </div>
-        <motion.div whileHover={{ x: 3 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>
+        <motion.div whileHover={{ x: 4 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>
           <Link href="/products?featured=true" className="text-sm font-medium text-primary hover:underline">
-            {t.sections.view_all}
+            {t.sections.view_all} →
           </Link>
         </motion.div>
       </FadeInView>

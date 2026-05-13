@@ -4,42 +4,42 @@ import type { Variants } from "framer-motion";
 export const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
 
 export const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: EASE_OUT_EXPO },
+    transition: { duration: 0.6, ease: EASE_OUT_EXPO },
   },
 };
 
 export const fadeIn: Variants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.4, ease: "easeOut" } },
+  visible: { opacity: 1, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
 export const cardVariant: Variants = {
-  hidden: { opacity: 0, y: 18, scale: 0.97 },
+  hidden: { opacity: 0, y: 60, scale: 0.9 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.45, ease: EASE_OUT_EXPO },
+    transition: { type: "spring", stiffness: 80, damping: 14 },
   },
 };
 
 export const staggerContainer: Variants = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.06, delayChildren: 0.05 },
+    transition: { staggerChildren: 0.07, delayChildren: 0.05 },
   },
 };
 
 export const slideUp: Variants = {
-  hidden: { opacity: 0, y: 40 },
+  hidden: { opacity: 0, y: 60 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: EASE_OUT_EXPO },
+    transition: { type: "spring", stiffness: 80, damping: 14 },
   },
 };
 

@@ -6,7 +6,6 @@ import type { CategoryWithCount } from "@/types";
 import { useUIStore } from "@/store/uiStore";
 import { getT } from "@/lib/i18n";
 import { FadeInView } from "@/components/motion/FadeInView";
-import { EASE_OUT_EXPO } from "@/components/motion/variants";
 
 interface CategorySectionProps {
   categories: CategoryWithCount[];
@@ -32,14 +31,14 @@ export function CategorySection({ categories }: CategorySectionProps) {
         {categories.map((cat, i) => (
           <motion.div
             key={cat.id}
-            initial={{ opacity: 0, y: 24, scale: 0.95 }}
+            initial={{ opacity: 0, y: 50, scale: 0.88 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.45, ease: EASE_OUT_EXPO, delay: i * 0.06 }}
+            viewport={{ once: true, margin: "-30px" }}
+            transition={{ type: "spring", stiffness: 80, damping: 14, delay: i * 0.07 }}
           >
             <Link href={`/categories/${cat.slug}`} className="group flex flex-col items-center gap-2">
               <motion.div
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.08, y: -3 }}
                 whileTap={{ scale: 0.94 }}
                 transition={{ type: "spring", stiffness: 400, damping: 22 }}
                 className="relative w-full aspect-square rounded-[14px] overflow-hidden bg-primary/5 border border-card-border group-hover:border-primary/40 transition-colors duration-200"

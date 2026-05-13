@@ -10,14 +10,14 @@ interface FadeInViewProps {
   duration?: number;
 }
 
-export function FadeInView({ children, className, delay = 0, y = 20, duration = 0.5 }: FadeInViewProps) {
+export function FadeInView({ children, className, delay = 0, y = 40, duration = 0.6 }: FadeInViewProps) {
   const prefersReduced = useReducedMotion();
 
   return (
     <motion.div
       initial={prefersReduced ? false : { opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
+      viewport={{ once: true, margin: "-50px" }}
       transition={{ duration, ease: EASE_OUT_EXPO, delay }}
       className={className}
     >

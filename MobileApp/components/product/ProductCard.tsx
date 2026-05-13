@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { formatPrice } from "@/lib/utils";
 import { useWishlistStore } from "@/store/wishlistStore";
 import type { ProductWithCategory } from "@/types";
-import { EASE_OUT_EXPO } from "@/components/motion/variants";
 
 interface ProductCardProps {
   product: ProductWithCategory;
@@ -25,21 +24,18 @@ export function ProductCard({ product, priority = false, index = 0 }: ProductCar
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : null;
 
-  // Cap stagger delay so items far down the list don't wait too long
-  const delay = Math.min(index * 0.05, 0.3);
+  const delay = Math.min(index * 0.07, 0.42);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.45, ease: EASE_OUT_EXPO, delay }}
-      whileTap={{ scale: 0.97 }}
+      initial={{ opacity: 0, y: 60, scale: 0.9 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-30px" }}
+      transition={{ type: "spring", stiffness: 80, damping: 14, delay }}
+      whileHover={{ y: -5, transition: { type: "spring", stiffness: 400, damping: 22 } }}
       className="group relative bg-card rounded-card overflow-hidden border border-card-border shadow-card hover:shadow-card-hover transition-shadow duration-300"
     >
       <Link href={`/products/${product.slug}`}>
-        {/* object-contain supaya foto produk full visible (tidak ke-crop
-            kepala/kaki). Ring inset + vignette memberi kedalaman pada frame. */}
         <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-zinc-50 via-muted to-violet-50/40 dark:from-zinc-900 dark:via-zinc-800/60 dark:to-violet-950/20 ring-1 ring-inset ring-black/[0.07] dark:ring-white/[0.05]">
           {coverImage ? (
             <>
@@ -51,12 +47,10 @@ export function ProductCard({ product, priority = false, index = 0 }: ProductCar
                 className="object-contain group-hover:scale-105 transition-transform duration-500"
                 priority={priority}
               />
-              {/* vignette frame: soft shadow ke dalam di semua sisi */}
               <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_20px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_0_20px_rgba(0,0,0,0.18)]" />
             </>
           ) : (
             <div className="relative w-full h-full flex flex-col items-center justify-center gap-2">
-              {/* dot grid pattern */}
               <div
                 className="absolute inset-0 opacity-[0.12] dark:opacity-[0.07]"
                 style={{
@@ -70,20 +64,34 @@ export function ProductCard({ product, priority = false, index = 0 }: ProductCar
               <span className="relative z-10 text-[10px] text-violet-400/70 dark:text-violet-600 font-medium tracking-wide">Belum ada foto</span>
             </div>
           )}
+
+          {/* Badge diskon — pop masuk dengan spring bounce */}
           {discount && (
-            <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+            <motion.span
+              initial={{ scale: 0, rotate: -15 }}
+              whileInView={{ scale: 1, rotate: 0 }}
+              viewport={{ once: true }}
+              transition={{ type: "spring", stiffness: 350, damping: 14, delay: delay + 0.15 }}
+              className="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full"
+            >
               -{discount}%
-            </span>
+            </motion.span>
           )}
           {product.isNew && !discount && (
-            <span className="absolute top-2 left-2 bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+            <motion.span
+              initial={{ scale: 0, rotate: -15 }}
+              whileInView={{ scale: 1, rotate: 0 }}
+              viewport={{ once: true }}
+              transition={{ type: "spring", stiffness: 350, damping: 14, delay: delay + 0.15 }}
+              className="absolute top-2 left-2 bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded-full"
+            >
               New
-            </span>
+            </motion.span>
           )}
         </div>
       </Link>
 
-      {/* Wishlist heart — spring bounce when toggled */}
+      {/* Wishlist heart */}
       <motion.button
         onClick={() => toggle(product.id)}
         whileTap={{ scale: 0.75 }}
