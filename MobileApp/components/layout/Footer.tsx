@@ -81,7 +81,17 @@ export function Footer() {
         >
           <h4 className="font-semibold mb-3 text-sm">{t.footer.contact_title}</h4>
           <ul className="space-y-2 text-sm text-white/60">
-            <li>📍 Jakarta, Indonesia</li>
+            <li>
+              <a
+                href="https://maps.app.goo.gl/YP6yXntqmPhmMrQ87"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors"
+              >
+                📍 Jl. Munggang No.52, Kramat Jati<br />
+                <span className="pl-5">Jakarta Timur 13530</span>
+              </a>
+            </li>
             <li>📞 +62 852-8573-3391</li>
             <li>✉️ hello@lumara.id</li>
             <li className="mt-2 whitespace-pre-line">{t.footer.hours}</li>

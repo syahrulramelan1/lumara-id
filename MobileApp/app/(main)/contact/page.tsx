@@ -77,19 +77,37 @@ export default function ContactPage() {
       {/* INFO LAINNYA */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { icon: Mail,    label: "Email",   value: "hello@lumara.id",       sub: "Dibalas 1x24 jam" },
-          { icon: MapPin,  label: "Alamat",  value: "Jakarta Selatan",       sub: "Tidak melayani kunjungan" },
-          { icon: Clock,   label: "Jam Kerja", value: "Senin – Sabtu",       sub: "09.00 – 17.00 WIB" },
-        ].map(({ icon: Icon, label, value, sub }) => (
-          <div key={label} className="bg-card border border-card-border rounded-2xl p-5">
-            <div className="flex items-center gap-2 text-muted-foreground mb-2">
-              <Icon size={16} />
-              <p className="text-xs font-semibold uppercase tracking-wider">{label}</p>
+          { icon: Mail,    label: "Email",     value: "hello@lumara.id",                    sub: "Dibalas 1x24 jam",     href: null },
+          { icon: MapPin,  label: "Alamat",    value: "Jl. Munggang No.52, Kramat Jati",    sub: "Jakarta Timur 13530",  href: "https://maps.app.goo.gl/YP6yXntqmPhmMrQ87" },
+          { icon: Clock,   label: "Jam Kerja", value: "Senin – Sabtu",                      sub: "09.00 – 17.00 WIB",    href: null },
+        ].map(({ icon: Icon, label, value, sub, href }) => {
+          const inner = (
+            <>
+              <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                <Icon size={16} />
+                <p className="text-xs font-semibold uppercase tracking-wider">{label}</p>
+                {href && <ExternalLink size={12} className="ml-auto text-primary/60" />}
+              </div>
+              <p className="font-semibold text-sm">{value}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>
+            </>
+          );
+          return href ? (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-card border border-card-border rounded-2xl p-5 hover:border-primary/30 transition-colors block"
+            >
+              {inner}
+            </a>
+          ) : (
+            <div key={label} className="bg-card border border-card-border rounded-2xl p-5">
+              {inner}
             </div>
-            <p className="font-semibold text-sm">{value}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <p className="text-center text-xs text-muted-foreground mt-8">
