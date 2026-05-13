@@ -15,22 +15,22 @@ export function HeroSection() {
   const t = getT(language);
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#F9F9FF] via-[#EDE9FE] to-[#F0E6FF] dark:from-[#0F0A1E] dark:via-[#1a0f2e] dark:to-[#0F0A1E] min-h-[480px] flex items-center">
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#F9F9FF] via-[#EDE9FE] to-[#F0E6FF] dark:from-[#111113] dark:via-[#111113] dark:to-[#111113] min-h-[480px] flex items-center">
       {/* Floating blobs */}
       <motion.div
         animate={{ y: [-12, 12, -12], scale: [1, 1.06, 1] }}
         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-20 right-10 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"
+        className="absolute top-20 right-10 w-64 h-64 bg-primary/10 dark:bg-primary/4 rounded-full blur-3xl pointer-events-none"
       />
       <motion.div
         animate={{ y: [10, -10, 10], scale: [1.05, 1, 1.05] }}
         transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-        className="absolute bottom-10 left-10 w-48 h-48 bg-secondary/10 rounded-full blur-3xl pointer-events-none"
+        className="absolute bottom-10 left-10 w-48 h-48 bg-secondary/10 dark:bg-secondary/3 rounded-full blur-3xl pointer-events-none"
       />
       <motion.div
         animate={{ x: [-8, 8, -8], opacity: [0.4, 0.7, 0.4] }}
         transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-        className="absolute top-1/2 right-1/4 w-32 h-32 bg-primary/8 rounded-full blur-2xl pointer-events-none"
+        className="absolute top-1/2 right-1/4 w-32 h-32 bg-primary/8 dark:bg-primary/3 rounded-full blur-2xl pointer-events-none"
       />
 
       <div className="relative max-w-7xl mx-auto px-4 py-16 md:py-24 w-full">

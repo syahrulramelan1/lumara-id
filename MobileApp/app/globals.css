@@ -230,6 +230,6 @@
     to   { transform: translateX(-50%); }
   }
   .marquee-track {
-    animation: marquee-x 16s linear infinite;
+    animation: marquee-x 28s linear infinite;
   }
 }
