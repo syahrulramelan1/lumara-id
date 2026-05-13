@@ -21,7 +21,7 @@ export function InfiniteMarquee({ className = "" }: InfiniteMarqueeProps) {
         {doubled.map((item, i) => (
           <span
             key={i}
-            className="inline-flex items-center gap-1.5 px-6 text-xs font-medium text-muted-foreground whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 px-6 text-xs font-medium text-muted-foreground dark:text-white/70 whitespace-nowrap"
           >
             {item}
             <span className="ml-4 text-primary/30">◆</span>
