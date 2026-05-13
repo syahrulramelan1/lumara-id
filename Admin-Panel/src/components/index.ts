@@ -27,4 +27,3 @@ export { default as SelectInput } from "./SelectInput";
 export { default as FAQSection } from "./FAQSection";
 export { default as SimpleNotification } from "./SimpleNotification";
 export { default as LoginComponent } from "./LoginComponent";
-export { default as RegisterComponent } from "./RegisterComponent";

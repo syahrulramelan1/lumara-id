@@ -14,13 +14,10 @@ const Categories     = lazy(() => import("./pages/Categories"));
 const CreateCategory = lazy(() => import("./pages/CreateCategory"));
 const EditCategory   = lazy(() => import("./pages/EditCategory"));
 const Orders         = lazy(() => import("./pages/Orders"));
-const CreateOrder    = lazy(() => import("./pages/CreateOrder"));
 const EditOrder      = lazy(() => import("./pages/EditOrder"));
 const Reviews        = lazy(() => import("./pages/Reviews"));
-const CreateReview   = lazy(() => import("./pages/CreateReview"));
 const EditReview     = lazy(() => import("./pages/EditReview"));
 const Users          = lazy(() => import("./pages/Users"));
-const CreateUser     = lazy(() => import("./pages/CreateUser"));
 const EditUser       = lazy(() => import("./pages/EditUser"));
 const HelpDesk       = lazy(() => import("./pages/HelpDesk"));
 const Notifications  = lazy(() => import("./pages/Notifications"));
@@ -52,13 +49,10 @@ const router = createBrowserRouter([
       { path: "categories/create-category",  element: lazyRoute(<CreateCategory />) },
       { path: "categories/:id",              element: lazyRoute(<EditCategory />) },
       { path: "orders",                      element: lazyRoute(<Orders />) },
-      { path: "orders/create-order",         element: lazyRoute(<CreateOrder />) },
       { path: "orders/:id",                  element: lazyRoute(<EditOrder />) },
       { path: "reviews",                     element: lazyRoute(<Reviews />) },
-      { path: "reviews/create-review",       element: lazyRoute(<CreateReview />) },
       { path: "reviews/:id",                 element: lazyRoute(<EditReview />) },
       { path: "users",                       element: lazyRoute(<Users />) },
-      { path: "users/create-user",           element: lazyRoute(<CreateUser />) },
       { path: "users/:id",                   element: lazyRoute(<EditUser />) },
       { path: "help-desk",                   element: lazyRoute(<HelpDesk />) },
       { path: "notifications",               element: lazyRoute(<Notifications />) },
