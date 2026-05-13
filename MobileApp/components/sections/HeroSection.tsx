@@ -115,7 +115,7 @@ export function HeroSection() {
             transition={{ duration: 0.5, delay: STAGGER_DELAY * 5 }}
             className="mt-5 max-w-md overflow-hidden rounded-xl border border-primary/20 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm"
           >
-            <InfiniteMarquee className="py-2" speed={16} />
+            <InfiniteMarquee className="py-2" />
           </motion.div>
         </div>
       </div>

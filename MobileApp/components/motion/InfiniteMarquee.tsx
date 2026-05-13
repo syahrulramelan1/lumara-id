@@ -1,6 +1,3 @@
-"use client";
-import { motion } from "framer-motion";
-
 const ITEMS = [
   "🚚 Gratis Ongkir",
   "✨ 100% Original",
@@ -14,28 +11,23 @@ const ITEMS = [
 
 interface InfiniteMarqueeProps {
   className?: string;
-  speed?: number;
 }
 
-export function InfiniteMarquee({ className = "", speed = 22 }: InfiniteMarqueeProps) {
+export function InfiniteMarquee({ className = "" }: InfiniteMarqueeProps) {
   const doubled = [...ITEMS, ...ITEMS];
   return (
     <div className={`overflow-hidden ${className}`}>
-      <motion.div
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{ duration: speed, repeat: Infinity, ease: "linear" }}
-        className="flex w-max"
-      >
+      <div className="marquee-track flex w-max">
         {doubled.map((item, i) => (
           <span
             key={i}
             className="inline-flex items-center gap-1.5 px-6 text-xs font-medium text-muted-foreground whitespace-nowrap"
           >
             {item}
-            <span className="ml-4 text-primary/25">◆</span>
+            <span className="ml-4 text-primary/30">◆</span>
           </span>
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 }

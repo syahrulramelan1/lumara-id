@@ -223,4 +223,13 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Marquee infinite scroll — CSS native, tidak tunggu JS hydration */
+  @keyframes marquee-x {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .marquee-track {
+    animation: marquee-x 16s linear infinite;
+  }
 }
