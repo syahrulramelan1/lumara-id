@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { HiOutlineSave, HiOutlineArrowLeft } from "react-icons/hi";
 import toast from "react-hot-toast";
-import { ImageUpload, Sidebar, ColorVariantInput } from "../components";
+import { ImageUpload, Sidebar, ColorVariantInput, RichTextarea } from "../components";
 import { productsApi, categoriesApi } from "../lib/api";
 import { parseJsonArr, parseJsonArrToString } from "../lib/jsonUtils";
 import { parseColors, type ColorVariant } from "../types/colorVariant";
@@ -143,8 +143,7 @@ const EditProduct = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Deskripsi</label>
-                  <textarea className="input-base resize-none" rows={4} placeholder="Deskripsi produk..." value={form.description}
-                    onChange={(e) => set("description", e.target.value)} />
+                  <RichTextarea value={form.description} onChange={(v) => set("description", v)} placeholder="Deskripsi produk..." />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[var(--text)] mb-1.5">Kategori *</label>
