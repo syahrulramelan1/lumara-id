@@ -48,7 +48,7 @@
 - **Database**: Supabase PostgreSQL (1 DB, di-share)
 - **Auth**: Supabase Auth + role di tabel Prisma `User.role` (`USER` | `ADMIN`)
 - **Storage**: Supabase Storage bucket `lumara-id`
-- **Deploy**: Render (kedua service via `render.yaml`)
+- **Deploy**: MobileApp → Vercel, Admin-Panel → Render
 
 ---
 
@@ -69,7 +69,6 @@
 - **Build tool**: Vite 5 (esbuild-based, fast dev/HMR)
 - **Style**: SPA murni — semua route di-handle client-side via react-router-dom
 - **HTTP client**: axios instance di `src/lib/api.ts` dengan baseURL `${VITE_API_URL}/api/admin` & header `x-admin-secret`
-- **Docker**: `dockerfile` + `compose.yml` tersedia untuk dev lokal (`docker compose up` → Vite dev server di `0.0.0.0:5173`)
 
 ### next.config.js — Detail Penting
 
@@ -77,7 +76,7 @@
 output: process.env.RENDER ? "standalone" : undefined
 images: { unoptimized: true }                            // ⚠️ trade-off build cepat vs gambar tidak di-compress
 experimental: { serverActions: { bodySizeLimit: "2mb" } } // untuk image upload via Server Action
-remotePatterns: *.supabase.co, images.unsplash.com, api.dicebear.com, *.onrender.com
+remotePatterns: *.supabase.co, images.unsplash.com, api.dicebear.com
 ```
 
 > `unoptimized: true` → gambar diserve as-is, tidak di-resize/compress. Pertimbangkan disable kalau upgrade ke paid plan.
@@ -541,7 +540,7 @@ syncUser endpoint:
 
 ## Environment Variables
 
-### MobileApp (`.env.local` lokal / Render env vars production)
+### MobileApp (`.env.local` lokal / Vercel env vars production)
 
 | Var                             | Wajib?          | Tujuan                                                                                     |
 | ------------------------------- | --------------- | ------------------------------------------------------------------------------------------ |
@@ -815,7 +814,7 @@ syncUser endpoint:
 
 | Service     | Repo                        | URL                                |
 | ----------- | --------------------------- | ---------------------------------- |
-| MobileApp   | `syahrulramelan1/lumara-id` | `https://lumara-id.onrender.com`   |
+| MobileApp   | `syahrulramelan1/lumara-id` | `https://lumara-id.vercel.app`     |
 | Admin-Panel | `UsedZ/admni-panel`         | `https://admni-panel.onrender.com` |
 
 ### Push Admin-Panel ke Repo Terpisah
@@ -828,26 +827,16 @@ git branch -D tmp
 
 Lakukan setiap ada perubahan Admin-Panel yang perlu di-deploy.
 
-### Render Build Commands (via `render.yaml`)
+### Vercel Deploy (MobileApp)
 
-**MobileApp:**
+- **Cara deploy**: push ke `syahrulramelan1/lumara-id` → Vercel auto-build
+- **Framework preset**: Next.js (auto-detect, tidak perlu `vercel.json`)
+- **Root directory**: `MobileApp`
+- **Build command**: `prisma generate && next build` (dari `package.json` scripts)
+- **Env vars**: diset di Vercel dashboard
+- `output: "standalone"` hanya aktif kalau env `RENDER` ada — di Vercel tidak di-set, jadi pakai serverless functions standar (tidak perlu copy static/public)
 
-```
-buildCommand:
-  cp prisma/schema.production.prisma prisma/schema.prisma
-  && npm install --include=dev
-  && npx prisma generate
-  && npx prisma db push
-  && npm run build
-  && cp -r .next/static .next/standalone/.next/static
-  && cp -r public .next/standalone/public
-
-startCommand: HOSTNAME=0.0.0.0 node .next/standalone/server.js
-```
-
-> Copy `static` + `public` HARUS di buildCommand (bukan startCommand) agar tersedia tiap deploy termasuk restart tanpa rebuild.
-
-**Admin-Panel:**
+### Render Build Commands (Admin-Panel via `Admin-Panel/render.yaml`)
 
 ```
 buildCommand: npm install && npm run build
@@ -858,8 +847,8 @@ routes: /* → /index.html (SPA rewrite)
 ### Supabase Config
 
 - Bucket storage: `lumara-id` (public)
-- Site URL: `https://lumara-id.onrender.com`
-- Redirect URL: `https://lumara-id.onrender.com/reset-password`
+- Site URL: `https://lumara-id.vercel.app`
+- Redirect URL: `https://lumara-id.vercel.app/reset-password`
 - `app_settings`: RLS enabled, no policy → blokir REST API, Prisma OK via direct connection
 
 ---
