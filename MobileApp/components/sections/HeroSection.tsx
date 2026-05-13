@@ -6,6 +6,7 @@ import { SearchBar } from "@/components/shared/SearchBar";
 import { useUIStore } from "@/store/uiStore";
 import { getT } from "@/lib/i18n";
 import { EASE_OUT_EXPO } from "@/components/motion/variants";
+import { InfiniteMarquee } from "@/components/motion/InfiniteMarquee";
 
 const STAGGER_DELAY = 0.1;
 
@@ -119,6 +120,11 @@ export function HeroSection() {
             <span className="flex items-center gap-1.5 bg-muted/60 px-3 py-1.5 rounded-full text-xs font-medium">🔄 {t.hero.badge_return}</span>
           </motion.div>
         </div>
+      </div>
+
+      {/* Infinite marquee strip — separates hero from sections below */}
+      <div className="relative border-t border-border/30 bg-background/60 backdrop-blur-sm">
+        <InfiniteMarquee className="py-2.5" />
       </div>
     </section>
   );

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useUIStore } from "@/store/uiStore";
 import { getT } from "@/lib/i18n";
-import { FadeInView } from "@/components/motion/FadeInView";
+import { EASE_OUT_EXPO } from "@/components/motion/variants";
 
 export function PromoSection() {
   const { language } = useUIStore();
@@ -12,7 +12,13 @@ export function PromoSection() {
   return (
     <section className="max-w-7xl mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FadeInView delay={0}>
+        {/* Card 1 — slide dari kiri */}
+        <motion.div
+          initial={{ opacity: 0, x: -60 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
+        >
           <motion.div
             whileHover={{ scale: 1.015, y: -2 }}
             whileTap={{ scale: 0.985 }}
@@ -37,9 +43,15 @@ export function PromoSection() {
               {t.promo.shop_now}
             </Link>
           </motion.div>
-        </FadeInView>
+        </motion.div>
 
-        <FadeInView delay={0.1}>
+        {/* Card 2 — slide dari kanan */}
+        <motion.div
+          initial={{ opacity: 0, x: 60 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.6, ease: EASE_OUT_EXPO, delay: 0.1 }}
+        >
           <motion.div
             whileHover={{ scale: 1.015, y: -2 }}
             whileTap={{ scale: 0.985 }}
@@ -62,7 +74,7 @@ export function PromoSection() {
               {t.promo.view_bundle}
             </Link>
           </motion.div>
-        </FadeInView>
+        </motion.div>
       </div>
     </section>
   );
