@@ -77,7 +77,7 @@ export const SOCIAL_CHANNELS: SocialChannel[] = [
     id:       "tiktok",
     label:    "TikTok",
     handle:   "@lumaraid",
-    url:      "https://www.tiktok.com/@lumaraid?_r=1&_t=ZS-961guyaB8hY",
+    url:      "https://www.tiktok.com/@lumaraid",
     desc:     "Video styling, mix & match outfit, dan konten lifestyle modest.",
     brandHex: "#000000",
   },
