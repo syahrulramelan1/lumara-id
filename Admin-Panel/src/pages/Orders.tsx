@@ -12,7 +12,7 @@ const Orders = () => {
   const [statusFilter, setStatusFilter] = useState("SEMUA");
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["orders", page],
     queryFn: () => ordersApi.list(page).then((r) => r.data),
   });
@@ -64,6 +64,11 @@ const Orders = () => {
           {isLoading ? (
             <div className="flex justify-center py-20">
               <div className="w-10 h-10 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : isError ? (
+            <div className="card p-12 text-center">
+              <p className="text-red-500 font-medium mb-1">Gagal memuat pesanan</p>
+              <p className="text-xs text-[var(--text-muted)]">Periksa koneksi atau coba refresh halaman</p>
             </div>
           ) : orders.length === 0 ? (
             <div className="card p-12 text-center text-[var(--text-muted)]">Tidak ada pesanan ditemukan</div>
