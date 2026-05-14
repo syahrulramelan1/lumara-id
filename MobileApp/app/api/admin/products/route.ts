@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import type { Prisma } from "@prisma/client";
 import { productModel } from "@/lib/models/ProductModel";
 import { checkAdminSecret, adminUnauthorized, uploadImage } from "@/lib/admin";
 
@@ -45,20 +46,19 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    let parsedSizes: unknown = [];
-    let parsedColors: unknown = [];
-    try { parsedSizes = JSON.parse(sizes); } catch { parsedSizes = sizes; }
-    try { parsedColors = JSON.parse(colors); } catch { parsedColors = colors; }
+    const parseJson = (s: string): Prisma.InputJsonValue => {
+      try { return JSON.parse(s) as Prisma.InputJsonValue; } catch { return s; }
+    };
 
     const product = await productModel.create({
       name, slug, description, categoryId,
       price, stock,
       ...(originalPrice !== undefined ? { originalPrice } : {}),
       ...(sku ? { sku } : {}),
-      sizes: parsedSizes,
-      colors: parsedColors,
+      sizes: parseJson(sizes),
+      colors: parseJson(colors),
       isFeatured, isNew,
-      images: imageUrls,
+      images: imageUrls as Prisma.InputJsonValue,
     });
 
     return NextResponse.json({ success: true, data: product }, { status: 201 });

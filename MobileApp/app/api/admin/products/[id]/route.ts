@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import type { Prisma } from "@prisma/client";
 import { productModel } from "@/lib/models/ProductModel";
 import { checkAdminSecret, adminUnauthorized, uploadImage } from "@/lib/admin";
 
@@ -52,10 +53,9 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
 
     const allImages = [...existingImages, ...newUrls];
 
-    let parsedSizes: unknown = undefined;
-    let parsedColors: unknown = undefined;
-    if (sizes) { try { parsedSizes = JSON.parse(sizes); } catch { parsedSizes = sizes; } }
-    if (colors) { try { parsedColors = JSON.parse(colors); } catch { parsedColors = colors; } }
+    const parseJson = (s: string): Prisma.InputJsonValue => {
+      try { return JSON.parse(s) as Prisma.InputJsonValue; } catch { return s; }
+    };
 
     const product = await productModel.update(id, {
       ...(name ? { name } : {}),
@@ -66,11 +66,11 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
       ...(originalPrice !== undefined ? { originalPrice } : {}),
       ...(stock !== undefined ? { stock } : {}),
       ...(sku !== null ? { sku } : {}),
-      ...(parsedSizes !== undefined ? { sizes: parsedSizes } : {}),
-      ...(parsedColors !== undefined ? { colors: parsedColors } : {}),
+      ...(sizes ? { sizes: parseJson(sizes) } : {}),
+      ...(colors ? { colors: parseJson(colors) } : {}),
       ...(isFeatured !== undefined ? { isFeatured } : {}),
       ...(isNew !== undefined ? { isNew } : {}),
-      images: allImages,
+      images: allImages as Prisma.InputJsonValue,
     });
 
     return NextResponse.json({ success: true, data: product });
