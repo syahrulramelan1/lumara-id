@@ -196,17 +196,19 @@ const RichTextarea = ({
       {/* ── Toolbar ── */}
       <div className="flex items-center gap-0.5 flex-wrap px-2 py-1.5 bg-gray-100 dark:bg-gray-700 border-b border-gray-300 dark:border-gray-600">
 
-        {/* Format blok */}
+        {/* Format blok — pakai placeholder "" agar opsi yang sama bisa dipilih ulang */}
         <select
           onMouseDown={(e) => e.stopPropagation()}
           onChange={(e) => {
-            setBlock(e.target.value as "p" | "h2" | "h3");
-            e.target.value = "p"; // reset visual
+            const val = e.target.value as "p" | "h2" | "h3";
+            setBlock(val);
+            e.target.value = ""; // reset ke placeholder, bukan "p" — supaya Normal bisa dipilih ulang
           }}
-          defaultValue="p"
+          defaultValue=""
           title="Format teks"
           className="text-xs rounded px-1.5 py-1 bg-transparent border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 cursor-pointer focus:outline-none focus:ring-1 focus:ring-[var(--brand,#7C3AED)]"
         >
+          <option value="" disabled>— Format —</option>
           <option value="p">Normal</option>
           <option value="h2">Judul Besar</option>
           <option value="h3">Sub Judul</option>
@@ -265,9 +267,9 @@ const RichTextarea = ({
           "[&:empty]:before:content-[attr(data-placeholder)]",
           "[&:empty]:before:text-gray-400 dark:[&:empty]:before:text-gray-500",
           "[&:empty]:before:pointer-events-none [&:empty]:before:select-none",
-          // Heading dalam editor — distinct ukuran biar kelihatan
-          "[&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-3 [&_h2]:mb-1",
-          "[&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-2 [&_h3]:mb-1",
+          // Heading dalam editor — paksa ukuran eksplisit, jangan inherit dari text-sm parent
+          "[&_h2]:!text-xl [&_h2]:!font-bold [&_h2]:mt-3 [&_h2]:mb-1",
+          "[&_h3]:!text-base [&_h3]:!font-semibold [&_h3]:mt-2 [&_h3]:mb-1",
           // Paragraf
           "[&_p]:my-1",
           // List
