@@ -38,14 +38,21 @@ const ProductTable = ({ products }: { products: ApiProduct[] }) => {
         </thead>
         <tbody>
           {products.map((item) => {
-            const img = firstImage(item.images);
+            const imgRaw = firstImage(item.images);
+            // Hanya gunakan img kalau valid URL (https/http/relative) — cegah CUID/ID masuk sebagai src
+            const img = imgRaw && /^https?:\/\//.test(imgRaw) ? imgRaw : null;
             const inStock = item.stock > 0;
             return (
               <tr key={item.id}>
                 <td>
                   <div className="flex items-center gap-3">
                     {img ? (
-                      <img src={img} alt="" className="h-10 w-10 rounded-lg object-cover bg-[var(--bg-3)] flex-shrink-0" />
+                      <img
+                        src={img}
+                        alt=""
+                        className="h-10 w-10 rounded-lg object-cover bg-[var(--bg-3)] flex-shrink-0"
+                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                      />
                     ) : (
                       <div className="h-10 w-10 rounded-lg bg-[var(--bg-3)] flex-shrink-0" />
                     )}

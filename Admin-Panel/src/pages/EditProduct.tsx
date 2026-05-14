@@ -13,10 +13,11 @@ const EditProduct = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data: product, isLoading } = useQuery({
+  const { data: product, isLoading, isError } = useQuery({
     queryKey: ["product", id],
     queryFn: () => productsApi.get(id!).then((r) => r.data.data),
     enabled: !!id,
+    retry: false,
   });
   const { data: catData } = useQuery({
     queryKey: ["categories"],
@@ -101,6 +102,19 @@ const EditProduct = () => {
       <Sidebar />
       <div className="flex-1 flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin" />
+      </div>
+    </div>
+  );
+
+  if (isError) return (
+    <div className="min-h-screen flex dark:bg-[#0D0B14] bg-[var(--bg-2)]">
+      <Sidebar />
+      <div className="flex-1 flex flex-col items-center justify-center gap-4">
+        <p className="text-[var(--text)] text-lg font-semibold">Produk tidak ditemukan</p>
+        <p className="text-[var(--text-muted)] text-sm">Produk mungkin sudah dihapus atau ID tidak valid.</p>
+        <button onClick={() => navigate("/products")} className="btn-primary text-sm">
+          Kembali ke Produk
+        </button>
       </div>
     </div>
   );
