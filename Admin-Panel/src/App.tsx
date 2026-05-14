@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { RouterProvider, createHashRouter } from "react-router-dom";
 import HomeLayout from "./pages/HomeLayout";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -35,7 +35,7 @@ const lazyRoute = (el: React.ReactNode) => (
 
 const protect = (el: React.ReactNode) => <ProtectedRoute>{el}</ProtectedRoute>;
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   { path: "/login", element: <Login /> },
   {
     path: "/",
