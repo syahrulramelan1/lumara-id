@@ -52,6 +52,11 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
 
     const allImages = [...existingImages, ...newUrls];
 
+    let parsedSizes: unknown = undefined;
+    let parsedColors: unknown = undefined;
+    if (sizes) { try { parsedSizes = JSON.parse(sizes); } catch { parsedSizes = sizes; } }
+    if (colors) { try { parsedColors = JSON.parse(colors); } catch { parsedColors = colors; } }
+
     const product = await productModel.update(id, {
       ...(name ? { name } : {}),
       ...(slug ? { slug } : {}),
@@ -61,16 +66,21 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
       ...(originalPrice !== undefined ? { originalPrice } : {}),
       ...(stock !== undefined ? { stock } : {}),
       ...(sku !== null ? { sku } : {}),
-      ...(sizes ? { sizes } : {}),
-      ...(colors ? { colors } : {}),
+      ...(parsedSizes !== undefined ? { sizes: parsedSizes } : {}),
+      ...(parsedColors !== undefined ? { colors: parsedColors } : {}),
       ...(isFeatured !== undefined ? { isFeatured } : {}),
       ...(isNew !== undefined ? { isNew } : {}),
-      images: JSON.stringify(allImages),
+      images: allImages,
     });
 
     return NextResponse.json({ success: true, data: product });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal memperbarui produk";
+    console.error("[PATCH /api/admin/products/:id]", err);
+    const prismaCode = (err as { code?: string })?.code;
+    let msg = err instanceof Error ? err.message : "Gagal memperbarui produk";
+    if (prismaCode === "P2002") msg = "Slug sudah dipakai produk lain — ganti slug dan coba lagi";
+    if (prismaCode === "P2025") msg = "Produk tidak ditemukan";
+    if (prismaCode === "P2003") msg = "Kategori tidak valid — pilih kategori yang ada";
     return NextResponse.json({ success: false, error: msg }, { status: 400 });
   }
 }

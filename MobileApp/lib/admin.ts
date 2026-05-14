@@ -19,6 +19,9 @@ function getSupabaseAdmin() {
 }
 
 export async function uploadImage(file: File, bucket = "lumara-id"): Promise<string> {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error("SUPABASE_SERVICE_ROLE_KEY belum dikonfigurasi di Vercel env vars");
+  }
   const supabase = getSupabaseAdmin();
   const ext = file.name.split(".").pop() ?? "jpg";
   const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;

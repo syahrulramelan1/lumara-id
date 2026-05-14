@@ -45,19 +45,29 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    let parsedSizes: unknown = [];
+    let parsedColors: unknown = [];
+    try { parsedSizes = JSON.parse(sizes); } catch { parsedSizes = sizes; }
+    try { parsedColors = JSON.parse(colors); } catch { parsedColors = colors; }
+
     const product = await productModel.create({
       name, slug, description, categoryId,
       price, stock,
       ...(originalPrice !== undefined ? { originalPrice } : {}),
       ...(sku ? { sku } : {}),
-      sizes, colors,
+      sizes: parsedSizes,
+      colors: parsedColors,
       isFeatured, isNew,
-      images: JSON.stringify(imageUrls),
+      images: imageUrls,
     });
 
     return NextResponse.json({ success: true, data: product }, { status: 201 });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal membuat produk";
+    console.error("[POST /api/admin/products]", err);
+    const prismaCode = (err as { code?: string })?.code;
+    let msg = err instanceof Error ? err.message : "Gagal membuat produk";
+    if (prismaCode === "P2002") msg = "Slug sudah dipakai produk lain — ganti slug dan coba lagi";
+    if (prismaCode === "P2003") msg = "Kategori tidak valid — pilih kategori yang ada";
     return NextResponse.json({ success: false, error: msg }, { status: 400 });
   }
 }
