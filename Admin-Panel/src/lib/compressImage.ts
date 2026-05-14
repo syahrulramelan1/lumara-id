@@ -2,10 +2,15 @@
 export async function compressImage(
   file: File,
   maxWidth = 1200,
-  quality = 0.75,
+  quality = 0.8,
 ): Promise<File> {
-  // Kalau bukan gambar atau ukurannya sudah kecil (<300KB), lewati
-  if (!file.type.startsWith("image/") || file.size < 300 * 1024) return file;
+  // Bukan gambar → lewati
+  if (!file.type.startsWith("image/")) return file;
+  // Sudah kecil (<400KB) dan tidak perlu resize → lewati
+  if (file.size < 400 * 1024) return file;
+
+  // PNG dengan transparansi → tetap PNG (jangan ubah ke JPEG, background jadi hitam)
+  const isPng = file.type === "image/png";
 
   return new Promise((resolve) => {
     const img = new Image();
@@ -26,17 +31,26 @@ export async function compressImage(
       const ctx = canvas.getContext("2d");
       if (!ctx) { resolve(file); return; }
 
+      // Untuk JPEG: isi background putih dulu supaya tidak ada artefak transparan
+      if (!isPng) {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, width, height);
+      }
       ctx.drawImage(img, 0, 0, width, height);
+
+      const mimeType = isPng ? "image/png" : "image/jpeg";
+      const ext      = isPng ? "png" : "jpg";
+
       canvas.toBlob(
         (blob) => {
           if (!blob) { resolve(file); return; }
-          // Kalau hasil kompresi lebih besar dari aslinya (jarang), pakai aslinya
+          // Kalau hasil kompresi malah lebih besar (gambar sudah optimal), pakai aslinya
           const result = blob.size < file.size
-            ? new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" })
+            ? new File([blob], file.name.replace(/\.[^.]+$/, `.${ext}`), { type: mimeType })
             : file;
           resolve(result);
         },
-        "image/jpeg",
+        mimeType,
         quality,
       );
     };
