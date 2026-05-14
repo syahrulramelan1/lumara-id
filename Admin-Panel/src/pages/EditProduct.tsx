@@ -7,6 +7,7 @@ import { ImageUpload, Sidebar, ColorVariantInput, RichTextarea } from "../compon
 import { productsApi, categoriesApi } from "../lib/api";
 import { parseJsonArr, parseJsonArrToString } from "../lib/jsonUtils";
 import { parseColors, type ColorVariant } from "../types/colorVariant";
+import { compressImage } from "../lib/compressImage";
 
 const EditProduct = () => {
   const { id } = useParams<{ id: string }>();
@@ -69,7 +70,7 @@ const EditProduct = () => {
     },
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.name || !form.categoryId || !form.price || !form.stock) {
       toast.error("Nama, kategori, harga, dan stok wajib diisi");
       return;
@@ -93,7 +94,9 @@ const EditProduct = () => {
     fd.append("isFeatured", String(form.isFeatured));
     fd.append("isNew", String(form.isNew));
     fd.append("existingImages", JSON.stringify(existingImages));
-    imageFiles.forEach((f) => fd.append("images", f));
+    // Compress semua gambar baru sebelum kirim — cegah 413 Vercel
+    const compressed = await Promise.all(imageFiles.map((f) => compressImage(f)));
+    compressed.forEach((f) => fd.append("images", f));
     updateMutation.mutate(fd);
   };
 
