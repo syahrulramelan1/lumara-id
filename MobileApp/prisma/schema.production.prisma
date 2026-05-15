@@ -82,6 +82,12 @@ model Product {
   wishlist   Wishlist[]
   orderItems OrderItem[]
 
+  @@index([categoryId])
+  @@index([isFeatured, stock])
+  @@index([isNew, stock])
+  @@index([createdAt])
+  @@index([rating])
+  @@index([price])
   @@map("products")
 }
 

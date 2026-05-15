@@ -63,10 +63,14 @@ function buildSearchTerms(query: string): string[] {
  * Tiap istilah dicari di: nama produk dan deskripsi.
  */
 function buildSearchOR(terms: string[]): object[] {
-  return terms.flatMap((term) => [
-    { name:        { contains: term, mode: "insensitive" } },
-    { description: { contains: term, mode: "insensitive" } },
-  ]);
+  return terms.flatMap((term) => {
+    const conds: object[] = [{ name: { contains: term, mode: "insensitive" } }];
+    // Search description hanya kalau term >= 4 huruf, hindari scan berat untuk kata pendek
+    if (term.length >= 4) {
+      conds.push({ description: { contains: term, mode: "insensitive" } });
+    }
+    return conds;
+  });
 }
 
 // ─── Model ────────────────────────────────────────────────────────────────────
