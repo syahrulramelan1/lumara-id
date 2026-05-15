@@ -47,7 +47,7 @@ export function ProductCard({ product, priority = false, index = 0 }: ProductCar
                 alt={product.name}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                className="object-contain group-hover:scale-105 transition-transform duration-500"
+                className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
                 priority={priority}
               />
               <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_20px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_0_20px_rgba(0,0,0,0.18)]" />
