@@ -83,6 +83,7 @@ export function ProductImageZoom({
                 fill
                 className="object-contain pointer-events-none"
                 priority
+                quality={85}
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
             )}

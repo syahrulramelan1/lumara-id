@@ -135,6 +135,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                     alt=""
                     fill
                     loading="lazy"
+                    quality={85}
                     className="object-contain transition-opacity"
                     sizes="64px"
                     onError={(e) => {
