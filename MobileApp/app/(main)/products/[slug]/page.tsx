@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { productService } from "@/lib/services/ProductService";
@@ -9,9 +10,12 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+// cache() deduplicate DB call — generateMetadata & page pakai hasil yang sama
+const getProduct = cache((slug: string) => productService.getProductBySlug(slug));
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const product = await productService.getProductBySlug(slug);
+  const product = await getProduct(slug);
   if (!product) return { title: "Not Found" };
   return {
     title: product.name,
@@ -23,7 +27,7 @@ export const dynamic = "force-dynamic";
 
 export default async function ProductDetailPage({ params }: Props) {
   const { slug } = await params;
-  const product = await productService.getProductBySlug(slug);
+  const [product, ] = await Promise.all([getProduct(slug)]);
   if (!product) notFound();
 
   const related = await productService.getRelatedProducts(product.categoryId, product.id);

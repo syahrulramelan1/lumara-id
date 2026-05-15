@@ -57,11 +57,11 @@ export class OrderService {
       throw new Error("Ongkir tidak valid atau sudah berubah. Silakan hitung ulang ongkir.");
     }
 
-    for (const item of items) {
-      const product = await productModel.findById(item.productId);
-      if (!product) throw new Error(`Produk ${item.name} tidak ditemukan`);
-      if (product.stock < item.quantity) throw new Error(`Stok ${item.name} tidak cukup`);
-    }
+    const products = await Promise.all(items.map((item) => productModel.findById(item.productId)));
+    products.forEach((product, i) => {
+      if (!product) throw new Error(`Produk ${items[i].name} tidak ditemukan`);
+      if (product.stock < items[i].quantity) throw new Error(`Stok ${items[i].name} tidak cukup`);
+    });
 
     const order = await orderModel.create(userId, items, shippingAddress, paymentMethod, shippingCost, courier, courierService);
 

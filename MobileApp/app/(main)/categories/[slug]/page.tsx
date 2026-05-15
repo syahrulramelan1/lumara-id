@@ -1,6 +1,8 @@
+import { cache } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { productService } from "@/lib/services/ProductService";
+import { categoryModel } from "@/lib/models/CategoryModel";
 import { ProductGrid } from "@/components/shared/ProductGrid";
 
 interface Props {
@@ -8,9 +10,12 @@ interface Props {
   searchParams: Promise<{ page?: string; sortBy?: string }>;
 }
 
+// Hanya fetch category (ringan) untuk metadata — tidak perlu fetch produk
+const getCategory = cache((slug: string) => categoryModel.findBySlug(slug));
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const { category } = await productService.getCategoryWithProducts(slug, { page: 1 });
+  const category = await getCategory(slug);
   if (!category) return { title: "Kategori tidak ditemukan" };
   return { title: category.name, description: category.description ?? undefined };
 }

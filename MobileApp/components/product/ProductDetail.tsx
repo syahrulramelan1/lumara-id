@@ -134,6 +134,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                     src={img}
                     alt=""
                     fill
+                    loading="lazy"
                     className="object-contain transition-opacity"
                     sizes="64px"
                     onError={(e) => {
