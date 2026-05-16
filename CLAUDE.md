@@ -613,15 +613,16 @@ syncUser endpoint:
 
 ### Product
 
-- `ProductCard.tsx` — listing/grid, `aspect-[3/4]` + `object-contain` (no crop)
+- `ProductCard.tsx` — listing/grid, `aspect-[3/4]` + `object-contain` (no crop); `h-full` pada motion wrapper agar card seragam tinggi di grid
 - `ProductDetail.tsx` — detail page, pakai `<ProductImageZoom />`
 - `ProductImageZoom.tsx` — **inner hover zoom 2.2× (Shopee-style)** + **lightbox full-screen** (mobile pinch-zoom + ESC/← →)
+- `ReviewSection.tsx` — **Shopee-style**: rating summary box (angka besar, bintang orange, progress bar per bintang), filter chip (Semua/5★/4★/.../Ada Komentar/Ada Foto), avatar icon generik abu-abu, username tanpa masking, lightbox foto, count format `(5.3rb)` untuk ≥1000
 - `ProductFilters.tsx`, `MobileFilterDrawer.tsx` (pakai `createPortal`)
 - `ColorSwatch.tsx` — swatch warna untuk pilihan variant produk
 
 ### Sections (dipakai di `/home`)
 
-- `HeroSection`, `FeaturedSection`, `NewArrivalsSection`, `CategorySection`, `PromoSection`
+- `HeroSection`, `FeaturedSection`, `NewArrivalsSection`, `CategorySection` (`aspect-[3/4]` + `object-cover object-top` — foto portrait tidak terpotong), `PromoSection`
 
 ### Splash
 
@@ -689,11 +690,17 @@ syncUser endpoint:
 ### Komponen Utama Admin-Panel
 
 - **Tables**: `ProductTable`, `OrderTable`, `ReviewsTable`, `CategoryTable`, `UserTable` (pagination 20/page via controlled component)
-- **Forms**: `InputWithLabel`, `SelectInput`, `TextAreaInput`, `ColorVariantInput` (preset 20 warna + hex + datalist), `ImageUpload`
+- **Forms**: `InputWithLabel`, `SelectInput`, `TextAreaInput`, `ColorVariantInput` (preset 20 warna + hex + datalist), `ImageUpload` (prop `hidePreviews?: boolean`)
 - **Charts**: `RechartsBarChart`, `ActivitiesByCountry`, `ActivitiesByDevices`, `ActivityByTime`, `ConversionRateBySource`
 - **Auth**: `ProtectedRoute`, `AuthContext` (`src/context/AuthContext.tsx`) — session + role check
 - **UI**: `Header`, `Sidebar`, `Footer`, `Pagination`, `SearchInput`, `WhiteButton`
 - **Code splitting**: `React.lazy` + `<Suspense>` per route di `App.tsx` — bundle awal hanya load HomeLayout + Login
+
+### Fitur Khusus Halaman Admin
+
+- **`Landing.tsx` (Dashboard)**: stat cards 6 metrik + card "Rating Toko" (angka besar kuning, partial-fill stars `StarDisplay`, breakdown per produk dengan bar color-coded, legend emerald/yellow/orange/red) + chart penjualan. Store rating = weighted avg dari semua produk berulasan.
+- **`EditProduct.tsx`**: foto [0] = cover (badge ★ kuning), hover foto lain tampilkan "Jadikan Cover", klik → reorder array ke [0]. `ImageUpload` dipanggil dengan `hidePreviews={true}` karena grid preview dikelola manual.
+- **`CreateProduct.tsx`**: `imagePreviews` state terpisah dari `imageFiles`, preview grid dengan cover badge + klik-to-reorder + delete button (×).
 
 ---
 
@@ -752,7 +759,7 @@ syncUser endpoint:
 
 ---
 
-## Progress Saat Ini (per 2026-05-14)
+## Progress Saat Ini (per 2026-05-17)
 
 ### ✅ Selesai
 
@@ -770,6 +777,9 @@ syncUser endpoint:
 - Maintenance mode: tag-based cache, hard-reload anti-loop, polling visibility-aware
 - Floating WhatsApp + social bar 4 channel (WA/IG/TikTok/Shopee)
 - Default theme light, dark opt-in
+- **ReviewSection Shopee-style** (`components/product/ReviewSection.tsx`): rating summary box, bintang orange, progress bar per bintang, filter chip (Semua/per bintang/Ada Komentar/Ada Foto), avatar icon generik, username tanpa masking, lightbox foto, format count `(5.3rb)`
+- **ProductCard** `h-full` pada motion wrapper — card seragam tinggi di grid
+- **CategorySection** `aspect-[3/4]` + `object-cover object-top` — foto portrait tidak terpotong
 
 **MobileApp — Backend**
 
@@ -778,6 +788,7 @@ syncUser endpoint:
 - OrderModel: LIST vs DETAIL include untuk hemat memory
 - Auth sync UIProvider (SIGNED_IN + TOKEN_REFRESHED)
 - Maintenance toggle instan via revalidateTag
+- **Dashboard API** (`/api/admin/dashboard`): tambah `storeRating` (weighted avg), `totalReviews`, `productRatings[]` (id, name, rating, reviewCount)
 
 **Admin-Panel**
 
@@ -788,12 +799,18 @@ syncUser endpoint:
 - Code splitting via React.lazy + Suspense
 - Mobile responsive
 - Maintenance toggle di Dashboard
+- **Cover photo selector** di EditProduct & CreateProduct — foto [0] = cover (badge ★), klik foto lain → reorder ke posisi [0]
+- **Store rating dashboard** di Landing.tsx — angka besar kuning, partial-fill stars, breakdown per produk dengan progress bar color-coded (emerald/yellow/orange/red), weighted average dari semua produk
 
 **Database**
 
 - Schema lengkap: 9 model, semua relasi + FK cascade
 - Tabel `order_trackings`, kolom shipping di `orders`, `app_settings`
 - Dual schema (dev + production) — production pakai `@db.Text` + `directUrl`
+
+**Seed Data**
+
+- `prisma/seed-reviews.ts` — 3.000 ulasan unik: nama user 0 duplikat (Fisher-Yates shuffle 5.850 kombinasi), komentar 0 duplikat (Set tracking + combinatorial pool), rating 87%★5/10%★4/2%★3/1%★1-2 → avg ~4.85, batch insert 500 row, distribusi merata per produk, recalculate rating setelah seed
 
 ### 📋 Belum Dikerjakan
 
@@ -802,7 +819,6 @@ syncUser endpoint:
 | **Admin login auto-sync**    | Admin login via Supabase belum auto-call sync-user → DB record belum guaranteed ada |
 | **Server-side search admin** | Filter Orders/Users/Reviews masih client-side (hanya current page)                  |
 | **Image optimization**       | `unoptimized: true` — pertimbangkan enable kalau upgrade ke paid plan               |
-| **Render free tier 139**     | Monitoring SIGSEGV — kalau masih crash upgrade ke Starter ($7)                      |
 | **shadcn/ui penuh**          | Saat ini cuma utility (cva, clsx); `npx shadcn init` kalau perlu komponen ready     |
 | **BaseModel konsistensikan** | Model konkret pakai singleton manual, belum extend BaseModel                        |
 
@@ -843,6 +859,13 @@ buildCommand: npm install && npm run build
 staticPublishPath: ./dist
 routes: /* → /index.html (SPA rewrite)
 ```
+
+### ⚠️ Jangan Matikan Vercel / Render
+
+Keduanya **wajib tetap aktif** meski punya VPS sendiri:
+- **Vercel**: Supabase Auth dikonfigurasi dengan Site URL = `https://lumara-id.vercel.app` dan Redirect URL = `https://lumara-id.vercel.app/reset-password` → auth reset password rusak kalau Vercel dimatikan
+- **Render**: URL Admin-Panel publik `https://admni-panel.onrender.com` masih aktif dan di-share ke tim
+- Keduanya free tier, tidak ada biaya bulanan
 
 ### Supabase Config
 
