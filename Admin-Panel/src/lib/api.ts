@@ -168,6 +168,8 @@ export interface SiteSettings {
   tiktok_url: string;
   shopee_handle: string;
   shopee_url: string;
+  logo_dark_url: string;
+  logo_white_url: string;
 }
 
 export interface ApiSettings {
@@ -182,4 +184,10 @@ export const settingsApi = {
     http.patch<{ success: boolean; data: ApiSettings }>("/settings", { maintenance }),
   updateSite: (site: Partial<SiteSettings>) =>
     http.patch<{ success: boolean }>("/settings", { site }),
+  uploadLogo: (file: File, variant: "dark" | "white") => {
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("variant", variant);
+    return http.post<{ success: boolean; url: string }>("/settings/logo", fd);
+  },
 };

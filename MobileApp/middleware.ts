@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const ALLOWED_ORIGINS = [
   "https://admni-panel.onrender.com",
+  "http://103.175.217.112:4000",
   "http://localhost:5173",
   "http://localhost:4173",
 ];

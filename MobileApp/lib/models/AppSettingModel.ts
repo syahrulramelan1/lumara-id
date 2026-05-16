@@ -17,6 +17,9 @@ export interface SiteSettings {
   tiktok_url: string;
   shopee_handle: string;
   shopee_url: string;
+  // URL custom logo — kosong = pakai file statis /api/logo/[variant]
+  logo_dark_url: string;   // logo untuk light mode (gelap di bg putih)
+  logo_white_url: string;  // logo untuk dark mode (putih di bg gelap)
 }
 
 export const SITE_SETTINGS_DEFAULTS: SiteSettings = {
@@ -36,6 +39,8 @@ export const SITE_SETTINGS_DEFAULTS: SiteSettings = {
   tiktok_url: "https://www.tiktok.com/@lumaraid",
   shopee_handle: "lumaraid",
   shopee_url: "https://shopee.co.id/lumaraid",
+  logo_dark_url: "",
+  logo_white_url: "",
 };
 
 const SITE_SETTINGS_KEYS = Object.keys(SITE_SETTINGS_DEFAULTS) as (keyof SiteSettings)[];

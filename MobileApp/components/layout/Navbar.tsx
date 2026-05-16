@@ -16,6 +16,7 @@ import { useUIStore } from "@/store/uiStore";
 import { getT } from "@/lib/i18n";
 import { useMounted } from "@/hooks/useMounted";
 import { createClientComponent } from "@/lib/supabase-browser";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 export function Navbar() {
   const pathname  = usePathname();
@@ -30,6 +31,7 @@ export function Navbar() {
   const { language, toggleLanguage } = useUIStore();
   const { resolvedTheme, setTheme }  = useTheme();
   const { dbUser, loading: authLoading } = useAuthStore();
+  const siteSettings = useSiteSettings();
 
   const safeCartCount = mounted ? cartCount  : 0;
   const safeWishCount = mounted ? wishCount  : 0;
@@ -103,21 +105,29 @@ export function Navbar() {
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
 
-          {/* Logo — link ke /home. Light: image dark-logo. Dark: text gradient lumara.id */}
+          {/* Logo — link ke /home */}
           <Link href="/home" className="flex items-center shrink-0 h-9">
             {mounted && safeTheme === "dark" ? (
-              <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-violet-300">
-                lumara.id
-              </span>
+              siteSettings.logo_white_url ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={siteSettings.logo_white_url}
+                  alt={siteSettings.site_name}
+                  width={140} height={36} loading="eager" decoding="async"
+                  className="h-9 w-auto object-contain"
+                  style={{ maxWidth: 140 }}
+                />
+              ) : (
+                <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-violet-300">
+                  {siteSettings.site_name}
+                </span>
+              )
             ) : mounted ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
-                src="/api/logo/dark"
-                alt="Lumara.id"
-                width={140}
-                height={36}
-                loading="eager"
-                decoding="async"
+                src={siteSettings.logo_dark_url || "/api/logo/dark"}
+                alt={siteSettings.site_name}
+                width={140} height={36} loading="eager" decoding="async"
                 className="h-9 w-auto object-contain"
                 style={{ maxWidth: 140 }}
               />

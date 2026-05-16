@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Sidebar } from "../components";
 import { settingsApi, SiteSettings } from "../lib/api";
 import {
   HiOutlineSave, HiOutlineGlobeAlt, HiOutlinePhone,
-  HiOutlineChatAlt2, HiOutlineOfficeBuilding,
+  HiOutlineChatAlt2, HiOutlineOfficeBuilding, HiOutlinePhotograph,
 } from "react-icons/hi";
 import { HiOutlineBuildingStorefront } from "react-icons/hi2";
 import toast from "react-hot-toast";
@@ -49,6 +49,74 @@ const Field = ({
   </div>
 );
 
+const LogoUpload = ({
+  label, hint, currentUrl, variant, onUploaded,
+}: {
+  label: string; hint: string; currentUrl: string;
+  variant: "dark" | "white"; onUploaded: (url: string) => void;
+}) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [preview, setPreview] = useState<string>(currentUrl);
+
+  const handleFile = async (file: File) => {
+    if (!file.type.startsWith("image/")) { toast.error("File harus berupa gambar"); return; }
+    setUploading(true);
+    const localPreview = URL.createObjectURL(file);
+    setPreview(localPreview);
+    try {
+      const res = await settingsApi.uploadLogo(file, variant);
+      const url = res.data.url;
+      onUploaded(url);
+      setPreview(url);
+      toast.success(`${label} berhasil diupload!`);
+    } catch {
+      toast.error("Upload gagal");
+      setPreview(currentUrl);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <label className="text-sm font-medium text-[var(--text)]">{label}</label>
+      <div className="flex items-center gap-4">
+        <div
+          className={`w-36 h-16 rounded-xl border-2 border-dashed border-[var(--border)] flex items-center justify-center overflow-hidden shrink-0 ${variant === "white" ? "bg-gray-900" : "bg-white"}`}
+        >
+          {preview ? (
+            <img src={preview} alt={label} className="h-full w-full object-contain p-1" />
+          ) : (
+            <HiOutlinePhotograph className="text-2xl text-[var(--text-muted)]" />
+          )}
+        </div>
+        <div className="flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            disabled={uploading}
+            className="btn-primary text-xs px-3 py-1.5 disabled:opacity-60"
+          >
+            {uploading ? "Mengupload..." : "Ganti Logo"}
+          </button>
+          {preview && (
+            <p className="text-[10px] text-[var(--text-muted)] break-all max-w-xs truncate">{preview}</p>
+          )}
+        </div>
+      </div>
+      <p className="text-xs text-[var(--text-muted)]">{hint}</p>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ""; }}
+      />
+    </div>
+  );
+};
+
 const Settings = () => {
   const [activeTab, setActiveTab] = useState<Tab>("umum");
   const queryClient = useQueryClient();
@@ -75,6 +143,8 @@ const Settings = () => {
     tiktok_url: "https://www.tiktok.com/@lumaraid",
     shopee_handle: "lumaraid",
     shopee_url: "https://shopee.co.id/lumaraid",
+    logo_dark_url: "",
+    logo_white_url: "",
   };
 
   const [form, setForm] = useState<SiteSettings>(defaultSite);
@@ -150,15 +220,42 @@ const Settings = () => {
 
           {/* Tab: Umum */}
           {activeTab === "umum" && (
-            <div className="card p-5 sm:p-6 flex flex-col gap-5">
-              <div className="flex items-center gap-2 mb-1">
-                <HiOutlineBuildingStorefront className="text-[var(--brand)] text-xl" />
-                <h3 className="font-semibold text-[var(--text)]">Informasi Toko</h3>
+            <div className="flex flex-col gap-5">
+              {/* Informasi Toko */}
+              <div className="card p-5 sm:p-6 flex flex-col gap-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <HiOutlineBuildingStorefront className="text-[var(--brand)] text-xl" />
+                  <h3 className="font-semibold text-[var(--text)]">Informasi Toko</h3>
+                </div>
+                <Field label="Nama Toko" name="site_name" value={form.site_name} onChange={handleChange} placeholder="Lumara.id" />
+                <Field label="Tagline" name="site_tagline" value={form.site_tagline} onChange={handleChange} placeholder="Modest Fashion Premium Indonesia" hint="Tampil di footer dan meta description" />
+                <Field label="Pesan Default WhatsApp" name="whatsapp_message" value={form.whatsapp_message} onChange={handleChange} rows={3} hint="Pesan yang muncul saat user klik tombol WhatsApp" />
+                <Field label="Nomor WhatsApp" name="whatsapp_number" value={form.whatsapp_number} onChange={handleChange} placeholder="6285285733391" hint="Format internasional tanpa + atau 0 di depan" />
               </div>
-              <Field label="Nama Toko" name="site_name" value={form.site_name} onChange={handleChange} placeholder="Lumara.id" />
-              <Field label="Tagline" name="site_tagline" value={form.site_tagline} onChange={handleChange} placeholder="Modest Fashion Premium Indonesia" hint="Tampil di footer dan meta description" />
-              <Field label="Pesan Default WhatsApp" name="whatsapp_message" value={form.whatsapp_message} onChange={handleChange} rows={3} hint="Pesan yang muncul saat user klik tombol WhatsApp" />
-              <Field label="Nomor WhatsApp" name="whatsapp_number" value={form.whatsapp_number} onChange={handleChange} placeholder="6285285733391" hint="Format internasional tanpa + atau 0 di depan" />
+
+              {/* Logo Toko */}
+              <div className="card p-5 sm:p-6 flex flex-col gap-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <HiOutlinePhotograph className="text-[var(--brand)] text-xl" />
+                  <h3 className="font-semibold text-[var(--text)]">Logo Toko</h3>
+                </div>
+                <p className="text-xs text-[var(--text-muted)] -mt-2">Upload logo baru akan langsung aktif di website. Format: PNG/SVG/JPEG. Rekomendasi: PNG transparan.</p>
+                <LogoUpload
+                  label="Logo Light Mode"
+                  hint="Tampil di navbar saat tema terang — gunakan logo warna gelap / berwarna di background putih"
+                  currentUrl={form.logo_dark_url}
+                  variant="dark"
+                  onUploaded={(url) => setForm((p) => ({ ...p, logo_dark_url: url }))}
+                />
+                <div className="border-t border-[var(--border)]" />
+                <LogoUpload
+                  label="Logo Dark Mode"
+                  hint="Tampil di navbar saat tema gelap — gunakan logo putih / terang di background hitam"
+                  currentUrl={form.logo_white_url}
+                  variant="white"
+                  onUploaded={(url) => setForm((p) => ({ ...p, logo_white_url: url }))}
+                />
+              </div>
             </div>
           )}
 
