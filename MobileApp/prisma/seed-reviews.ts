@@ -417,7 +417,7 @@ async function main() {
   const BATCH      = 500; // insert 500 row sekaligus
 
   for (const product of products) {
-    const target = num(5_000, 10_000);
+    const target = num(50_000, 80_000);
     console.log(`→ [${product.name.slice(0, 50)}]`);
     console.log(`   Target: ${target.toLocaleString("id-ID")} ulasan`);
 
