@@ -120,7 +120,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
             onIndexChange={setActiveImage}
           />
           {displayImages.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
               {displayImages.map((img, i) => (
                 <button
                   key={`${img}-${i}`}

@@ -28,7 +28,7 @@ export function PromoSection() {
             whileHover={{ scale: 1.015, y: -2 }}
             whileTap={{ scale: 0.985 }}
             transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            className="relative bg-gradient-to-br from-primary to-secondary rounded-2xl p-6 overflow-hidden text-white cursor-pointer"
+            className="relative bg-gradient-to-br from-primary to-secondary rounded-2xl p-4 sm:p-6 overflow-hidden text-white cursor-pointer"
           >
             <motion.div
               animate={{ scale: [1, 1.1, 1], rotate: [0, 10, 0] }}
@@ -60,7 +60,7 @@ export function PromoSection() {
             whileHover={{ scale: 1.015, y: -2 }}
             whileTap={{ scale: 0.985 }}
             transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            className="relative bg-gradient-to-br from-[#0F0A1E] to-[#1a0f2e] rounded-2xl p-6 overflow-hidden text-white cursor-pointer"
+            className="relative bg-gradient-to-br from-[#0F0A1E] to-[#1a0f2e] rounded-2xl p-4 sm:p-6 overflow-hidden text-white cursor-pointer"
           >
             <motion.div
               animate={{ scale: [1, 1.08, 1] }}

@@ -199,7 +199,7 @@ export function Navbar() {
 
                     {/* Dropdown */}
                     {profileOpen && (
-                      <div className="absolute right-0 top-full mt-2 w-52 bg-card border border-card-border rounded-2xl shadow-lg overflow-hidden z-[80]">
+                      <div className="absolute right-0 top-full mt-2 w-52 max-w-[calc(100vw-2rem)] bg-card border border-card-border rounded-2xl shadow-lg overflow-hidden z-[80]">
                         {/* User info */}
                         <div className="px-4 py-3 border-b border-border">
                           <p className="text-sm font-semibold truncate">{safeUser.name ?? "—"}</p>
@@ -267,7 +267,7 @@ export function Navbar() {
       )}
 
       {/* ── Drawer panel ───────────────────────────────── */}
-      <div className={`fixed top-0 right-0 h-full w-[300px] z-[70] bg-background border-l border-border shadow-2xl md:hidden
+      <div className={`fixed top-0 right-0 h-full w-[min(300px,85vw)] z-[70] bg-background border-l border-border shadow-2xl md:hidden
         flex flex-col transform transition-transform duration-300 ease-in-out
         ${drawerOpen ? "translate-x-0" : "translate-x-full"}`}
       >

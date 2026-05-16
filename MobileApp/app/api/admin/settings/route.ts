@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { checkAdminSecret, adminUnauthorized } from "@/lib/admin";
-import { appSettingModel } from "@/lib/models/AppSettingModel";
+import { appSettingModel, SiteSettings } from "@/lib/models/AppSettingModel";
 
 export async function GET(req: NextRequest) {
   if (!checkAdminSecret(req)) return adminUnauthorized();
   try {
-    const maintenance = await appSettingModel.isMaintenanceMode();
-    return NextResponse.json({ success: true, data: { maintenance } });
+    const [maintenance, site] = await Promise.all([
+      appSettingModel.isMaintenanceMode(),
+      appSettingModel.getSiteSettings(),
+    ]);
+    return NextResponse.json({ success: true, data: { maintenance, site } });
   } catch {
     return NextResponse.json({ success: false, error: "Gagal membaca settings" }, { status: 500 });
   }
@@ -16,17 +19,22 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   if (!checkAdminSecret(req)) return adminUnauthorized();
   try {
-    const body = await req.json() as { maintenance?: boolean };
-    if (typeof body.maintenance !== "boolean") {
-      return NextResponse.json({ success: false, error: "Field 'maintenance' harus boolean" }, { status: 400 });
+    const body = await req.json() as { maintenance?: boolean; site?: Partial<SiteSettings> };
+
+    if (body.maintenance !== undefined) {
+      if (typeof body.maintenance !== "boolean") {
+        return NextResponse.json({ success: false, error: "Field 'maintenance' harus boolean" }, { status: 400 });
+      }
+      await appSettingModel.setMaintenanceMode(body.maintenance);
+      revalidateTag("maintenance");
     }
 
-    await appSettingModel.setMaintenanceMode(body.maintenance);
+    if (body.site) {
+      await appSettingModel.setSiteSettings(body.site);
+      revalidateTag("site-settings");
+    }
 
-    // Invalidate cache supaya layout langsung pakai value baru — tidak perlu nunggu 60s.
-    revalidateTag("maintenance");
-
-    return NextResponse.json({ success: true, data: { maintenance: body.maintenance } });
+    return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ success: false, error: "Gagal update settings" }, { status: 500 });
   }

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -18,7 +18,7 @@ import { useAuthStore } from "@/store/authStore";
 import { createClientComponent } from "@/lib/supabase-browser";
 import type { ShippingAddress } from "@/types";
 
-/** Pembayaran detail menyusul (sesuai permintaan — tanpa rekening/QR di UI). */
+/** Pembayaran detail menyusul (sesuai permintaan â€” tanpa rekening/QR di UI). */
 const PAYMENT_PENDING = "Menunggu_konfirmasi_pembayaran";
 
 interface RoProvince {
@@ -49,12 +49,12 @@ function formatIDR(n: number) {
   }).format(n);
 }
 
-/** "2 day" → "2 hari", "1-3 day" → "1 - 3 hari", "" → "" (no estimate) */
+/** "2 day" â†’ "2 hari", "1-3 day" â†’ "1 - 3 hari", "" â†’ "" (no estimate) */
 function formatEtd(etd: string): string {
   if (!etd || etd === "-") return "";
   const cleaned = etd.replace(/\s*days?\s*$/i, "").trim();
   if (!cleaned) return "";
-  // Spasi di sekitar dash supaya rapi: "1-3" → "1 - 3"
+  // Spasi di sekitar dash supaya rapi: "1-3" â†’ "1 - 3"
   const spaced = cleaned.replace(/\s*-\s*/g, " - ");
   return `${spaced} hari`;
 }
@@ -151,7 +151,7 @@ export default function CheckoutPage() {
 
   const subtotal = total();
 
-  // Master provinsi — auto-fallback ke static kalau Komerce down
+  // Master provinsi â€” auto-fallback ke static kalau Komerce down
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -199,12 +199,12 @@ export default function CheckoutPage() {
       if (!r.ok || !j.success) throw new Error(j.error ?? "Gagal memuat kota");
       const data = j.data ?? [];
       setCities(data);
-      // Cities fallback → auto-switch ke fallback mode (city pakai text input)
+      // Cities fallback â†’ auto-switch ke fallback mode (city pakai text input)
       if (j.fallback) setFallbackMode(true);
       return data;
     } catch (e) {
       console.error("[cities] error:", e);
-      // Network/server error → fallback mode supaya UX gak stuck
+      // Network/server error â†’ fallback mode supaya UX gak stuck
       setFallbackMode(true);
       return [];
     } finally {
@@ -277,7 +277,7 @@ export default function CheckoutPage() {
       if (!r.ok || !j.success) throw new Error(j.error ?? "Gagal hitung ongkir");
       const opts = j.data ?? [];
       if (opts.length === 0) {
-        toast.message("Tidak ada layanan ongkir untuk rute ini — coba berat atau kota lain.");
+        toast.message("Tidak ada layanan ongkir untuk rute ini â€” coba berat atau kota lain.");
       }
       // Kalau cost endpoint return fallback flag, lock fallback mode di UI
       if (j.fallback) setFallbackMode(true);
@@ -360,7 +360,7 @@ export default function CheckoutPage() {
 
   if (authLoading) {
     return (
-      <div className="max-w-xl mx-auto px-4 py-8">
+      <div className="max-w-xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
         <div className="h-40 bg-muted animate-pulse rounded-2xl" />
       </div>
     );
@@ -368,7 +368,7 @@ export default function CheckoutPage() {
 
   if (!dbUser) {
     return (
-      <div className="max-w-xl mx-auto px-4 py-8 text-center">
+      <div className="max-w-xl mx-auto px-3 sm:px-4 py-6 sm:py-8 text-center">
         <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
           <LogIn size={28} className="text-primary" />
         </div>
@@ -386,7 +386,7 @@ export default function CheckoutPage() {
 
   if (items.length === 0 && !done) {
     return (
-      <div className="max-w-xl mx-auto px-4 py-8 text-center">
+      <div className="max-w-xl mx-auto px-3 sm:px-4 py-6 sm:py-8 text-center">
         <ShoppingBag size={40} className="mx-auto text-muted-foreground mb-3" />
         <p className="font-semibold">Keranjang kamu kosong</p>
         <Link
@@ -414,7 +414,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-8">
+    <div className="max-w-xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <Link
         href="/cart"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
@@ -460,7 +460,7 @@ export default function CheckoutPage() {
                 disabled={loadingProvinces}
                 className="w-full px-3 py-2.5 text-sm border border-border rounded-[10px] bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
               >
-                <option value="">{loadingProvinces ? "Memuat provinsi…" : "Pilih provinsi"}</option>
+                <option value="">{loadingProvinces ? "Memuat provinsiâ€¦" : "Pilih provinsi"}</option>
                 {provinces.map((p) => (
                   <option key={p.province_id} value={p.province_id}>
                     {p.province}
@@ -488,7 +488,7 @@ export default function CheckoutPage() {
                   className="w-full px-3 py-2.5 text-sm border border-border rounded-[10px] bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
                 >
                   <option value="">
-                    {!addr.provinceId ? "Pilih provinsi dulu" : loadingCities ? "Memuat kota…" : "Pilih kota"}
+                    {!addr.provinceId ? "Pilih provinsi dulu" : loadingCities ? "Memuat kotaâ€¦" : "Pilih kota"}
                   </option>
                   {cities.map((c) => (
                     <option key={c.city_id} value={c.city_id}>
@@ -577,7 +577,7 @@ export default function CheckoutPage() {
 
           {fallbackMode && (
             <div className="text-xs px-3 py-2 rounded-[10px] bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 text-amber-900 dark:text-amber-200">
-              ℹ️ Estimasi ongkir flat per zona. Harga akhir bisa berubah saat barang diserahkan ke kurir.
+              â„¹ï¸ Estimasi ongkir flat per zona. Harga akhir bisa berubah saat barang diserahkan ke kurir.
             </div>
           )}
 
@@ -591,8 +591,8 @@ export default function CheckoutPage() {
                 const etdLabel = formatEtd(o.etd);
                 const serviceName = o.description || o.service;
                 const title = etdLabel
-                  ? `${o.courierName} · ${serviceName} (${etdLabel})`
-                  : `${o.courierName} · ${serviceName}`;
+                  ? `${o.courierName} Â· ${serviceName} (${etdLabel})`
+                  : `${o.courierName} Â· ${serviceName}`;
                 return (
                   <button
                     key={`${o.courier}-${o.service}-${o.cost}`}
@@ -625,7 +625,7 @@ export default function CheckoutPage() {
           )}
         </div>
 
-        {/* Pembayaran — tanpa detail rekening/QR */}
+        {/* Pembayaran â€” tanpa detail rekening/QR */}
         <div className="bg-card border border-card-border rounded-2xl p-5 text-sm text-muted-foreground">
           <p className="font-semibold text-foreground mb-1">Pembayaran</p>
           <p>
@@ -644,7 +644,7 @@ export default function CheckoutPage() {
                 className="flex justify-between text-muted-foreground"
               >
                 <span className="truncate mr-2">
-                  {item.name} ({item.size}/{item.color}) ×{item.quantity}
+                  {item.name} ({item.size}/{item.color}) Ã—{item.quantity}
                 </span>
                 <span className="shrink-0">{formatIDR(item.price * item.quantity)}</span>
               </div>
@@ -655,7 +655,7 @@ export default function CheckoutPage() {
             </div>
             <div className="flex justify-between text-muted-foreground">
               <span>Ongkir</span>
-              <span>{selectedShip ? formatIDR(selectedShip.cost) : "—"}</span>
+              <span>{selectedShip ? formatIDR(selectedShip.cost) : "â€”"}</span>
             </div>
             <div className="border-t border-border pt-2 flex justify-between font-bold">
               <span>Total</span>
@@ -669,7 +669,7 @@ export default function CheckoutPage() {
           disabled={submitting || !selectedShip}
           className="w-full py-4 bg-primary text-white font-bold rounded-[14px] hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-base"
         >
-          {submitting ? "Memproses..." : `Buat pesanan • ${formatIDR(grandTotal)}`}
+          {submitting ? "Memproses..." : `Buat pesanan â€¢ ${formatIDR(grandTotal)}`}
         </button>
       </form>
     </div>

@@ -26,7 +26,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className="flex-1 pb-20 md:pb-0">
+      <main className="flex-1 pb-bottom-nav md:pb-0">
         <PageTransition>{children}</PageTransition>
       </main>
       <Footer />

@@ -33,8 +33,8 @@ export function BottomNav() {
     : null;
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-border safe-area-pb">
-      <div className="flex items-center justify-around h-16 px-1">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-border">
+      <div className="flex items-center justify-around px-1" style={{ height: 'calc(4rem + env(safe-area-inset-bottom))', paddingBottom: 'env(safe-area-inset-bottom)' }}>
         {navItems.map(({ href, icon: Icon, label }) => {
           const active = href === "/home" ? pathname === "/home" : pathname.startsWith(href);
           const isAccount = href === "/account";

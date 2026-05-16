@@ -206,6 +206,19 @@
   .pt-safe {
     padding-top: env(safe-area-inset-top);
   }
+  /* Bottom nav total height + safe area — untuk main content padding */
+  .pb-bottom-nav {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+  }
+  /* Floating button di atas BottomNav (mobile) atau sudut kanan bawah (desktop) */
+  .bottom-above-nav {
+    bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  }
+  @media (min-width: 768px) {
+    .bottom-above-nav {
+      bottom: 1.5rem;
+    }
+  }
 
   /* Glassmorphism effect */
   .glass {

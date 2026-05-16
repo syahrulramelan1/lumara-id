@@ -6,6 +6,7 @@ import { getT } from "@/lib/i18n";
 import { useUIStore } from "@/store/uiStore";
 import { SocialLinks } from "@/components/shared/SocialLinks";
 import { EASE_OUT_EXPO } from "@/components/motion/variants";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 function FooterNavLink({ label, href, delay }: { label: string; href: string; delay: number }) {
   const ref = useRef<HTMLLIElement>(null);
@@ -25,6 +26,7 @@ function FooterNavLink({ label, href, delay }: { label: string; href: string; de
 export function Footer() {
   const language = useUIStore((s) => s.language);
   const t = getT(language);
+  const site = useSiteSettings();
 
   const col1Ref = useRef<HTMLDivElement>(null);
   const col2Ref = useRef<HTMLDivElement>(null);
@@ -83,17 +85,17 @@ export function Footer() {
           <ul className="space-y-2 text-sm text-white/60">
             <li>
               <a
-                href="https://maps.app.goo.gl/YP6yXntqmPhmMrQ87"
+                href={site.site_maps_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-white transition-colors"
               >
-                📍 Jl. Munggang No.52, Kramat Jati<br />
-                <span className="pl-5">Jakarta Timur 13530</span>
+                📍 {site.site_address}<br />
+                <span className="pl-5">{site.site_address2}</span>
               </a>
             </li>
-            <li>📞 +62 852-8573-3391</li>
-            <li>✉️ hello@lumara.id</li>
+            <li>📞 {site.site_phone}</li>
+            <li>✉️ {site.site_email}</li>
             <li className="mt-2 whitespace-pre-line">{t.footer.hours}</li>
           </ul>
         </motion.div>

@@ -151,8 +151,28 @@ export const dashboardApi = {
 
 // ─── Settings ─────────────────────────────────────────────────────────────────
 
+export interface SiteSettings {
+  site_name: string;
+  site_tagline: string;
+  site_email: string;
+  site_phone: string;
+  site_address: string;
+  site_address2: string;
+  site_maps_url: string;
+  site_hours: string;
+  whatsapp_number: string;
+  whatsapp_message: string;
+  instagram_handle: string;
+  instagram_url: string;
+  tiktok_handle: string;
+  tiktok_url: string;
+  shopee_handle: string;
+  shopee_url: string;
+}
+
 export interface ApiSettings {
   maintenance: boolean;
+  site: SiteSettings;
 }
 
 export const settingsApi = {
@@ -160,4 +180,6 @@ export const settingsApi = {
     http.get<{ success: boolean; data: ApiSettings }>("/settings"),
   setMaintenance: (maintenance: boolean) =>
     http.patch<{ success: boolean; data: ApiSettings }>("/settings", { maintenance }),
+  updateSite: (site: Partial<SiteSettings>) =>
+    http.patch<{ success: boolean }>("/settings", { site }),
 };

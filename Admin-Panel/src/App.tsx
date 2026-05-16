@@ -22,6 +22,7 @@ const EditUser       = lazy(() => import("./pages/EditUser"));
 const HelpDesk       = lazy(() => import("./pages/HelpDesk"));
 const Notifications  = lazy(() => import("./pages/Notifications"));
 const Profile        = lazy(() => import("./pages/Profile"));
+const Settings       = lazy(() => import("./pages/Settings"));
 
 const RouteFallback = () => (
   <div className="flex-1 flex items-center justify-center min-h-[60vh]">
@@ -57,6 +58,7 @@ const router = createHashRouter([
       { path: "help-desk",                   element: lazyRoute(<HelpDesk />) },
       { path: "notifications",               element: lazyRoute(<Notifications />) },
       { path: "profile",                     element: lazyRoute(<Profile />) },
+      { path: "settings",                    element: lazyRoute(<Settings />) },
     ],
   },
 ]);

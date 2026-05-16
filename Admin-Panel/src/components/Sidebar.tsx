@@ -1,4 +1,4 @@
-import { HiOutlineHome, HiOutlineTag, HiOutlineTruck, HiOutlineStar, HiOutlineInformationCircle, HiOutlineX, HiOutlineUser, HiOutlineExternalLink } from "react-icons/hi";
+import { HiOutlineHome, HiOutlineTag, HiOutlineTruck, HiOutlineStar, HiOutlineInformationCircle, HiOutlineX, HiOutlineUser, HiOutlineExternalLink, HiOutlineCog } from "react-icons/hi";
 import { HiOutlineDevicePhoneMobile, HiOutlineUserGroup } from "react-icons/hi2";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { setSidebar } from "../features/dashboard/dashboardSlice";
@@ -20,7 +20,8 @@ const navItems = [
   { to: "/orders",     end: false, icon: HiOutlineTruck,            label: "Pesanan" },
   { to: "/users",      end: false, icon: HiOutlineUserGroup,        label: "Pengguna" },
   { to: "/reviews",    end: false, icon: HiOutlineStar,             label: "Ulasan" },
-  { to: "/profile",    end: false, icon: HiOutlineUser,             label: "Profil" },
+  { to: "/settings",  end: false, icon: HiOutlineCog,              label: "Pengaturan" },
+  { to: "/profile",   end: false, icon: HiOutlineUser,             label: "Profil" },
 ];
 
 const Sidebar = () => {

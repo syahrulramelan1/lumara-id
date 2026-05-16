@@ -3,7 +3,7 @@ import Link from "next/link";
 import { FaWhatsapp, FaInstagram, FaTiktok } from "react-icons/fa";
 import { SiShopee } from "react-icons/si";
 import { Mail, MapPin, Clock, ExternalLink } from "lucide-react";
-import { SOCIAL_CHANNELS, buildWhatsAppUrl } from "@/lib/social";
+import { appSettingModel } from "@/lib/models/AppSettingModel";
 
 export const metadata: Metadata = { title: "Kontak Kami" };
 
@@ -14,7 +14,43 @@ const ICON_MAP = {
   shopee:    SiShopee,
 } as const;
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const site = await appSettingModel.getSiteSettings();
+
+  const SOCIAL_CHANNELS = [
+    {
+      id: "whatsapp" as const,
+      label: "WhatsApp",
+      handle: "Chat Sekarang",
+      url: `https://wa.me/${site.whatsapp_number}?text=${encodeURIComponent(site.whatsapp_message)}`,
+      desc: "Live chat 24 jam — paling cepat dibalas.",
+      brandHex: "#25D366",
+    },
+    {
+      id: "instagram" as const,
+      label: "Instagram",
+      handle: site.instagram_handle,
+      url: site.instagram_url,
+      desc: "Foto produk terbaru, behind the scene, dan promo eksklusif.",
+      brandHex: "#E4405F",
+    },
+    {
+      id: "tiktok" as const,
+      label: "TikTok",
+      handle: site.tiktok_handle,
+      url: site.tiktok_url,
+      desc: "Video styling, mix & match outfit, dan konten lifestyle modest.",
+      brandHex: "#000000",
+    },
+    {
+      id: "shopee" as const,
+      label: "Shopee",
+      handle: site.shopee_handle,
+      url: site.shopee_url,
+      desc: "Belanja di Shopee — gratis ongkir, voucher, dan cashback.",
+      brandHex: "#EE4D2D",
+    },
+  ];
   return (
     <div className="max-w-4xl mx-auto px-4 py-10 md:py-14">
       <div className="text-center mb-10">
@@ -24,7 +60,7 @@ export default function ContactPage() {
 
       {/* PRIMARY CTA: WhatsApp livechat */}
       <a
-        href={buildWhatsAppUrl()}
+        href={`https://wa.me/${site.whatsapp_number}?text=${encodeURIComponent(site.whatsapp_message)}`}
         target="_blank"
         rel="noopener noreferrer"
         className="block bg-gradient-to-br from-[#25D366] to-[#1EBE5A] rounded-2xl p-6 md:p-8 mb-6 text-white shadow-lg shadow-green-500/20 hover:shadow-green-500/40 transition-all hover:scale-[1.01]"
@@ -77,9 +113,9 @@ export default function ContactPage() {
       {/* INFO LAINNYA */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { icon: Mail,    label: "Email",     value: "hello@lumara.id",                    sub: "Dibalas 1x24 jam",     href: null },
-          { icon: MapPin,  label: "Alamat",    value: "Jl. Munggang No.52, Kramat Jati",    sub: "Jakarta Timur 13530",  href: "https://maps.app.goo.gl/YP6yXntqmPhmMrQ87" },
-          { icon: Clock,   label: "Jam Kerja", value: "Senin – Sabtu",                      sub: "09.00 – 17.00 WIB",    href: null },
+          { icon: Mail,    label: "Email",     value: site.site_email,    sub: "Dibalas 1x24 jam",  href: null },
+          { icon: MapPin,  label: "Alamat",    value: site.site_address,  sub: site.site_address2,  href: site.site_maps_url },
+          { icon: Clock,   label: "Jam Kerja", value: site.site_hours.split("\n")[0], sub: site.site_hours.split("\n")[1] ?? "", href: null },
         ].map(({ icon: Icon, label, value, sub, href }) => {
           const inner = (
             <>
