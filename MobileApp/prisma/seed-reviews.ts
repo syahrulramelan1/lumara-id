@@ -1,7 +1,8 @@
 /**
- * Seed ulasan massal gaya Shopee/Tokopedia
- * Target: 5.000–10.000 review per produk, rating 4.8–5.0
- * Menggunakan batch insert (createMany) supaya cepat.
+ * Seed 3.000 ulasan unik gaya Shopee/Tokopedia
+ * - Nama user: tidak ada yang sama (shuffle pool, ambil 3000 pertama)
+ * - Komentar: tidak ada yang sama (track via Set, regenerate jika duplikat)
+ * - Rating: distribusi 4.8–5.0 per produk
  * Jalankan: npx tsx prisma/seed-reviews.ts
  */
 
@@ -19,39 +20,34 @@ try {
 
 const prisma = new PrismaClient();
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────────────────────
-const rnd = <T>(a: T[]): T => a[Math.floor(Math.random() * a.length)];
-const num = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+const rnd  = <T>(a: T[]): T => a[Math.floor(Math.random() * a.length)];
+const num  = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 const coin = (p = 0.5) => Math.random() < p;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Variabel personal
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── Variabel personal ────────────────────────────────────────────────────────
 const SIZES    = ["S","M","L","XL","XXL"];
-const HEIGHTS  = [148,150,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,170,172];
-const WEIGHTS  = [42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,60,62,63,65,67];
+const HEIGHTS  = [148,150,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,172];
+const WEIGHTS  = [42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,60,62,63,65,67,68];
 const CITIES   = [
   "Jakarta Selatan","Jakarta Timur","Jakarta Barat","Jakarta Pusat","Jakarta Utara",
-  "Surabaya","Bandung","Medan","Bekasi","Tangerang","Depok","Semarang","Makassar",
-  "Palembang","Yogyakarta","Balikpapan","Bogor","Malang","Pekanbaru","Batam",
-  "Banjarmasin","Padang","Pontianak","Lampung","Cirebon","Tasikmalaya","Kediri",
-  "Jember","Samarinda","Solo","Madiun","Mojokerto","Probolinggo","Banyuwangi",
-  "Kupang","Ambon","Manado","Palu","Ternate","Sorong","Jayapura","Mataram",
-  "Denpasar","Singaraja","Jombang","Gresik","Sidoarjo","Pasuruan","Situbondo",
+  "Surabaya","Bandung","Medan","Bekasi","Tangerang Selatan","Tangerang Kota","Depok","Semarang",
+  "Makassar","Palembang","Yogyakarta","Balikpapan","Bogor","Malang","Pekanbaru","Batam",
+  "Banjarmasin","Padang","Pontianak","Lampung","Cirebon","Tasikmalaya","Kediri","Jember",
+  "Samarinda","Solo","Madiun","Mojokerto","Probolinggo","Banyuwangi","Kupang","Manado",
+  "Palu","Mataram","Denpasar","Singaraja","Gresik","Sidoarjo","Pasuruan","Jombang","Sorong",
 ];
 const OCCASIONS = [
   "kondangan","kerja","pengajian","wisuda","arisan","lebaran","acara keluarga",
-  "hangout","kajian","reuni","lamaran","pernikahan","silaturahmi","rapat kantor",
-  "perpisahan sekolah","acara kampus","seminar","gathering kantor","pengajian rutin",
-  "pertemuan PKK","walimah","khitanan","aqiqah","halal bihalal",
+  "hangout","kajian","reuni SMA","lamaran","pernikahan","silaturahmi","rapat kantor",
+  "perpisahan sekolah","acara kampus","gathering kantor","pengajian rutin","pertemuan PKK",
+  "walimahan","khitanan","halal bihalal","acara RT","selamatan","reuni kuliah",
 ];
-const COURIERS = ["JNE","J&T","SiCepat","Anteraja","Ninja Express","Pos Indonesia","TIKI","Lion Parcel"];
+const COURIERS  = ["JNE","J&T","SiCepat","Anteraja","Ninja Express","Pos Indonesia","TIKI","Lion Parcel"];
 const COLORS_REF = [
   "navy","hitam","abu-abu","dusty pink","cream","mocca","olive green","burgundy","putih",
   "coklat muda","biru dongker","tosca","mustard","sage green","lilac","maroon","grey",
-  "dark green","off white","caramel","lavender","peach","cobalt blue","forest green","chocolate",
+  "dark green","off white","caramel","lavender","peach","cobalt blue","forest green",
+  "chocolate","beige","ivory","mauve","wine","slate blue",
 ];
 
 type V = { sz: string; h: number; w: number; city: string; acara: string; kurir: string; warna: string };
@@ -60,9 +56,7 @@ const mkV = (): V => ({
   acara: rnd(OCCASIONS), kurir: rnd(COURIERS), warna: rnd(COLORS_REF),
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Pool kalimat
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── Pool kalimat (semakin besar = semakin sedikit kemungkinan duplikat) ──────
 
 const PEMBUKA: string[] = [
   "Barang sudah sampai dengan kondisi baik.",
@@ -74,41 +68,41 @@ const PEMBUKA: string[] = [
   "Pesanan udah di tangan, packingnya rapi.",
   "Barang tiba lebih cepat dari perkiraan.",
   "Paket sampai dengan selamat.",
-  "Baru buka paket, langsung happy dengan hasilnya.",
+  "Baru buka paket, langsung happy.",
   "Barang sampai dalam kondisi terlipat rapi.",
-  "Packing bubble wrap, aman sampai tujuan.",
   "Terima kasih, barang cepat sampai.",
   "Udah nyampe ke tangan saya.",
-  "Paket diterima, kondisi prima.",
   "Barang sampai hari ini, langsung dicoba.",
   "Baru unboxing, hasilnya tidak mengecewakan.",
-  "Produk sudah diterima, packing sangat aman.",
-  "Pengiriman cepat, barang langsung dicoba.",
+  "Produk sudah diterima, packing aman.",
   "Akhirnya barang sampai, senang sekali.",
-  "Barang baru sampai tadi pagi.",
   "Langsung dicoba begitu paket dibuka.",
   "Paket sampai lebih awal dari estimasi.",
   "Diterima dengan kondisi sempurna.",
   "Sudah terima barang, tidak ada masalah.",
-  "Baru nyampe dari kurir, langsung unboxing.",
+  "Baru nyampe dari kurir tadi, langsung unboxing.",
   "Barang selamat sampai tanpa kerusakan.",
   "Paket datang lebih cepat dari yang dijanjikan.",
+  "Packaging rapi dan barang aman di dalamnya.",
+  "Barang tiba dengan kondisi yang sangat baik.",
+  "Senang sekali barang cepat sampai.",
+  "Alhamdulillah pesanan sudah di tangan.",
 ];
 
 const BAHAN_POS: string[] = [
   "Bahannya adem dan lembut di kulit.",
   "Kainnya tidak panas sama sekali walau dipakai seharian.",
-  "Bahan terasa ringan, cocok untuk iklim tropis.",
+  "Bahan terasa ringan, cocok untuk iklim Indonesia yang panas.",
   "Kualitas kain di luar ekspektasi, sangat halus.",
   "Bahannya jatuh dengan baik di badan, tidak kaku.",
   "Material terasa premium meskipun harganya terjangkau.",
   "Kain tidak transparan walau terlihat tipis.",
-  "Bahannya menyerap keringat, nyaman untuk aktivitas.",
+  "Bahannya menyerap keringat dengan baik.",
   "Tekstur kain halus, tidak bikin gatal di kulit.",
-  "Bahan adem banget, cocok untuk kerja seharian.",
+  "Bahan adem, cocok untuk aktivitas seharian.",
   "Kainnya lembut dan tidak mudah kusut.",
   "Material quality-nya oke untuk harga di kisaran ini.",
-  "Bahannya tidak luntur setelah beberapa kali cuci.",
+  "Bahannya tidak luntur setelah beberapa kali dicuci.",
   "Kain tebal tapi tetap ringan, tidak pengap.",
   "Bahan stretch-nya pas, tidak ketat dan tidak melorot.",
   "Kualitas kain lebih bagus dari yang saya harapkan.",
@@ -122,57 +116,62 @@ const BAHAN_POS: string[] = [
   "Kualitas bahan melebihi ekspektasi untuk harga ini.",
   "Bahannya lembut, cocok untuk kulit sensitif.",
   "Kain tebal yang pas, tidak terlalu tebal tidak terlalu tipis.",
-  "Material breathable-nya oke, tidak pengap.",
+  "Material breathable-nya oke, tidak pengap sama sekali.",
   "Kainnya tidak pilling setelah beberapa kali cuci.",
-  "Bahan yang dipakai nyaman sepanjang hari.",
-  "Kain jatuhnya cantik saat dipakai.",
+  "Bahan nyaman dipakai sepanjang hari.",
+  "Kain jatuhnya cantik dan anggun saat dipakai.",
   "Bahannya jauh lebih bagus dari harganya.",
   "Kualitas kain setara baju offline yang lebih mahal.",
-  "Bahan tidak panas dan tidak mudah kusut, cocok untuk perjalanan.",
+  "Bahan tidak panas dan tidak mudah kusut, cocok untuk perjalanan jauh.",
   "Kainnya terasa dingin di kulit, nyaman di iklim panas.",
-  "Material premium yang tidak biasa di harga segini.",
+  "Material premium yang tidak biasa untuk harga segini.",
+  "Bahan sangat nyaman, bahkan nyaman dipakai di kondisi panas.",
 ];
 
 const UKURAN: ((v: V) => string)[] = [
   v => `Size ${v.sz} pas banget di saya, tinggi ${v.h}cm berat ${v.w}kg.`,
   v => `Untuk referensi: saya ${v.h}cm ${v.w}kg, ambil size ${v.sz} hasilnya pas.`,
-  v => `Size chart akurat, ${v.sz} sesuai di saya yang ${v.h}cm ${v.w}kg.`,
+  v => `Size chart akurat, ${v.sz} sesuai di saya yang ${v.h}cm/${v.w}kg.`,
   v => `Biasanya pakai size ${v.sz} dan ternyata tepat sekali.`,
   v => `Untuk postur seperti saya (${v.h}cm, ${v.w}kg), size ${v.sz} recommended.`,
-  v => `Size ${v.sz} pas, tidak kekecilan tidak kebesaran. Tinggi ${v.h}cm berat ${v.w}kg.`,
+  v => `Size ${v.sz} pas banget, tidak kekecilan tidak kebesaran. Tinggi ${v.h}cm berat ${v.w}kg.`,
   v => `Panjangnya pas untuk tinggi ${v.h}cm.`,
   v => `Size ${v.sz} di saya ${v.h}cm ${v.w}kg agak sedikit longgar tapi masih nyaman.`,
-  _ => `Ukurannya true to size, tidak perlu ragu order sesuai biasanya.`,
-  _ => `Size chart-nya akurat, sesuai yang tertera di deskripsi.`,
+  _  => `Ukurannya true to size, tidak perlu ragu order sesuai biasanya.`,
+  _  => `Size chart-nya akurat, sesuai yang tertera di deskripsi produk.`,
   v => `Ambil size ${v.sz} dan ternyata fit sempurna di badan.`,
   v => `Referensi ukuran: saya ${v.h}cm ${v.w}kg, size ${v.sz} sangat cocok.`,
-  v => `Size ${v.sz} nyaman di badan, tidak terlalu longgar. Tinggi saya ${v.h}cm.`,
-  _ => `Panjang bajunya sesuai ekspektasi, tidak terlalu panjang tidak terlalu pendek.`,
+  v => `Size ${v.sz} nyaman di badan. Tinggi saya ${v.h}cm.`,
+  _  => `Panjang bajunya sesuai ekspektasi, tidak terlalu panjang tidak terlalu pendek.`,
   v => `Saya tinggi ${v.h}cm bb ${v.w}kg, size ${v.sz} hasilnya sempurna.`,
-  v => `Untuk yang bertubuh seperti saya ${v.h}/${v.w}kg, size ${v.sz} pilihan tepat.`,
-  _ => `Ukurannya presisi, sesuai dengan panduan ukuran yang diberikan seller.`,
-  v => `Size ${v.sz} sangat pas, tidak perlu diubah atau ditambah apapun.`,
+  v => `Untuk yang bertubuh seperti saya ${v.h}cm/${v.w}kg, size ${v.sz} pilihan tepat.`,
+  _  => `Ukurannya presisi, sesuai dengan panduan ukuran dari seller.`,
+  v => `Size ${v.sz} sangat pas, tidak perlu diubah sama sekali.`,
+  v => `Aku ${v.h}cm ${v.w}kg ambil ${v.sz} dan muat sempurna.`,
+  v => `Size ${v.sz} fit di badan, tidak kendur tidak sesak. Tinggi aku ${v.h}cm.`,
 ];
 
 const WARNA_ARR: ((v: V) => string)[] = [
   v => `Warna ${v.warna}-nya persis seperti di foto.`,
-  _ => `Warna sesuai yang ditampilkan di foto produk.`,
-  _ => `Warnanya tidak meleset dari foto, senang sekali.`,
+  _  => `Warna sesuai yang ditampilkan di foto produk.`,
+  _  => `Warnanya tidak meleset dari foto, senang sekali.`,
   v => `Pilih warna ${v.warna} dan ternyata bagus di kulit sawo matang.`,
-  _ => `Warnanya lebih cantik waktu dilihat langsung dibanding foto.`,
+  _  => `Warnanya lebih cantik waktu dilihat langsung dibanding foto.`,
   v => `Warna ${v.warna} cocok untuk harian, tidak terlalu mencolok.`,
-  _ => `Pigmen warna oke, tidak pudar setelah dicuci.`,
-  _ => `Warna konsisten dan tidak belang.`,
+  _  => `Pigmen warna oke, tidak pudar setelah dicuci.`,
+  _  => `Warna konsisten dan tidak belang.`,
   v => `Senang dengan pilihan warna ${v.warna}, cocok dengan kulit saya.`,
-  _ => `Warna persis di foto, tidak ada perbedaan signifikan.`,
-  v => `Warna ${v.warna} elegan dan mudah dipadukan.`,
-  _ => `Warna aslinya bagus sekali, tidak mengecewakan.`,
-  _ => `Warna sesuai deskripsi, kualitas warna terjaga.`,
+  _  => `Warna persis di foto, tidak ada perbedaan signifikan.`,
+  v => `Warna ${v.warna} elegan dan mudah dipadukan dengan outfit lain.`,
+  _  => `Warna aslinya bagus sekali, tidak mengecewakan sama sekali.`,
+  _  => `Warna sesuai deskripsi, kualitas warna terjaga.`,
   v => `Ambil warna ${v.warna} dan tidak menyesal sama sekali.`,
-  _ => `Warna-nya cantik, tidak terlalu gelap tidak terlalu terang.`,
-  _ => `Warna original persis foto, tidak ada editing berlebihan.`,
+  _  => `Warna-nya cantik, tidak terlalu gelap tidak terlalu terang.`,
+  _  => `Warna original persis foto, tidak ada editing berlebihan.`,
   v => `Warna ${v.warna} sangat cocok dipadukan dengan berbagai busana.`,
-  _ => `Warna stabil, tidak luntur saat pertama kali dicuci.`,
+  _  => `Warna stabil, tidak luntur saat pertama kali dicuci.`,
+  v => `Warna ${v.warna} yang saya pilih ternyata lebih cantik dari ekspektasi.`,
+  _  => `Warna terjaga dan tidak mudah pudar.`,
 ];
 
 const JAHITAN: string[] = [
@@ -187,30 +186,33 @@ const JAHITAN: string[] = [
   "Tidak ada jahitan yang loncat atau benang keluar.",
   "Jahitannya presisi, terlihat dikerjakan dengan teliti.",
   "Kualitas jahitan setara produk toko offline.",
-  "Penyelesaian (finishing) produk sangat baik.",
+  "Penyelesaian produk sangat baik.",
   "Tidak ada cacat produksi yang terlihat.",
   "Jahitan tepi sangat rapi, tidak ada yang kasar.",
   "Kualitas jahitan konsisten di seluruh bagian baju.",
   "Jahitannya kuat dan tidak mudah lepas meski sering dipakai.",
+  "Tidak ada benang yang keluar atau jahitan yang meleset.",
 ];
 
 const KIRIM: ((v: V) => string)[] = [
   v => `Pengiriman via ${v.kurir} cepat, sampai dalam 2 hari.`,
-  v => `Kurir ${v.kurir} sigap, barang sampai lebih awal.`,
-  _ => `Pengiriman sesuai estimasi, tidak ada masalah.`,
-  _ => `Proses pengiriman cepat dan tracking-nya jelas.`,
-  _ => `Tidak ada keterlambatan pengiriman.`,
-  _ => `Seller cepat proses pesanan, pengiriman tidak molor.`,
+  v => `Kurir ${v.kurir} sigap, barang sampai lebih awal dari estimasi.`,
+  _  => `Pengiriman sesuai estimasi, tidak ada masalah.`,
+  _  => `Proses pengiriman cepat dan tracking-nya jelas.`,
+  _  => `Tidak ada keterlambatan pengiriman.`,
+  _  => `Seller cepat proses pesanan, pengiriman tidak molor.`,
   v => `Pakai ${v.kurir}, estimasi 2-3 hari dan tepat waktu.`,
-  _ => `Pengiriman oke, packing aman dengan bubble wrap.`,
-  _ => `Tracking pengiriman jelas dan selalu update.`,
+  _  => `Packing aman dengan bubble wrap, barang selamat.`,
+  _  => `Tracking pengiriman jelas dan selalu update.`,
   v => `Dikirim via ${v.kurir}, sampai dalam kondisi baik.`,
-  _ => `Pesanan diproses cepat oleh seller.`,
-  _ => `Packing sangat aman, barang tidak rusak selama pengiriman.`,
-  _ => `Pengiriman sangat cepat, melebihi ekspektasi.`,
-  _ => `Barang dikemas dengan sangat baik sebelum dikirim.`,
-  _ => `Seller langsung proses hari yang sama dengan order.`,
-  _ => `Tidak ada masalah dengan pengiriman, sesuai resi yang diberikan.`,
+  _  => `Pesanan diproses cepat oleh seller.`,
+  _  => `Packing sangat aman, barang tidak rusak selama pengiriman.`,
+  _  => `Pengiriman sangat cepat, melebihi ekspektasi.`,
+  _  => `Barang dikemas dengan sangat baik sebelum dikirim.`,
+  _  => `Seller langsung proses hari yang sama dengan order.`,
+  v => `Dari ${v.city} bisa tracking dengan jelas, sampai tepat waktu.`,
+  _  => `Tidak ada masalah dengan pengiriman, sesuai resi yang diberikan.`,
+  _  => `Pengiriman aman, tidak ada kerusakan selama perjalanan.`,
 ];
 
 const PAKAI: ((v: V) => string)[] = [
@@ -218,17 +220,18 @@ const PAKAI: ((v: V) => string)[] = [
   v => `Sudah dicoba untuk acara ${v.acara}, tampil memuaskan.`,
   v => `Cocok banget untuk ${v.acara}, penampilannya elegan.`,
   v => `Beli khusus untuk ${v.acara}, hasilnya tidak mengecewakan.`,
-  _ => `Nyaman untuk aktivitas harian maupun acara formal.`,
-  _ => `Bisa dipadukan dengan banyak outfit berbeda.`,
-  _ => `Tetap terlihat syari dan elegant untuk berbagai acara.`,
-  _ => `Sudah dipakai beberapa kali, kualitas tetap terjaga.`,
+  _  => `Nyaman untuk aktivitas harian maupun acara formal.`,
+  _  => `Bisa dipadukan dengan banyak outfit berbeda.`,
+  _  => `Tetap terlihat syari dan elegant untuk berbagai acara.`,
+  _  => `Sudah dipakai beberapa kali, kualitas tetap terjaga.`,
   v => `Dipakai ke ${v.acara} dan dapat banyak pujian dari teman-teman.`,
-  v => `Cocok sekali untuk acara ${v.acara}, penampilannya memuaskan.`,
-  _ => `Nyaman dipakai dari pagi hingga malam tanpa rasa gerah.`,
-  _ => `Versatile, bisa dipakai ke banyak kesempatan.`,
+  v => `Cocok sekali untuk acara ${v.acara}.`,
+  _  => `Nyaman dipakai dari pagi hingga malam tanpa rasa gerah.`,
+  _  => `Versatile, bisa dipakai ke banyak kesempatan berbeda.`,
   v => `Hadir ke ${v.acara} dengan percaya diri pakai ini.`,
-  _ => `Model dan bahan yang pas untuk berbagai kegiatan.`,
-  _ => `Cocok dipakai ke mana saja, dari rumah hingga acara formal.`,
+  _  => `Cocok dipakai ke mana saja, dari rumah hingga acara formal.`,
+  v => `Sudah dipakai dua kali ke ${v.acara}, selalu dapat pujian.`,
+  _  => `Model dan bahan yang pas untuk berbagai kegiatan.`,
 ];
 
 const SELLER_ARR: string[] = [
@@ -243,7 +246,8 @@ const SELLER_ARR: string[] = [
   "Seller profesional, pesanan diproses cepat.",
   "Toko sangat recommended, seller amanah.",
   "Pelayanan prima dari seller.",
-  "Seller dengan cepat menjawab semua pertanyaan.",
+  "Seller menjawab pertanyaan dengan cepat dan jelas.",
+  "Toko ini bisa dipercaya, pengalaman belanja menyenangkan.",
 ];
 
 const KESIM_POS: string[] = [
@@ -263,7 +267,7 @@ const KESIM_POS: string[] = [
   "Overall sempurna, tidak ada minus.",
   "Good quality, fast delivery. Puas.",
   "Barang sesuai foto dan deskripsi, sangat memuaskan.",
-  "Produk berkualitas, harga terjangkau. Mantap.",
+  "Produk berkualitas, harga terjangkau.",
   "Pengalaman belanja yang menyenangkan.",
   "Langsung tambah ke wishlist untuk varian berikutnya.",
   "Kualitas terjamin, akan order lagi.",
@@ -272,14 +276,14 @@ const KESIM_POS: string[] = [
   "Tidak ragu untuk repeat order.",
   "Sudah puas, teman-teman juga ikut order.",
   "Produk terbaik untuk kategori harganya.",
-  "Pengalaman belanja yang memuaskan dari awal hingga akhir.",
   "Rekomendasikan tanpa syarat.",
   "Kualitas produk konsisten setiap order.",
   "Toko ini sudah jadi langganan tetap.",
-  "Bahan dan model sesuai ekspektasi, tidak mengecewakan.",
+  "Bahan dan model sesuai ekspektasi.",
   "Kalau ada varian baru pasti langsung order.",
-  "Sudah buktikan kualitasnya, memang bagus.",
   "Lebih dari cukup untuk harga yang dibayar.",
+  "Sangat puas, tidak ada kekurangan.",
+  "Ini pembelian yang tepat.",
 ];
 
 const MINOR_NEG: string[] = [
@@ -287,6 +291,7 @@ const MINOR_NEG: string[] = [
   "Bahannya sedikit kaku di awal, tapi setelah dicuci lebih lembut.",
   "Pengiriman agak lama, tapi barang sampai dengan selamat.",
   "Warna sedikit berbeda dari foto layar, masih cantik.",
+  "Ukurannya sedikit besar dari yang diharapkan, tapi masih oke.",
 ];
 
 const KESIM_NET: string[] = [
@@ -295,11 +300,10 @@ const KESIM_NET: string[] = [
   "Sesuai harga yang dibayar.",
   "Overall oke, namun ada ruang untuk improvement.",
   "Cukup memuaskan, tapi tidak istimewa.",
+  "Masih perlu evaluasi, tapi tidak mengecewakan.",
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Nama pembeli (First 115 × Last 50 = 5.750 kombinasi unik)
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── Nama pembeli (117 × 50 = 5.850 kombinasi — ambil 3.000 tanpa ulang) ────
 const FIRSTS: string[] = [
   "Siti","Dewi","Rina","Fitri","Nurul","Indah","Maya","Ayu","Ratna","Yuni",
   "Nisa","Lia","Desi","Wulan","Rini","Novita","Hana","Sari","Tuti","Endah",
@@ -323,20 +327,15 @@ const LASTS: string[] = [
   "Mariana","Ariani","Hartini","Purnama","Santika","Trisnawati","Utami","Valentina","Wahyuningsih","Yuniarti",
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Distribusi rating → rata-rata 4.85
-// ─────────────────────────────────────────────────────────────────────────────
+// Distribusi: 87% bintang-5, 10% bintang-4, 2% bintang-3, 1% 1-2 → avg ~4.85
 function pickRating(): number {
   const r = Math.random();
   if (r < 0.87) return 5;
   if (r < 0.97) return 4;
-  if (r < 0.992) return 3;
+  if (r < 0.99) return 3;
   return Math.random() < 0.5 ? 2 : 1;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Bangun komentar unik dari fragmen
-// ─────────────────────────────────────────────────────────────────────────────
 function pickUniq<T>(arr: T[], n: number): T[] {
   const copy = [...arr];
   const out: T[] = [];
@@ -347,17 +346,18 @@ function pickUniq<T>(arr: T[], n: number): T[] {
   return out;
 }
 
+// Bangun komentar — return string unik (caller tracking via Set)
 function buildComment(rating: number, v: V): string {
   const parts: string[] = [];
 
   if (rating >= 4) {
     if (coin(0.55)) parts.push(rnd(PEMBUKA));
     parts.push(...pickUniq(BAHAN_POS, num(1, 2)));
-    if (coin(0.75)) parts.push(rnd(UKURAN)(v));
-    if (coin(0.55)) parts.push(rnd(WARNA_ARR)(v));
+    if (coin(0.78)) parts.push(rnd(UKURAN)(v));
+    if (coin(0.58)) parts.push(rnd(WARNA_ARR)(v));
     if (coin(0.40)) parts.push(rnd(JAHITAN));
-    if (coin(0.50)) parts.push(rnd(KIRIM)(v));
-    if (coin(0.40)) parts.push(rnd(PAKAI)(v));
+    if (coin(0.52)) parts.push(rnd(KIRIM)(v));
+    if (coin(0.42)) parts.push(rnd(PAKAI)(v));
     if (coin(0.25)) parts.push(rnd(SELLER_ARR));
     parts.push(rnd(KESIM_POS));
     if (rating === 4 && coin(0.20)) parts.push(rnd(MINOR_NEG));
@@ -387,9 +387,22 @@ function buildComment(rating: number, v: V): string {
   return parts.join(" ");
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Main
-// ─────────────────────────────────────────────────────────────────────────────
+// Bangun komentar yang DIJAMIN unik
+function uniqueComment(rating: number, usedSet: Set<string>, maxTry = 20): string {
+  for (let i = 0; i < maxTry; i++) {
+    const v   = mkV();
+    const txt = buildComment(rating, v);
+    if (!usedSet.has(txt)) { usedSet.add(txt); return txt; }
+  }
+  // fallback: tambahkan suffix unik berbasis counter
+  const v   = mkV();
+  const txt = buildComment(rating, v) + ` [${usedSet.size}]`;
+  usedSet.add(txt);
+  return txt;
+}
+
+const TOTAL_REVIEWS = 3_000;
+
 async function main() {
   console.log("▶ Menghapus semua ulasan lama...");
   const del = await prisma.review.deleteMany({});
@@ -397,71 +410,65 @@ async function main() {
 
   console.log("▶ Reset rating semua produk...");
   await prisma.product.updateMany({ data: { rating: 0, reviewCount: 0 } });
-  console.log("  ✓ Rating di-reset.\n");
 
   const products = await prisma.product.findMany({ select: { id: true, name: true } });
   if (!products.length) { console.error("✗ Tidak ada produk!"); return; }
-  console.log(`▶ ${products.length} produk ditemukan.\n`);
+  console.log(`▶ ${products.length} produk ditemukan.`);
+  console.log(`▶ Target total: ${TOTAL_REVIEWS.toLocaleString("id-ID")} ulasan\n`);
 
-  // Pre-generate semua pasangan nama
+  // ── Buat pool nama UNIK (shuffle 5.850 kombinasi, ambil 3.000 pertama) ────
   const ALL_PAIRS: string[] = [];
   for (const fn of FIRSTS) for (const ln of LASTS) ALL_PAIRS.push(`${fn}|${ln}`);
-  // Shuffle
+  // Fisher-Yates shuffle
   for (let i = ALL_PAIRS.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [ALL_PAIRS[i], ALL_PAIRS[j]] = [ALL_PAIRS[j], ALL_PAIRS[i]];
   }
+  const uniqueNames = ALL_PAIRS.slice(0, TOTAL_REVIEWS);
 
-  let totalReviews = 0;
-  let globalIdx    = 0;
-  const BATCH      = 500; // insert 500 row sekaligus
+  // Distribusikan merata ke tiap produk
+  const perProduct = Math.floor(TOTAL_REVIEWS / products.length);
+  const remainder  = TOTAL_REVIEWS % products.length;
 
-  for (const product of products) {
-    const target = num(50_000, 80_000);
-    console.log(`→ [${product.name.slice(0, 50)}]`);
-    console.log(`   Target: ${target.toLocaleString("id-ID")} ulasan`);
+  // Track komentar yang sudah dipakai (global — tidak ada duplikat antar produk)
+  const usedComments = new Set<string>();
+  let nameIdx = 0;
+  let totalCreated = 0;
 
-    // ── 1. Generate semua user data ──────────────────────────────────────
+  for (let pi = 0; pi < products.length; pi++) {
+    const product = products[pi];
+    const count   = perProduct + (pi < remainder ? 1 : 0);
+    console.log(`→ [${product.name.slice(0, 55)}]`);
+    console.log(`   Target: ${count} ulasan`);
+
+    // ── 1. Buat/upsert user unik ────────────────────────────────────────
     const userRows: { email: string; name: string; role: string }[] = [];
-    for (let i = 0; i < target; i++) {
-      const pair    = ALL_PAIRS[(globalIdx + i) % ALL_PAIRS.length];
+    for (let i = 0; i < count; i++) {
+      const pair    = uniqueNames[nameIdx++];
       const [fn, ln] = pair.split("|");
-      const suffix  = globalIdx + i;
-      userRows.push({
-        email: `${fn.toLowerCase()}.${ln.toLowerCase()}.${suffix}@buyer.lumara`,
-        name:  `${fn} ${ln}`,
-        role:  "USER",
-      });
+      const email   = `${fn.toLowerCase()}.${ln.toLowerCase()}@lumara-buyer.id`;
+      userRows.push({ email, name: `${fn} ${ln}`, role: "USER" });
     }
-    globalIdx += target;
 
-    // ── 2. Batch insert users ─────────────────────────────────────────────
-    process.stdout.write("   Membuat user...");
-    for (let i = 0; i < userRows.length; i += BATCH) {
-      await prisma.user.createMany({ data: userRows.slice(i, i + BATCH), skipDuplicates: true });
+    // Batch insert users
+    for (let i = 0; i < userRows.length; i += 500) {
+      await prisma.user.createMany({ data: userRows.slice(i, i + 500), skipDuplicates: true });
     }
-    console.log(" selesai.");
 
-    // ── 3. Ambil user ID yang baru dibuat ─────────────────────────────────
-    process.stdout.write("   Mengambil user ID...");
+    // Ambil ID user
     const emails  = userRows.map(u => u.email);
-    // Fetch batch per 1000 email untuk hindari query terlalu besar
-    const users: { id: string; email: string }[] = [];
+    const dbUsers: { id: string; email: string }[] = [];
     for (let i = 0; i < emails.length; i += 1000) {
       const chunk = await prisma.user.findMany({
         where:  { email: { in: emails.slice(i, i + 1000) } },
         select: { id: true, email: true },
       });
-      users.push(...chunk);
+      dbUsers.push(...chunk);
     }
-    console.log(` ${users.length.toLocaleString("id-ID")} user.`);
-
-    // Buat lookup email → id
     const emailToId: Record<string, string> = {};
-    for (const u of users) emailToId[u.email] = u.id;
+    for (const u of dbUsers) emailToId[u.email] = u.id;
 
-    // ── 4. Generate review data ────────────────────────────────────────────
-    process.stdout.write("   Generate komentar...");
+    // ── 2. Generate reviews dengan komentar UNIK ─────────────────────────
     const reviewRows: {
       userId: string; productId: string; rating: number;
       comment: string; images: string; createdAt: Date;
@@ -473,25 +480,21 @@ async function main() {
       if (!userId) continue;
 
       const rating    = pickRating();
-      const v         = mkV();
-      const comment   = buildComment(rating, v);
-      // Sebar merata 12 bulan ke belakang
-      const ageMs     = Math.floor(Math.random() * 365 * 86_400_000);
+      const comment   = uniqueComment(rating, usedComments);
+      // Sebar tanggal merata selama 12 bulan
+      const fraction  = i / userRows.length;
+      const ageMs     = fraction * 365 * 86_400_000 + Math.random() * 86_400_000;
       const createdAt = new Date(now - ageMs);
 
       reviewRows.push({ userId, productId: product.id, rating, comment, images: "[]", createdAt });
     }
-    console.log(" selesai.");
 
-    // ── 5. Batch insert reviews ───────────────────────────────────────────
-    process.stdout.write("   Insert ulasan...");
-    for (let i = 0; i < reviewRows.length; i += BATCH) {
-      await prisma.review.createMany({ data: reviewRows.slice(i, i + BATCH), skipDuplicates: true });
-      if (i % 5000 === 0 && i > 0) process.stdout.write(` ${i.toLocaleString("id-ID")}...`);
+    // ── 3. Batch insert reviews ──────────────────────────────────────────
+    for (let i = 0; i < reviewRows.length; i += 500) {
+      await prisma.review.createMany({ data: reviewRows.slice(i, i + 500), skipDuplicates: true });
     }
-    console.log(" selesai.");
 
-    // ── 6. Recalculate rating ─────────────────────────────────────────────
+    // ── 4. Recalculate rating ────────────────────────────────────────────
     const agg = await prisma.review.aggregate({
       where:  { productId: product.id },
       _avg:   { rating: true },
@@ -503,13 +506,27 @@ async function main() {
       data:  { rating: finalRating, reviewCount: agg._count.rating },
     });
 
-    totalReviews += agg._count.rating;
-    console.log(`   ✓ Total: ${agg._count.rating.toLocaleString("id-ID")} ulasan | Rating: ${finalRating}\n`);
+    totalCreated += agg._count.rating;
+    console.log(`   ✓ ${agg._count.rating} ulasan | Rating: ${finalRating}\n`);
   }
 
-  console.log(`\n✅ SELESAI!`);
-  console.log(`   Total ulasan: ${totalReviews.toLocaleString("id-ID")}`);
-  console.log(`   Rata-rata per produk: ${Math.round(totalReviews / products.length).toLocaleString("id-ID")}`);
+  // ── Store rating = rata-rata weighted dari semua produk ────────────────
+  const allProducts = await prisma.product.findMany({
+    where:  { reviewCount: { gt: 0 } },
+    select: { rating: true, reviewCount: true, name: true },
+  });
+  let totalWeighted = 0, totalCount = 0;
+  for (const p of allProducts) { totalWeighted += p.rating * p.reviewCount; totalCount += p.reviewCount; }
+  const storeRating = totalCount > 0 ? Math.round((totalWeighted / totalCount) * 10) / 10 : 0;
+
+  console.log("╔══════════════════════════════════════╗");
+  console.log(`║  SELESAI! Total: ${totalCreated.toLocaleString("id-ID").padEnd(20)}║`);
+  console.log(`║  Rating Toko (weighted): ${storeRating}          ║`);
+  console.log("╚══════════════════════════════════════╝");
+  console.log("\nBreakdown per produk:");
+  for (const p of allProducts) {
+    console.log(`  ${p.name.slice(0, 45).padEnd(45)} → ${p.rating} ⭐ (${p.reviewCount} ulasan)`);
+  }
 }
 
 main()

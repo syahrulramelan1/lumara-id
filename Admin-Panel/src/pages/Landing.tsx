@@ -4,7 +4,7 @@ import { RechartsBarChart } from "../components/chart";
 import { dashboardApi, settingsApi } from "../lib/api";
 import {
   HiOutlineShoppingBag, HiOutlineTag, HiOutlineClipboardList,
-  HiOutlineCurrencyDollar, HiOutlineClock, HiOutlineUsers,
+  HiOutlineCurrencyDollar, HiOutlineClock, HiOutlineUsers, HiOutlineStar,
 } from "react-icons/hi";
 import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 import { useAuth } from "../context/AuthContext";
@@ -13,10 +13,14 @@ function formatPrice(n: number) {
   return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
 }
 
-const statCards = (stats: {
+interface DashboardStats {
   totalProducts: number; totalCategories: number; totalOrders: number;
   totalRevenue: number; pendingOrders: number; totalUsers: number;
-}) => [
+  storeRating: number; totalReviews: number;
+  productRatings: { id: string; name: string; rating: number; reviewCount: number }[];
+}
+
+const statCards = (stats: DashboardStats) => [
   { label: "Total Produk",     value: String(stats.totalProducts),    icon: HiOutlineShoppingBag,   bg: "bg-purple-100 dark:bg-purple-900/30", color: "text-purple-600 dark:text-purple-400" },
   { label: "Kategori",         value: String(stats.totalCategories),  icon: HiOutlineTag,           bg: "bg-blue-100 dark:bg-blue-900/30",    color: "text-blue-600 dark:text-blue-400" },
   { label: "Total Pesanan",    value: String(stats.totalOrders),      icon: HiOutlineClipboardList, bg: "bg-indigo-100 dark:bg-indigo-900/30",color: "text-indigo-600 dark:text-indigo-400" },
@@ -24,6 +28,26 @@ const statCards = (stats: {
   { label: "Pesanan Pending",  value: String(stats.pendingOrders),    icon: HiOutlineClock,         bg: "bg-yellow-100 dark:bg-yellow-900/30",color: "text-yellow-600 dark:text-yellow-400" },
   { label: "Total Pengguna",   value: String(stats.totalUsers),       icon: HiOutlineUsers,         bg: "bg-rose-100 dark:bg-rose-900/30",    color: "text-rose-600 dark:text-rose-400" },
 ];
+
+function StarDisplay({ rating, size = 16 }: { rating: number; size?: number }) {
+  const full = Math.floor(rating);
+  const frac = rating - full;
+  return (
+    <div className="flex items-center gap-0.5">
+      {Array.from({ length: 5 }).map((_, i) => {
+        const fill = i < full ? 1 : i === full ? frac : 0;
+        return (
+          <span key={i} className="relative inline-block" style={{ width: size, height: size }}>
+            <HiOutlineStar className="absolute inset-0 text-yellow-300" style={{ width: size, height: size }} />
+            <span className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}>
+              <HiOutlineStar className="text-yellow-400" style={{ width: size, height: size, fill: "currentColor" }} />
+            </span>
+          </span>
+        );
+      })}
+    </div>
+  );
+}
 
 const Landing = () => {
   const { user } = useAuth();
@@ -107,6 +131,90 @@ const Landing = () => {
                   </div>
                 ))}
               </div>
+
+              {/* Rating Toko */}
+              {data.productRatings?.length > 0 && (
+                <div className="card p-6">
+                  <div className="flex items-center gap-2 mb-5">
+                    <HiOutlineStar className="text-yellow-400 text-lg" style={{ fill: "currentColor" }} />
+                    <h3 className="font-semibold text-[var(--text)]">Rating Toko</h3>
+                    <span className="ml-auto text-xs text-[var(--text-muted)] bg-[var(--bg-3)] px-2 py-1 rounded border border-[var(--border)]">
+                      weighted avg dari semua produk
+                    </span>
+                  </div>
+
+                  {/* Angka besar store rating */}
+                  <div className="flex flex-col sm:flex-row gap-6 items-start">
+                    <div className="flex flex-col items-center min-w-[110px] bg-[var(--bg-3)] rounded-xl p-4 border border-[var(--border)]">
+                      <span className="text-5xl font-bold text-yellow-500 leading-none">
+                        {data.storeRating?.toFixed(1) ?? "—"}
+                      </span>
+                      <span className="text-xs text-[var(--text-muted)] mt-1">dari 5</span>
+                      <div className="mt-2">
+                        <StarDisplay rating={data.storeRating ?? 0} size={14} />
+                      </div>
+                      <span className="text-[11px] text-[var(--text-muted)] mt-1.5">
+                        {(data.totalReviews ?? 0).toLocaleString("id-ID")} ulasan
+                      </span>
+                    </div>
+
+                    {/* Breakdown per produk */}
+                    <div className="flex-1 space-y-3 w-full">
+                      <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wide mb-3">Breakdown per Produk</p>
+                      {data.productRatings.map((p: { id: string; name: string; rating: number; reviewCount: number }) => {
+                        const pct = (p.rating / 5) * 100;
+                        const ratingColor =
+                          p.rating >= 4.8 ? "text-emerald-600 dark:text-emerald-400" :
+                          p.rating >= 4.5 ? "text-yellow-600 dark:text-yellow-400" :
+                          p.rating >= 4.0 ? "text-orange-500" : "text-red-500";
+                        const barColor =
+                          p.rating >= 4.8 ? "bg-emerald-500" :
+                          p.rating >= 4.5 ? "bg-yellow-400" :
+                          p.rating >= 4.0 ? "bg-orange-400" : "bg-red-400";
+                        return (
+                          <div key={p.id} className="space-y-1">
+                            <div className="flex items-center justify-between gap-3">
+                              <p className="text-sm text-[var(--text)] truncate max-w-[260px]" title={p.name}>
+                                {p.name}
+                              </p>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className={`text-sm font-bold ${ratingColor}`}>
+                                  {p.rating.toFixed(1)}
+                                </span>
+                                <StarDisplay rating={p.rating} size={12} />
+                                <span className="text-[11px] text-[var(--text-muted)] w-20 text-right">
+                                  {p.reviewCount.toLocaleString("id-ID")} ulasan
+                                </span>
+                              </div>
+                            </div>
+                            <div className="h-1.5 bg-[var(--bg-3)] rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-700 ${barColor}`}
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      {/* Legenda warna */}
+                      <div className="flex gap-4 flex-wrap mt-2 pt-2 border-t border-[var(--border)]">
+                        {[
+                          { label: "≥ 4.8", color: "bg-emerald-500" },
+                          { label: "≥ 4.5", color: "bg-yellow-400" },
+                          { label: "≥ 4.0", color: "bg-orange-400" },
+                          { label: "< 4.0", color: "bg-red-400" },
+                        ].map(l => (
+                          <div key={l.label} className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
+                            <span className={`w-2.5 h-2.5 rounded-full ${l.color}`} />
+                            {l.label}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Chart */}
               <div className="card p-6">
