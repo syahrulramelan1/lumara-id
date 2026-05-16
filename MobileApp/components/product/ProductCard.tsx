@@ -36,7 +36,7 @@ export function ProductCard({ product, priority = false, index = 0 }: ProductCar
       animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 60, scale: 0.9 }}
       transition={{ type: "spring", stiffness: 80, damping: 14, delay }}
       whileHover={{ y: -5, transition: { type: "spring", stiffness: 400, damping: 22 } }}
-      className="group relative bg-card rounded-card overflow-hidden border border-card-border shadow-card hover:shadow-card-hover transition-shadow duration-300"
+      className="group relative bg-card rounded-card overflow-hidden border border-card-border shadow-card hover:shadow-card-hover transition-shadow duration-300 h-full"
     >
       <Link href={`/products/${product.slug}`}>
         <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-zinc-50 via-muted to-violet-50/40 dark:from-zinc-900 dark:via-zinc-800/60 dark:to-violet-950/20 ring-1 ring-inset ring-black/[0.07] dark:ring-white/[0.05]">
