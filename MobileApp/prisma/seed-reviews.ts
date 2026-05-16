@@ -7,8 +7,19 @@
  * - Auto-update rating & reviewCount di tabel products
  */
 
+import { readFileSync } from "fs";
+import { resolve } from "path";
 import { PrismaClient } from "@prisma/client";
 import { randomUUID } from "crypto";
+
+// Load .env.local secara manual agar DATABASE_URL terbaca
+try {
+  const raw = readFileSync(resolve(process.cwd(), ".env.local"), "utf-8");
+  for (const line of raw.split("\n")) {
+    const m = line.match(/^([^#=\s][^=]*)=(.*)$/);
+    if (m) process.env[m[1].trim()] = m[2].trim().replace(/^["']|["']$/g, "");
+  }
+} catch { /* file tidak ada, lanjut */ }
 
 const prisma = new PrismaClient();
 
