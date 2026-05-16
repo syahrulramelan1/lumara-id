@@ -21,9 +21,9 @@ import sharp from "sharp";
  */
 
 const VARIANTS: Record<string, { file: string; maxWidth: number }> = {
-  dark:  { file: "logo-dark.jpeg",  maxWidth: 600 },
-  white: { file: "logo-white.jpeg", maxWidth: 600 },
-  icon:  { file: "mawar-icon.jpeg", maxWidth: 200 },
+  dark:  { file: "logo-dark.jpeg",  maxWidth: 1200 },
+  white: { file: "logo-white.jpeg", maxWidth: 1200 },
+  icon:  { file: "mawar-icon.jpeg", maxWidth: 400 },
 };
 
 const CACHE = new Map<string, Buffer>();
@@ -67,8 +67,9 @@ export async function GET(
     try {
       const raw = readFileSync(path);
       const optimized = await sharp(raw)
-        .resize({ width: config.maxWidth, withoutEnlargement: true })
-        .webp({ quality: 85 })
+        .resize({ width: config.maxWidth, withoutEnlargement: true, kernel: sharp.kernel.lanczos3 })
+        .sharpen({ sigma: 0.6, flat: 1, jagged: 2 })
+        .webp({ quality: 92, effort: 6 })
         .toBuffer();
 
       CACHE.set(variant, optimized);

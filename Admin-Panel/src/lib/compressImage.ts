@@ -1,15 +1,16 @@
-/** Compress + resize image sebelum upload — cegah 413 dari Vercel (batas 4.5MB) */
+/** Compress + resize image sebelum upload — cegah 413 dari Vercel (batas 4.5MB).
+ *  maxWidth dinaikkan ke 2400 supaya gambar produk tetap tajam saat di-zoom 2x+.
+ *  quality dinaikkan ke 0.92 — beda tipis di file size tapi jauh lebih tajam.
+ */
 export async function compressImage(
   file: File,
-  maxWidth = 1200,
-  quality = 0.8,
+  maxWidth = 2400,
+  quality = 0.92,
 ): Promise<File> {
-  // Bukan gambar → lewati
   if (!file.type.startsWith("image/")) return file;
-  // Sudah kecil (<400KB) dan tidak perlu resize → lewati
-  if (file.size < 400 * 1024) return file;
+  // Sudah kecil (<800KB) dan tidak perlu resize → lewati
+  if (file.size < 800 * 1024) return file;
 
-  // PNG dengan transparansi → tetap PNG (jangan ubah ke JPEG, background jadi hitam)
   const isPng = file.type === "image/png";
 
   return new Promise((resolve) => {
@@ -31,7 +32,10 @@ export async function compressImage(
       const ctx = canvas.getContext("2d");
       if (!ctx) { resolve(file); return; }
 
-      // Untuk JPEG: isi background putih dulu supaya tidak ada artefak transparan
+      // Aktifkan high-quality interpolation untuk canvas — gambar lebih tajam
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+
       if (!isPng) {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, width, height);
@@ -44,7 +48,6 @@ export async function compressImage(
       canvas.toBlob(
         (blob) => {
           if (!blob) { resolve(file); return; }
-          // Kalau hasil kompresi malah lebih besar (gambar sudah optimal), pakai aslinya
           const result = blob.size < file.size
             ? new File([blob], file.name.replace(/\.[^.]+$/, `.${ext}`), { type: mimeType })
             : file;
