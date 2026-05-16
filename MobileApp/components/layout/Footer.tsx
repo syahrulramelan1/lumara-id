@@ -57,12 +57,12 @@ export function Footer() {
         >
           {/* Logo footer — oval jika ada custom logo, fallback teks */}
           {site.logo_white_url ? (
-            <div className="h-10 w-[120px] rounded-full overflow-hidden mb-4 bg-white/10">
+            <div className="h-10 w-[120px] rounded-full overflow-hidden mb-4 bg-white/10 flex items-center justify-center px-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={site.logo_white_url}
                 alt={site.site_name}
-                className="h-full w-full object-cover"
+                className="h-full w-auto max-w-full object-contain"
                 loading="lazy"
               />
             </div>

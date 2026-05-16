@@ -109,12 +109,12 @@ export function Navbar() {
           <Link href="/home" className="flex items-center shrink-0">
             {mounted && safeTheme === "dark" ? (
               siteSettings.logo_white_url ? (
-                <div className="h-10 w-[120px] rounded-full overflow-hidden flex items-center justify-center bg-white/5">
+                <div className="h-10 w-[120px] rounded-full overflow-hidden flex items-center justify-center bg-white/5 px-2">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={siteSettings.logo_white_url}
                     alt={siteSettings.site_name}
-                    className="h-full w-full object-cover"
+                    className="h-full w-auto max-w-full object-contain"
                     loading="eager" decoding="async"
                   />
                 </div>
@@ -124,12 +124,12 @@ export function Navbar() {
                 </span>
               )
             ) : mounted ? (
-              <div className="h-10 w-[120px] rounded-full overflow-hidden flex items-center justify-center bg-black/5">
+              <div className="h-10 w-[120px] rounded-full overflow-hidden flex items-center justify-center bg-black/5 px-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={siteSettings.logo_dark_url || "/api/logo/dark"}
                   alt={siteSettings.site_name}
-                  className="h-full w-full object-cover"
+                  className="h-full w-auto max-w-full object-contain"
                   loading="eager" decoding="async"
                 />
               </div>
