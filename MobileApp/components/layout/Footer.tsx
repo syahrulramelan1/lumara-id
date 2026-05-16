@@ -55,20 +55,6 @@ export function Footer() {
           animate={isInView1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.55, ease: EASE_OUT_EXPO }}
         >
-          {/* Logo footer — oval jika ada custom logo, fallback teks */}
-          {site.logo_white_url ? (
-            <div className="h-10 w-[120px] rounded-full overflow-hidden mb-4 bg-white/10 flex items-center justify-center px-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={site.logo_white_url}
-                alt={site.site_name}
-                className="h-full w-auto max-w-full object-contain"
-                loading="lazy"
-              />
-            </div>
-          ) : (
-            <p className="text-lg font-bold text-white mb-2">{site.site_name}</p>
-          )}
           <p className="text-sm text-white/60 leading-relaxed mb-4">{t.footer.tagline}</p>
           <SocialLinks variant="footer" />
         </motion.div>

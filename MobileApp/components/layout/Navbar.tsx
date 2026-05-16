@@ -105,36 +105,32 @@ export function Navbar() {
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
 
-          {/* Logo — link ke /home */}
-          <Link href="/home" className="flex items-center shrink-0">
+          {/* Logo — link ke /home. Light: image dark-logo. Dark: text gradient lumara.id */}
+          <Link href="/home" className="flex items-center shrink-0 h-9">
             {mounted && safeTheme === "dark" ? (
               siteSettings.logo_white_url ? (
-                <div className="h-10 w-[120px] rounded-full overflow-hidden flex items-center justify-center bg-white/5 px-2">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={siteSettings.logo_white_url}
-                    alt={siteSettings.site_name}
-                    className="h-full w-auto max-w-full object-contain"
-                    loading="eager" decoding="async"
-                  />
-                </div>
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={siteSettings.logo_white_url}
+                  alt={siteSettings.site_name}
+                  width={140} height={36} loading="eager" decoding="async"
+                  style={{ maxWidth: 140, height: 36, width: "auto" }}
+                />
               ) : (
                 <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-violet-300">
-                  {siteSettings.site_name}
+                  lumara.id
                 </span>
               )
             ) : mounted ? (
-              <div className="h-10 w-[120px] rounded-full overflow-hidden flex items-center justify-center bg-black/5 px-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={siteSettings.logo_dark_url || "/api/logo/dark"}
-                  alt={siteSettings.site_name}
-                  className="h-full w-auto max-w-full object-contain"
-                  loading="eager" decoding="async"
-                />
-              </div>
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={siteSettings.logo_dark_url || "/api/logo/dark"}
+                alt={siteSettings.site_name}
+                width={140} height={36} loading="eager" decoding="async"
+                style={{ maxWidth: 140, height: 36, width: "auto" }}
+              />
             ) : (
-              <div className="h-10 w-[120px] rounded-full bg-muted/30" />
+              <div className="h-9 w-[100px]" />
             )}
           </Link>
 
