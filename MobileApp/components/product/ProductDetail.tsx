@@ -13,6 +13,7 @@ import { useUIStore } from "@/store/uiStore";
 import { getT } from "@/lib/i18n";
 import { ProductImageZoom } from "@/components/product/ProductImageZoom";
 import { ColorSwatch } from "@/components/product/ColorSwatch";
+import { ReviewSection } from "@/components/product/ReviewSection";
 import type { ProductWithReviews } from "@/types";
 import {
   type ColorVariant,
@@ -296,31 +297,11 @@ export function ProductDetail({ product }: ProductDetailProps) {
         </div>
       </div>
 
-      {product.reviews.length > 0 && (
-        <div className="mt-12">
-          <h2 className="text-xl font-bold mb-6">{t.product.reviews_section} ({product.reviewCount})</h2>
-          <div className="space-y-4">
-            {product.reviews.map((review) => (
-              <div key={review.id} className="bg-card border border-card-border rounded-[14px] p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 bg-primary/10 text-primary rounded-full flex items-center justify-center font-bold text-sm">
-                    {review.user.name?.charAt(0) ?? "U"}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">{review.user.name}</p>
-                    <div className="flex items-center gap-0.5">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star key={i} size={10} className={i < review.rating ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground"} />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground">{review.comment}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <ReviewSection
+        reviews={product.reviews}
+        rating={product.rating}
+        reviewCount={product.reviewCount}
+      />
     </div>
   );
 }
