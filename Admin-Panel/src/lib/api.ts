@@ -63,10 +63,16 @@ export interface ApiUser {
   avatar: string | null; phone: string | null; role: string; createdAt: string;
 }
 
+export interface ProductRatingStat {
+  id: string; name: string; rating: number; reviewCount: number;
+}
+
 export interface DashboardStats {
   totalProducts: number; totalCategories: number;
   totalOrders: number; totalRevenue: number;
   pendingOrders: number; totalUsers: number;
+  storeRating: number; totalReviews: number;
+  productRatings: ProductRatingStat[];
 }
 
 // ─── Products ────────────────────────────────────────────────────────────────
