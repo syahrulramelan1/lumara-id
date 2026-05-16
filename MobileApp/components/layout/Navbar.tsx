@@ -280,29 +280,7 @@ export function Navbar() {
         ${drawerOpen ? "translate-x-0" : "translate-x-full"}`}
       >
         {/* Close button */}
-        <div className="flex items-center justify-between px-5 h-14 shrink-0">
-          {/* Drawer logo — sama pola dengan header: image (light) / text gradient (dark) */}
-          <div className="h-7 flex items-center">
-            {mounted && safeTheme === "dark" ? (
-              <span className="text-base font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-violet-300">
-                lumara.id
-              </span>
-            ) : mounted ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src="/api/logo/dark"
-                alt="Lumara.id"
-                width={110}
-                height={28}
-                loading="eager"
-                decoding="async"
-                className="h-7 w-auto object-contain"
-                style={{ maxWidth: 110 }}
-              />
-            ) : (
-              <div className="h-7 w-[80px]" />
-            )}
-          </div>
+        <div className="flex items-center justify-end px-5 h-14 shrink-0">
           <button onClick={() => setDrawerOpen(false)}
             className="p-2 hover:bg-muted rounded-full transition-colors">
             <X size={18} />
