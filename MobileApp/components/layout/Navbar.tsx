@@ -106,15 +106,15 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
 
           {/* Logo — link ke /home. Light: image dark-logo. Dark: text gradient lumara.id */}
-          <Link href="/home" className="flex items-center shrink-0 h-9">
+          <Link href="/home" className="flex items-center shrink-0 h-11">
             {mounted && safeTheme === "dark" ? (
               siteSettings.logo_white_url ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={siteSettings.logo_white_url}
                   alt={siteSettings.site_name}
-                  width={140} height={36} loading="eager" decoding="async"
-                  style={{ maxWidth: 140, height: 36, width: "auto" }}
+                  width={160} height={44} loading="eager" decoding="async"
+                  style={{ maxWidth: 160, height: 44, width: "auto" }}
                 />
               ) : (
                 <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-violet-300">
@@ -126,7 +126,7 @@ export function Navbar() {
               <img
                 src={siteSettings.logo_dark_url || "/api/logo/dark"}
                 alt={siteSettings.site_name}
-                width={140} height={36} loading="eager" decoding="async"
+                width={160} height={44} loading="eager" decoding="async"
                 style={{ maxWidth: 140, height: 36, width: "auto" }}
               />
             ) : (
