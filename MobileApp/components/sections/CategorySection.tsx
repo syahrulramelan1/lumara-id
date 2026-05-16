@@ -24,14 +24,14 @@ function CategoryCard({ cat, delay, productsLabel }: { cat: CategoryWithCount; d
           whileHover={{ scale: 1.08, y: -3 }}
           whileTap={{ scale: 0.94 }}
           transition={{ type: "spring", stiffness: 400, damping: 22 }}
-          className="relative w-full aspect-square rounded-[14px] overflow-hidden bg-primary/5 border border-card-border group-hover:border-primary/40 transition-colors duration-200"
+          className="relative w-full aspect-[3/4] rounded-[14px] overflow-hidden bg-primary/5 border border-card-border group-hover:border-primary/40 transition-colors duration-200"
         >
           {cat.image ? (
             <Image
               src={cat.image}
               alt={cat.name}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-400"
+              className="object-cover object-top group-hover:scale-105 transition-transform duration-400"
               sizes="(max-width: 640px) 30vw, 20vw"
             />
           ) : (
