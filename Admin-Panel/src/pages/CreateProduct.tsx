@@ -27,6 +27,7 @@ const CreateProduct = () => {
   });
   const [colors, setColors] = useState<ColorVariant[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   const set = (key: string, val: string | boolean) => setForm((f) => ({ ...f, [key]: val }));
   const autoSlug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -71,6 +72,7 @@ const CreateProduct = () => {
     const compressed = await Promise.all(imageFiles.map((f) => compressImage(f)));
     compressed.forEach((f) => fd.append("images", f));
     createMutation.mutate(fd);
+    imagePreviews.forEach(url => URL.revokeObjectURL(url));
   };
 
   return (
@@ -192,9 +194,67 @@ const CreateProduct = () => {
           </div>
 
           <div className="card p-6 h-fit">
-            <h3 className="font-semibold text-[var(--text)] mb-4">Foto Produk</h3>
-            <ImageUpload multiple onFilesSelect={setImageFiles} />
-            <p className="text-xs text-[var(--text-muted)] mt-2">Upload beberapa foto sekaligus. Foto pertama jadi gambar utama.</p>
+            <div className="flex items-start justify-between mb-4">
+              <h3 className="font-semibold text-[var(--text)]">Foto Produk</h3>
+              {imagePreviews.length > 1 && (
+                <span className="text-xs text-[var(--text-muted)] mt-0.5">Klik foto untuk jadikan cover</span>
+              )}
+            </div>
+            {imagePreviews.length > 0 && (
+              <div className="mb-4">
+                <div className="flex flex-wrap gap-2">
+                  {imagePreviews.map((src, i) => (
+                    <div
+                      key={i}
+                      className="relative group cursor-pointer"
+                      onClick={() => {
+                        if (i === 0) return;
+                        setImagePreviews(prev => [prev[i], ...prev.filter((_, idx) => idx !== i)]);
+                        setImageFiles(prev => [prev[i], ...prev.filter((_, idx) => idx !== i)]);
+                      }}
+                    >
+                      <img
+                        src={src}
+                        alt=""
+                        className={`w-24 h-24 object-cover rounded-lg border-2 transition-all ${
+                          i === 0
+                            ? "border-violet-500 ring-2 ring-violet-400/30"
+                            : "border-[var(--border)] hover:border-violet-300"
+                        }`}
+                      />
+                      {i === 0 ? (
+                        <div className="absolute bottom-0 left-0 right-0 bg-violet-600/90 text-white text-[10px] font-bold text-center py-0.5 rounded-b-md">
+                          ★ Cover
+                        </div>
+                      ) : (
+                        <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[9px] font-medium text-center py-0.5 rounded-b-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                          Jadikan Cover
+                        </div>
+                      )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          URL.revokeObjectURL(src);
+                          setImagePreviews(prev => prev.filter((_, idx) => idx !== i));
+                          setImageFiles(prev => prev.filter((_, idx) => idx !== i));
+                        }}
+                        className="absolute top-0.5 right-0.5 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >×</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <ImageUpload
+              multiple
+              hidePreviews
+              onFilesSelect={(files) => {
+                imagePreviews.forEach(url => URL.revokeObjectURL(url));
+                setImageFiles(files);
+                setImagePreviews(files.map(f => URL.createObjectURL(f)));
+              }}
+            />
+            <p className="text-xs text-[var(--text-muted)] mt-2">Foto pertama (cover) tampil di listing produk.</p>
           </div>
         </div>
       </div>

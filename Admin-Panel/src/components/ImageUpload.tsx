@@ -4,9 +4,10 @@ interface ImageUploadProps {
   onFileSelect?: (file: File) => void;
   multiple?: boolean;
   onFilesSelect?: (files: File[]) => void;
+  hidePreviews?: boolean;
 }
 
-const ImageUpload = ({ onFileSelect, multiple = false, onFilesSelect }: ImageUploadProps) => {
+const ImageUpload = ({ onFileSelect, multiple = false, onFilesSelect, hidePreviews = false }: ImageUploadProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [previews, setPreviews] = useState<string[]>([]);
 
@@ -48,7 +49,7 @@ const ImageUpload = ({ onFileSelect, multiple = false, onFilesSelect }: ImageUpl
         className="hidden"
         onChange={handleChange}
       />
-      {previews.length > 0 && (
+      {!hidePreviews && previews.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-3">
           {previews.map((src, i) => (
             <img key={i} src={src} alt="" className="w-20 h-20 object-cover rounded-lg border border-[var(--border)]" />

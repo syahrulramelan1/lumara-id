@@ -240,17 +240,45 @@ const EditProduct = () => {
           </div>
 
           <div className="card p-6 h-fit">
-            <h3 className="font-semibold text-[var(--text)] mb-4">Foto Produk</h3>
+            <div className="flex items-start justify-between mb-4">
+              <h3 className="font-semibold text-[var(--text)]">Foto Produk</h3>
+              {existingImages.length > 1 && (
+                <span className="text-xs text-[var(--text-muted)] mt-0.5">Klik foto untuk jadikan cover</span>
+              )}
+            </div>
             {existingImages.length > 0 && (
               <div className="mb-4">
-                <p className="text-sm text-[var(--text-muted)] mb-2">Foto saat ini:</p>
                 <div className="flex flex-wrap gap-2">
                   {existingImages.map((src, i) => (
-                    <div key={i} className="relative group">
-                      <img src={src} alt="" className="w-20 h-20 object-cover rounded-lg border border-[var(--border)]" />
+                    <div
+                      key={i}
+                      className="relative group cursor-pointer"
+                      onClick={() => {
+                        if (i === 0) return;
+                        setExistingImages(prev => [prev[i], ...prev.filter((_, idx) => idx !== i)]);
+                      }}
+                    >
+                      <img
+                        src={src}
+                        alt=""
+                        className={`w-24 h-24 object-cover rounded-lg border-2 transition-all ${
+                          i === 0
+                            ? "border-violet-500 ring-2 ring-violet-400/30"
+                            : "border-[var(--border)] hover:border-violet-300"
+                        }`}
+                      />
+                      {i === 0 ? (
+                        <div className="absolute bottom-0 left-0 right-0 bg-violet-600/90 text-white text-[10px] font-bold text-center py-0.5 rounded-b-md">
+                          ★ Cover
+                        </div>
+                      ) : (
+                        <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[9px] font-medium text-center py-0.5 rounded-b-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                          Jadikan Cover
+                        </div>
+                      )}
                       <button
-                        onClick={() => setExistingImages(prev => prev.filter((_, idx) => idx !== i))}
-                        className="absolute top-0 right-0 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={(e) => { e.stopPropagation(); setExistingImages(prev => prev.filter((_, idx) => idx !== i)); }}
+                        className="absolute top-0.5 right-0.5 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                       >×</button>
                     </div>
                   ))}
@@ -258,7 +286,7 @@ const EditProduct = () => {
               </div>
             )}
             <ImageUpload multiple onFilesSelect={setImageFiles} />
-            <p className="text-xs text-[var(--text-muted)] mt-2">Upload foto baru akan ditambahkan ke foto yang ada.</p>
+            <p className="text-xs text-[var(--text-muted)] mt-2">Upload foto baru ditambahkan setelah foto yang ada.</p>
           </div>
         </div>
       </div>
