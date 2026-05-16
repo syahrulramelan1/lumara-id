@@ -68,7 +68,7 @@ export async function GET(
       const raw = readFileSync(path);
       const optimized = await sharp(raw)
         .resize({ width: config.maxWidth, withoutEnlargement: true, kernel: sharp.kernel.lanczos3 })
-        .sharpen({ sigma: 0.6, flat: 1, jagged: 2 })
+        .sharpen(0.6, 1, 2)
         .webp({ quality: 92, effort: 6 })
         .toBuffer();
 
