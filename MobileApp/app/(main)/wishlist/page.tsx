@@ -24,11 +24,9 @@ export default function WishlistPage() {
 
     const fetchWishlistProducts = async () => {
       try {
-        const fetches = productIds.map((id) =>
-          fetch(`/api/products/${id}`).then((r) => r.json()).then((d) => d.data)
-        );
-        const results = await Promise.all(fetches);
-        setProducts(results.filter(Boolean));
+        const res = await fetch(`/api/products/batch?ids=${productIds.join(",")}`);
+        const json = await res.json();
+        setProducts(json.data ?? []);
       } finally {
         setLoading(false);
       }

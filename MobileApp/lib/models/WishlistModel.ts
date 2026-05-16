@@ -13,6 +13,7 @@ export class WishlistModel {
       where: { userId },
       include: { product: { include: { category: true } } },
       orderBy: { createdAt: "desc" },
+      take: 50,
     });
   }
 

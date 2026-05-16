@@ -69,41 +69,28 @@ export function ProductCard({ product, priority = false, index = 0 }: ProductCar
           )}
 
           {discount && (
-            <motion.span
-              initial={{ scale: 0, rotate: -15 }}
-              animate={isInView ? { scale: 1, rotate: 0 } : { scale: 0, rotate: -15 }}
-              transition={{ type: "spring", stiffness: 350, damping: 14, delay: delay + 0.15 }}
-              className="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full"
-            >
+            <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
               -{discount}%
-            </motion.span>
+            </span>
           )}
           {product.isNew && !discount && (
-            <motion.span
-              initial={{ scale: 0, rotate: -15 }}
-              animate={isInView ? { scale: 1, rotate: 0 } : { scale: 0, rotate: -15 }}
-              transition={{ type: "spring", stiffness: 350, damping: 14, delay: delay + 0.15 }}
-              className="absolute top-2 left-2 bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded-full"
-            >
+            <span className="absolute top-2 left-2 bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded-full">
               New
-            </motion.span>
+            </span>
           )}
         </div>
       </Link>
 
-      <motion.button
+      <button
         onClick={() => toggle(product.id)}
-        whileTap={{ scale: 0.75 }}
-        animate={wishlisted ? { scale: [1, 1.35, 1] } : { scale: 1 }}
-        transition={{ duration: 0.3 }}
-        className="absolute top-2 right-2 p-2 bg-white/85 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-colors"
+        className="absolute top-2 right-2 p-2 bg-white/85 backdrop-blur-sm rounded-full shadow-sm hover:bg-white active:scale-90 transition-all"
         aria-label={wishlisted ? "Hapus dari wishlist" : "Tambah ke wishlist"}
       >
         <Heart
           size={16}
           className={wishlisted ? "fill-red-500 text-red-500" : "text-muted-foreground"}
         />
-      </motion.button>
+      </button>
 
       <div className="p-3">
         <p className="text-xs text-muted-foreground mb-0.5">{product.category.name}</p>

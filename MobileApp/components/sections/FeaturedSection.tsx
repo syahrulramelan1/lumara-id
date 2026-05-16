@@ -1,6 +1,7 @@
 "use client";
+import { useRef } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { ProductGrid } from "@/components/shared/ProductGrid";
 import type { ProductWithCategory } from "@/types";
 import { useUIStore } from "@/store/uiStore";
@@ -14,17 +15,19 @@ interface FeaturedSectionProps {
 export function FeaturedSection({ products }: FeaturedSectionProps) {
   const language = useUIStore((s) => s.language);
   const t = getT(language);
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { margin: "100px" });
 
   return (
-    <section className="relative max-w-7xl mx-auto px-4 py-12 overflow-hidden">
-      {/* Blob dekoratif */}
+    <section ref={sectionRef} className="relative max-w-7xl mx-auto px-4 py-12 overflow-hidden">
+      {/* Blob dekoratif — hanya animasi saat section terlihat */}
       <motion.div
-        animate={{ y: [-10, 10, -10], scale: [1, 1.05, 1] }}
+        animate={isInView ? { y: [-10, 10, -10], scale: [1, 1.05, 1] } : false}
         transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
         className="absolute -top-16 -right-16 w-72 h-72 bg-primary/6 rounded-full blur-3xl pointer-events-none -z-10"
       />
       <motion.div
-        animate={{ y: [8, -8, 8], scale: [1.03, 1, 1.03] }}
+        animate={isInView ? { y: [8, -8, 8], scale: [1.03, 1, 1.03] } : false}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         className="absolute bottom-0 -left-20 w-56 h-56 bg-secondary/5 rounded-full blur-3xl pointer-events-none -z-10"
       />
